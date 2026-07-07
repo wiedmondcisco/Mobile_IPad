@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+/* ── iOS Surface tokens — switch when .dark is applied to the phone shell ── */
+:root,
+.dark {
+  --ios-bg:        #F2F2F7;
+  --ios-card:      #FFFFFF;
+  --ios-sep:       rgba(60,60,67,0.12);
+  --ios-fill:      rgba(120,120,128,0.12);
+  --ios-nav-bg:    rgba(255,255,255,0.88);
+
+  /* Badges */
+  --bdg-green-bg:  rgba(52,199,89,0.15);  --bdg-green-fg:  #1A7A32;
+  --bdg-blue-bg:   rgba(0,122,255,0.13);  --bdg-blue-fg:   #0055CC;
+  --bdg-gray-bg:   rgba(142,142,147,0.16);--bdg-gray-fg:   #555558;
+  --bdg-red-bg:    rgba(255,59,48,0.13);  --bdg-red-fg:    #C0392B;
+  --bdg-amber-bg:  rgba(255,149,0,0.13);  --bdg-amber-fg:  #92570A;
+  --bdg-purple-bg: rgba(175,82,222,0.13); --bdg-purple-fg: #6B2287;
+}
+
+.dark {
+  --ios-bg:        #000000;
+  --ios-card:      #1C1C1E;
+  --ios-sep:       rgba(84,84,88,0.35);
+  --ios-fill:      rgba(99,99,102,0.30);
+  --ios-nav-bg:    rgba(28,28,30,0.88);
+
+  --bdg-green-bg:  rgba(52,199,89,0.22);  --bdg-green-fg:  #30D158;
+  --bdg-blue-bg:   rgba(10,132,255,0.22); --bdg-blue-fg:   #0A84FF;
+  --bdg-gray-bg:   rgba(99,99,102,0.35);  --bdg-gray-fg:   #AEAEB2;
+  --bdg-red-bg:    rgba(255,69,58,0.22);  --bdg-red-fg:    #FF453A;
+  --bdg-amber-bg:  rgba(255,159,10,0.22); --bdg-amber-fg:  #FF9F0A;
+  --bdg-purple-bg: rgba(191,90,242,0.22); --bdg-purple-fg: #BF5AF2;
+}
