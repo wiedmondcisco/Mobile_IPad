@@ -424,6 +424,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-hero-asof{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
 .m-hero-change{font-size:11px;opacity:.85}
 
+/* Hide-amounts toggle pill (screen-share privacy). The zone adds a click-
+   absorbing buffer (padding, offset by negative margin so layout is
+   unchanged) between the button and the clickable card around it. */
+.m-hide-zone{display:inline-flex;align-items:center;flex-shrink:0;padding:8px 4px 8px 14px;margin:-8px -4px -8px 0}
+.m-hide-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;font-weight:700;line-height:1;cursor:pointer;flex-shrink:0;transition:filter .15s}
+.m-hide-btn:hover{filter:brightness(.96)}
+.m-hide-btn svg{flex-shrink:0}
+.m-hide-btn-light{background:#fff;border-color:#fff;color:#334155;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.m-hide-btn-light:hover{filter:brightness(.94)}
+.m-hero-asof .m-hide-zone{margin-left:auto}
+.m-asof-banner .m-hide-zone{margin-left:auto}
+
 /* Prev/next context strip — de-emphasized */
 .m-context-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .m-context-card{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius-sm);padding:9px 11px;display:flex;flex-direction:column;gap:2px}
@@ -1054,6 +1066,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-brand{display:flex;align-items:center;gap:10px;padding:4px 6px 2px}
 .i-brand-txt b{display:block;font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px}
 .i-brand-txt small{font-size:10px;color:var(--muted);font-weight:600}
+.i-brand-tag{font-size:11px;font-weight:600;color:var(--text-3);line-height:1.4;padding:6px 6px 0}
 .i-profile{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:13px;background:var(--bg)}
 .i-avatar{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent);flex-shrink:0}
 .i-profile-txt b{display:block;font-size:14px;font-weight:800;color:var(--text)}
@@ -1082,7 +1095,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-sidebar.closed{width:68px;padding:16px 10px}
 .i-sidebar.closed .i-brand{flex-direction:column;gap:9px;padding:2px 0 0}
 .i-sidebar.closed .i-side-collapse{margin-left:0}
-.i-sidebar.closed .i-brand-txt,.i-sidebar.closed .i-profile-txt,.i-sidebar.closed .i-viewtoggle button span,
+.i-sidebar.closed .i-brand-txt,.i-sidebar.closed .i-brand-tag,.i-sidebar.closed .i-profile-txt,.i-sidebar.closed .i-viewtoggle button span,
 .i-sidebar.closed .i-navitem span,.i-sidebar.closed .i-side-askiq span,.i-sidebar.closed .i-side-theme span{display:none}
 .i-sidebar.closed .i-profile{padding:4px;justify-content:center;background:none}
 .i-sidebar.closed .i-viewtoggle button{justify-content:center;padding:10px 0}
@@ -1104,9 +1117,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(208px,1fr));gap:14px;margin-bottom:18px;align-items:start}
 .i-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px;margin-bottom:18px;align-items:start}
 .i-col-a,.i-col-b{display:flex;flex-direction:column;gap:16px}
-.i-glance-top{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch}
-.i-glance-side{display:flex;flex-direction:column;gap:14px}
-.i-context-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* Payment timeline: Apr | May (hero) | Jun — chronological left→right */
+.i-glance-top{display:grid;grid-template-columns:1fr 1.9fr 1fr;gap:16px;margin-bottom:14px;align-items:stretch}
+.i-glance-top .m-hero{margin-bottom:0}
+.i-timeline-card{justify-content:center;gap:4px;padding:14px 16px}
+.i-timeline-card .m-context-amt{font-size:22px}
+.i-timeline-date{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
 .i-pe-donut-wrap{display:flex;justify-content:center;padding:8px 0 12px}
 .i-goaltab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .i-team-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
@@ -1167,10 +1183,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-device:not(.land) .i-page{padding:26px 26px 52px}
 .i-device:not(.land) .i-head{margin-bottom:24px}
 /* At A Glance: hero gets the full width; context + progress pair up under it */
-.i-device:not(.land) .i-glance-top{grid-template-columns:1fr;gap:16px}
-.i-device:not(.land) .i-glance-side{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
-.i-device:not(.land) .i-glance-side .m-section{height:100%;box-sizing:border-box;margin-bottom:0}
-.i-device:not(.land) .i-context-grid{grid-template-columns:1fr;gap:12px}
+.i-device:not(.land) .i-glance-top{grid-template-columns:1fr 1.7fr 1fr;gap:12px}
+.i-device:not(.land) .i-hero{padding:16px 16px 14px}
+.i-device:not(.land) .i-hero .m-hero-label{font-size:10px}
+.i-device:not(.land) .i-hero .m-hero-amt{font-size:36px;letter-spacing:-1px}
+.i-device:not(.land) .i-hero .m-hero-asof{flex-wrap:wrap}
+.i-device:not(.land) .i-timeline-card .m-context-amt{font-size:17px}
 /* Team: 2×2 stats instead of 4 squeezed across */
 .i-device:not(.land) .i-team-stats{grid-template-columns:1fr 1fr;gap:16px}
 /* Looser rhythm between blocks */

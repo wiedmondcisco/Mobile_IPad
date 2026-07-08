@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, Package, Download, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, Package, Download, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -11,6 +11,14 @@ import "./styles.css";
    ════════════════════════════════════════════════════════════════ */
 const DATA_AS_OF = "Data as of Jun 30, 2026, 2:45 PM";
 const REFRESH_NOTE = "Refreshes daily at 6:00 AM PST";
+
+/* Hide-amounts (seller privacy): when on, payment/earnings figures render
+   as dots. Module mirror avoids threading state through every amount render
+   site — safe because the whole tree re-renders from App when it flips. */
+let AMOUNTS_HIDDEN = false;
+const DOTS = "•••••";
+const amt = v => AMOUNTS_HIDDEN ? (String(v).startsWith("$") ? "$" + DOTS : DOTS) : v;
+const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, "$" + DOTS) : t;
 
 /* CompX IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
@@ -365,7 +373,7 @@ function FullScreenPopup({title, subtitle, tabs, activeTab, onTab, onClose, chil
 function FormulaStrip({weight, targetIncentive, proration, payoutRate, result}) {
   const factors = [
     {v:weight, l:"Weight"},
-    {v:targetIncentive, l:"Target Incentive"},
+    {v:amt(targetIncentive), l:"Target Incentive"},
     {v:proration, l:"Proration"},
     {v:payoutRate, l:"Payout Rate Multiplier"}
   ];
@@ -375,7 +383,7 @@ function FormulaStrip({weight, targetIncentive, proration, payoutRate, result}) 
       <div className="m-formula-factor"><b>{f.v}</b><small>{f.l}</small></div>
     </React.Fragment>)}
     <span className="m-formula-op m-formula-eq">=</span>
-    <div className="m-formula-result">{result}</div>
+    <div className="m-formula-result">{amt(result)}</div>
   </div>;
 }
 
@@ -388,6 +396,20 @@ function Expandable({title, defaultOpen=false, children}) {
     </div>
     {open && <div className="m-exp-body">{children}</div>}
   </div>;
+}
+
+/* Hide/Show pill — dots out payment figures so a seller can screen-share
+   without exposing their pay. `light` = on-gradient (hero) variant.
+   The zone wrapper absorbs clicks/Enter in a buffer around the button so a
+   near-miss inside a clickable card (hero → Payments) doesn't navigate. */
+function HideBtn({s, light=false}) {
+  const Icon = s.hideAmts ? Eye : EyeOff;
+  return <span className="m-hide-zone" onClick={e=>e.stopPropagation()} onKeyDown={e=>e.stopPropagation()}>
+    <button className={`m-hide-btn ${light?"m-hide-btn-light":""}`} aria-pressed={s.hideAmts}
+      onClick={()=>s.setHideAmts(!s.hideAmts)}>
+      <Icon size={13}/> {s.hideAmts ? "Show" : "Hide"}
+    </button>
+  </span>;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -430,11 +452,11 @@ function AtAGlancePage({s}) {
         <span className={`m-pay-status m-status-${hero.status.toLowerCase()}`}>{hero.status}</span>
       </div>
       <div className="m-hero-amt-row">
-        <span className="m-hero-amt">${hero.amount}</span>
+        <span className="m-hero-amt">{amt("$"+hero.amount)}</span>
         <span className="m-hero-usd">USD</span>
       </div>
       <div className="m-hero-meta">
-        <span className="m-hero-asof"><Calendar size={11}/> {DATA_AS_OF}</span>
+        <span className="m-hero-asof"><Calendar size={11}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
         <span className="m-hero-change">{hero.change} vs Apr · {hero.payDate}</span>
       </div>
     </div>
@@ -443,7 +465,7 @@ function AtAGlancePage({s}) {
     <div className="m-context-strip">
       {context.map((c,i)=><div key={i} className="m-context-card">
         <span className="m-context-month">{c.month}</span>
-        <b className="m-context-amt">${c.amount}</b>
+        <b className="m-context-amt">{amt("$"+c.amount)}</b>
         <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
       </div>)}
     </div>
@@ -479,7 +501,7 @@ function AtAGlancePage({s}) {
       {spiffBonus.map((s,i)=><div key={i} className="m-spiff-card">
         <div className="m-spiff-top">
           <span className="m-spiff-status" style={{color:s.statusColor, borderColor:s.statusColor}}>{s.status}</span>
-          <b className="m-spiff-amt" style={{color:s.statusColor}}>{s.amount}</b>
+          <b className="m-spiff-amt" style={{color:s.statusColor}}>{amt(s.amount)}</b>
         </div>
         <b className="m-spiff-name">{s.name}</b>
         <span className="m-spiff-sub">{s.sub}</span>
@@ -500,7 +522,7 @@ function AtAGlancePage({s}) {
           <span className="m-insight-tag" style={{color:c.tagColor}}>{c.tag}</span>
         </div>
         <b className="m-insight-title">{c.title}</b>
-        <p className="m-insight-desc">{c.desc}</p>
+        <p className="m-insight-desc">{maskText(c.desc)}</p>
       </div>)}
     </div>
   </div>;
@@ -514,7 +536,7 @@ function PeriodChips({s}) {
   return <div className="m-period-scroll">
     {fullPaymentPeriods.map((pr,i)=><div key={i} className={`m-period-item ${i===s.periodIdx?"m-period-active":""}`} onClick={()=>s.setPeriodIdx(i)}>
       <span className="m-period-month">{pr.month}</span>
-      <b className="m-period-amt">${pr.amount}</b>
+      <b className="m-period-amt">{amt("$"+pr.amount)}</b>
       <span className={`m-pay-status m-status-${pr.status.toLowerCase()}`}>{pr.status}</span>
     </div>)}
   </div>;
@@ -526,7 +548,7 @@ function PaymentBreakdownCard({p, donutSize=180}) {
   return <div className="m-section">
     <div className="m-section-hdr"><h2>Payment Breakdown</h2><span className={`m-pay-status m-status-${p.status.toLowerCase()}`}>{p.status}</span></div>
     <div className="m-donut-hero">
-      <SegmentDonut items={donutItems} total={total} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={`$${p.amount}`} centerSub={p.month} interactive/>
+      <SegmentDonut items={donutItems} total={total} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={amt(`$${p.amount}`)} centerSub={p.month} interactive/>
     </div>
     <div className="m-leg2-list">
       {donutItems.map((d,i)=>{
@@ -534,7 +556,7 @@ function PaymentBreakdownCard({p, donutSize=180}) {
         return <div key={i} className="m-leg2" style={{borderLeftColor:d.color}}>
           <span className="m-leg2-badge" style={{background:d.color}}>{pct}%</span>
           <span className="m-leg2-label">{d.label}</span>
-          <b className="m-leg2-val">${d.value.toLocaleString(undefined,{minimumFractionDigits:2})}</b>
+          <b className="m-leg2-val">{amt("$"+d.value.toLocaleString(undefined,{minimumFractionDigits:2}))}</b>
         </div>;
       })}
     </div>
@@ -582,7 +604,7 @@ function PaymentAccordion({p, s}) {
     <div className="m-pb-hdr" onClick={()=>toggle(sec.key)}>
       <ChevronRight size={14} className={`m-pb-chev ${expanded[sec.key]?"open":""}`}/>
       <div className="m-pb-hdr-text"><b>{sec.label}</b>{sec.period && <small>{sec.period}</small>}</div>
-      <b className="m-pb-amt">{sec.amount}</b>
+      <b className="m-pb-amt">{amt(sec.amount)}</b>
     </div>
 
     {expanded[sec.key] && sec.key==="goalSheet" && <div className="m-pb-body">
@@ -602,7 +624,7 @@ function PaymentAccordion({p, s}) {
           </>}
           <div className="m-pb-pe-actions">
             <span className={`m-pb-pe-payout-link ${item.calc?"":"m-no-link"}`} onClick={()=>item.calc && onOpenCalc(item)}>
-              ${item.payout}
+              {amt("$"+item.payout)}
             </span>
             {item.calc && <button className="m-pb-pe-pdf" aria-label="Payment statement" onClick={()=>onOpenPdf(item)}>
               <FileText size={14}/>
@@ -614,7 +636,7 @@ function PaymentAccordion({p, s}) {
 
     {expanded[sec.key] && sec.key!=="goalSheet" && <div className="m-pb-body">
       {p[sec.key].items.length>0 ? p[sec.key].items.map((item,j)=><div key={j} className="m-pb-detail-row">
-        <span>{item.name}</span><b>{item.amount}</b>
+        <span>{item.name}</span><b>{amt(item.amount)}</b>
       </div>) : <div className="m-pb-empty">No items this period.</div>}
     </div>}
   </div>)}</>;
@@ -624,7 +646,7 @@ function PaymentsPage({s}) {
   const p = fullPaymentPeriods[s.periodIdx];
   return <div className="m-page">
     <h1 className="m-page-title">Payments</h1>
-    <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div></div>
+    <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
     <PeriodChips s={s}/>
     <PaymentBreakdownCard p={p}/>
     <PaymentScheduleCard p={p}/>
@@ -651,7 +673,7 @@ function CompCalcPopup({item, month, onClose}) {
     <div className="m-calc-badge-row"><PePill pe={item.pe} label={item.label} color={item.color}/></div>
 
     {tab==="Payment Calculation" && <>
-      <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {item.pe} is <b>{c.result}</b>.</p>
+      <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {item.pe} is <b>{amt(c.result)}</b>.</p>
 
       <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result}/>
 
@@ -674,7 +696,7 @@ function CompCalcPopup({item, month, onClose}) {
       </Expandable>
 
       <Expandable title="What is my Total Payment against this Plan?">
-        <p className="m-exp-text">Based on your total attainment of <b>{c.totalAtt}</b> of your goal, your incentive payment for {item.pe} is <b>{c.result}</b>.</p>
+        <p className="m-exp-text">Based on your total attainment of <b>{c.totalAtt}</b> of your goal, your incentive payment for {item.pe} is <b>{amt(c.result)}</b>.</p>
         <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result}/>
         <p className="m-rate-name">Payout Rate Table</p>
         <div className="m-rate-scroll">
@@ -692,10 +714,10 @@ function CompCalcPopup({item, month, onClose}) {
       <p className="m-calc-summary">Your Target Incentive is your annual variable comp target, weighted to {item.pe} and prorated for the goal period.</p>
       <div className="m-calc-formula-card">
         <div className="m-calc-rows" style={{width:"100%"}}>
-          <div className="m-calc-row"><span>Annual Target Incentive</span><b>{c.targetIncentive}</b></div>
+          <div className="m-calc-row"><span>Annual Target Incentive</span><b>{amt(c.targetIncentive)}</b></div>
           <div className="m-calc-row"><span>Plan Weight</span><b>{c.weight}</b></div>
           <div className="m-calc-row"><span>Proration</span><b>{c.proration}</b></div>
-          <div className="m-calc-row m-calc-total"><span>Weighted TI (this period)</span><b>{c.result}</b></div>
+          <div className="m-calc-row m-calc-total"><span>Weighted TI (this period)</span><b>{amt(c.result)}</b></div>
         </div>
       </div>
     </>}
@@ -760,7 +782,7 @@ function CompUpliftSection({s}) {
         <b className="m-uplift-name">{p.name}</b>
         <b className="m-uplift-pct">{p.pct}%</b>
       </div>
-      <span className="m-uplift-sub">{p.earned} of {UPLIFT_GOAL} goal</span>
+      <span className="m-uplift-sub">{amt(p.earned)} of {UPLIFT_GOAL} goal</span>
       <div className="m-uplift-bar">
         <div className="m-uplift-track"><div className="m-uplift-fill" style={{width:Math.max(p.pct,0.6)+"%"}}/></div>
         <div className="m-uplift-100"><span>100%</span></div>
@@ -822,7 +844,7 @@ function KsoSection() {
             <span className="m-kso-cap">Achievement Cap: <b>{qt.cap}</b></span>
           </div>
           <div className="m-kso-hdr-right">
-            <div className="m-kso-bonus-blk"><small>{qt.bonusLabel}</small><b>{qt.bonus}</b></div>
+            <div className="m-kso-bonus-blk"><small>{qt.bonusLabel}</small><b>{amt(qt.bonus)}</b></div>
             <div className="m-kso-date"><b>{qt.date}</b><span>{qt.dateLabel}</span></div>
           </div>
         </div>
@@ -830,7 +852,7 @@ function KsoSection() {
           const tone = KSO_TONE[r.tone];
           return <div key={i} className="m-kso-row">
             <div className="m-kso-cell-name"><b>{r.name}</b><span className="m-kso-row-desc">{r.desc}</span></div>
-            <div className="m-kso-fig"><small>{qt.bonusLabel}</small><b>{r.bonus}</b></div>
+            <div className="m-kso-fig"><small>{qt.bonusLabel}</small><b>{amt(r.bonus)}</b></div>
             <div className="m-kso-fig"><small>KSO Weight</small><b>{r.weight}</b></div>
             <div className="m-kso-prog">
               <span className="m-kso-prog-lbl">{r.prog}</span>
@@ -1013,7 +1035,7 @@ function GoalsPage({s}) {
       <div className="m-goal-stats">
         <div><small>Goal</small><span>{g.goal}</span></div>
         <div><small>Attainment</small><span style={{color:g.color}}>{g.attPct}%</span></div>
-        <div><small>Incentive</small><span className="m-goal-earn">{g.incentive}</span></div>
+        <div><small>Incentive</small><span className="m-goal-earn">{amt(g.incentive)}</span></div>
       </div>
     </div>
 
@@ -1039,7 +1061,7 @@ function GoalSheetPopup({onClose}) {
   return <FullScreenPopup title="Goal Sheet" onClose={onClose}>
     <div className="m-gs-meta">
       <div><small>Goaling Period</small><b>{goalSheetExample.period}</b></div>
-      <div><small>Target Incentive</small><b>{goalSheetExample.target}</b></div>
+      <div><small>Target Incentive</small><b>{amt(goalSheetExample.target)}</b></div>
     </div>
     {goalSheetExample.rows.map((r,i)=><div key={i} className="m-gs-row">
       <div className="m-gs-row-top">
@@ -1449,7 +1471,7 @@ const histRow = (member, pi, pe) => {
   const {f,w} = HIST_PE[pe];
   return {earned:Math.round(e*w), target:Math.round(t*w), book:Math.round(b*f), goal:g, att:+Math.min(125, a*f).toFixed(1)};
 };
-const fmtUsd = n => "$" + n.toLocaleString("en-US");
+const fmtUsd = n => amt("$" + n.toLocaleString("en-US"));
 const histTier = a => a >= 100 ? "#16a34a" : a >= 70 ? "#d97706" : "#dc2626";
 
 function HistSingle({s}) {
@@ -1695,6 +1717,8 @@ function useCompXState() {
   const [histPeriods, setHistPeriods] = useState([...HIST_PERIODS]);
   const [histPe, setHistPe] = useState("PE1");
   const [sideCollapsed, setSideCollapsed] = useState(false);        // iPad sidebar rail mode
+  const [hideAmts, setHideAmts] = useState(false);                  // dot out payment figures (privacy)
+  AMOUNTS_HIDDEN = hideAmts;
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -1712,7 +1736,7 @@ function useCompXState() {
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
     histCmpMember, setHistCmpMember, histPeriods, setHistPeriods, histPe, setHistPe,
-    sideCollapsed, setSideCollapsed,
+    sideCollapsed, setSideCollapsed, hideAmts, setHideAmts,
     currentMonth: fullPaymentPeriods[0].month
   };
 }
@@ -1866,38 +1890,36 @@ function IPadHeader({title, sub, s, right}) {
 }
 
 function IPadGlance({s}) {
-  const hero = monthlyPayCards.find(c=>c.current);
-  const context = monthlyPayCards.filter(c=>!c.current);
   return <div className="i-page">
     <IPadHeader title="At A Glance" sub="Your compensation snapshot · H1 2026" s={s}/>
+    {/* Payment timeline — cards read chronologically left→right (Apr · May · Jun),
+        with the current month as the dominant hero in the middle */}
     <div className="i-glance-top">
-      <div className="m-hero i-hero" role="button" tabIndex={0} title="View Payments"
-        onClick={()=>s.setTab("payments")} onKeyDown={e=>e.key==="Enter"&&s.setTab("payments")}>
-        <div className="m-hero-top">
-          <span className="m-hero-label">Current Payment · {hero.month}</span>
-          <span className={`m-pay-status m-status-${hero.status.toLowerCase()}`}>{hero.status}</span>
-        </div>
-        <div className="m-hero-amt-row"><span className="m-hero-amt">${hero.amount}</span><span className="m-hero-usd">USD</span></div>
-        <div className="m-hero-meta">
-          <span className="m-hero-asof"><Calendar size={12}/> {DATA_AS_OF}</span>
-          <span className="m-hero-change">{hero.change} vs Apr · {hero.payDate}</span>
-        </div>
-      </div>
-      <div className="i-glance-side">
-        <div className="i-context-grid">
-          {context.map((c,i)=><div key={i} className="m-context-card">
+      {monthlyPayCards.map((c,i)=> c.current
+        ? <div key={i} className="m-hero i-hero" role="button" tabIndex={0} title="View Payments"
+            onClick={()=>s.setTab("payments")} onKeyDown={e=>e.key==="Enter"&&s.setTab("payments")}>
+            <div className="m-hero-top">
+              <span className="m-hero-label">Current Payment · {c.month}</span>
+              <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+            </div>
+            <div className="m-hero-amt-row"><span className="m-hero-amt">{amt("$"+c.amount)}</span><span className="m-hero-usd">USD</span></div>
+            <div className="m-hero-meta">
+              <span className="m-hero-asof"><Calendar size={12}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
+              <span className="m-hero-change">{c.change} vs Apr · {c.payDate}</span>
+            </div>
+          </div>
+        : <div key={i} className="m-context-card i-timeline-card">
             <span className="m-context-month">{c.month}</span>
-            <b className="m-context-amt">${c.amount}</b>
+            <b className="m-context-amt">{amt("$"+c.amount)}</b>
             <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+            <small className="i-timeline-date">{c.payDate}</small>
           </div>)}
-        </div>
-        <div className="m-section">
-          <div className="m-section-hdr"><h2>Goaling Period Progress</h2><span className="m-badge">H1 2026</span></div>
-          <div className="m-gp-row"><span>Jan 1 – Jun 30, 2026</span><b>76%</b></div>
-          <div className="m-att-bar-wrap"><div className="m-att-bar" style={{width:"76%"}}></div></div>
-          <small className="m-gp-days">138 of 181 days elapsed</small>
-        </div>
-      </div>
+    </div>
+    <div className="m-section">
+      <div className="m-section-hdr"><h2>Goaling Period Progress</h2><span className="m-badge">H1 2026</span></div>
+      <div className="m-gp-row"><span>Jan 1 – Jun 30, 2026</span><b>76%</b></div>
+      <div className="m-att-bar-wrap"><div className="m-att-bar" style={{width:"76%"}}></div></div>
+      <small className="m-gp-days">138 of 181 days elapsed</small>
     </div>
 
     <div className="m-section-label"><span className="m-section-icon">⁘</span> PLAN ELEMENTS & INCENTIVES</div>
@@ -1916,7 +1938,7 @@ function IPadGlance({s}) {
       <div className="m-section">
         <div className="m-section-hdr"><h2>SPIFF & BONUS</h2></div>
         {spiffBonus.map((sp,i)=><div key={i} className="m-spiff-card">
-          <div className="m-spiff-top"><span className="m-spiff-status" style={{color:sp.statusColor, borderColor:sp.statusColor}}>{sp.status}</span><b className="m-spiff-amt" style={{color:sp.statusColor}}>{sp.amount}</b></div>
+          <div className="m-spiff-top"><span className="m-spiff-status" style={{color:sp.statusColor, borderColor:sp.statusColor}}>{sp.status}</span><b className="m-spiff-amt" style={{color:sp.statusColor}}>{amt(sp.amount)}</b></div>
           <b className="m-spiff-name">{sp.name}</b><span className="m-spiff-sub">{sp.sub}</span>
           {sp.pct<100 && <div className="m-spiff-bar-wrap"><div className="m-spiff-bar" style={{width:sp.pct+"%", background:sp.statusColor}}></div>{sp.prog && <span className="m-spiff-prog">{sp.prog}</span>}</div>}
           <small className="m-spiff-date">{sp.date}</small>
@@ -1926,7 +1948,7 @@ function IPadGlance({s}) {
         <div className="m-section-hdr"><h2>Insights</h2></div>
         {insightCards.map((c,i)=><div key={i} className="m-insight-card">
           <div className="m-insight-top"><span className="m-insight-badge" style={{color:c.peColor, borderColor:c.peColor}}>{c.peBadge}</span><span className="m-insight-tag" style={{color:c.tagColor}}>{c.tag}</span></div>
-          <b className="m-insight-title">{c.title}</b><p className="m-insight-desc">{c.desc}</p>
+          <b className="m-insight-title">{c.title}</b><p className="m-insight-desc">{maskText(c.desc)}</p>
         </div>)}
       </div>
     </div>
@@ -1936,7 +1958,7 @@ function IPadGlance({s}) {
 function IPadPayments({s}) {
   const p = fullPaymentPeriods[s.periodIdx];
   return <div className="i-page">
-    <IPadHeader title="Payments" sub={`${DATA_AS_OF} · ${REFRESH_NOTE}`} s={s}/>
+    <IPadHeader title="Payments" sub={`${DATA_AS_OF} · ${REFRESH_NOTE}`} s={s} right={<HideBtn s={s}/>}/>
     <PeriodChips s={s}/>
     <div className="i-split">
       <div className="i-col-a">
@@ -1970,7 +1992,7 @@ function IPadGoals({s}) {
           <div className="m-goal-stats">
             <div><small>Goal</small><span>{g.goal}</span></div>
             <div><small>Attainment</small><span style={{color:g.color}}>{g.attPct}%</span></div>
-            <div><small>Incentive</small><span className="m-goal-earn">{g.incentive}</span></div>
+            <div><small>Incentive</small><span className="m-goal-earn">{amt(g.incentive)}</span></div>
           </div>
         </div>
       </div>
@@ -2107,6 +2129,7 @@ function IPadFrame({s, landscape=false}) {
               {s.sideCollapsed ? <ChevronRight size={16}/> : <ChevronLeft size={16}/>}
             </button>
           </div>
+          <p className="i-brand-tag">Your source for compensation information</p>
           <div className="i-profile" title="Alex Johnson · Enterprise AE">
             <img src="https://randomuser.me/api/portraits/men/32.jpg" className="i-avatar" alt=""/>
             <div className="i-profile-txt"><b>Hi Alex!</b><small>Enterprise AE</small></div>
