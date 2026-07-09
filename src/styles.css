@@ -290,12 +290,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* hover tooltips on the goal-sheet attainment bars */
 /* hover tooltips: pinned over the bar's empty right side, one compact row —
    fixed in place so they never cover the row's labels or amounts */
-.m-pbtips{position:absolute;top:50%;right:12px;transform:translateY(-50%);display:flex;align-items:center;gap:4px;z-index:8;pointer-events:none}
-.m-pbtip{white-space:nowrap;font-size:9px;font-weight:700;color:#fff;padding:3px 7px;border-radius:6px;box-shadow:0 5px 14px rgba(0,0,0,.3)}
+.m-pbtips{position:absolute;top:50%;right:10px;transform:translateY(-50%);display:flex;align-items:center;gap:3px;z-index:8;pointer-events:none}
+.m-pbtip{white-space:nowrap;font-size:8px;font-weight:700;color:#fff;padding:2px 5px;border-radius:5px;box-shadow:0 4px 10px rgba(0,0,0,.28)}
 .m-pbtip-rev{background:#0f7a4d}
 .m-pbtip-chg{background:#1e40af}
-.m-pb-pe-bar-track{height:8px;background:var(--track);border-radius:4px;overflow:hidden;border:2px solid var(--border)}
-.m-pb-pe-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.m-pb-pe-bar-track{display:flex;height:8px;background:var(--track);border-radius:4px;overflow:hidden;border:2px solid var(--border)}
+.m-pb-pe-bar-fill{height:100%;background:var(--green);transition:width .4s ease}
+.m-pb-pe-bar-chg{height:100%;background:#3b82f6;transition:width .4s ease}
 .m-pb-pe-bar-marker{position:absolute;top:-1px;width:2px;height:10px;background:var(--text);border-radius:1px}
 .m-pb-pe-stats{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
 .m-pb-pe-att{font-size:12.5px;color:var(--text)}
@@ -506,6 +507,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pe-flat .m-pe-legend{font-size:11.5px;font-weight:600;gap:6px 14px;flex-wrap:wrap}
 .m-pe-flat .m-pe-legend .m-dot{width:9px;height:9px}
 
+/* Goals page solo card — Backlog Insights removed, so the remaining card
+   scales up (padding, stat, bar, footer stats) to fill the freed space */
+.m-pe-solo{padding:20px 18px}
+.m-pe-solo .m-pe-left b{font-size:16px}
+.m-pe-solo .m-pe-badge{font-size:11px;padding:4px 9px}
+.m-pe-solo .m-pe-goal{font-size:13px}
+.m-pe-solo .m-pe-att-row{margin:16px 0 4px}
+.m-pe-solo .m-pe-att-big{font-size:46px}
+.m-pe-solo .m-pe-att-lbl{font-size:11.5px}
+.m-pe-solo .m-pe-bar-section{margin-top:20px}
+.m-pe-solo .m-pe-book-row{font-size:13.5px;margin-bottom:10px}
+.m-pe-solo .m-pe-bar-track{height:20px;border-radius:10px;margin-bottom:10px}
+.m-pe-solo .m-pe-bar-bookings{border-radius:10px}
+.m-pe-solo .m-pe-bar-100{top:-7px;bottom:-7px}
+.m-pe-solo .m-pe-legend{font-size:12.5px;gap:8px 16px}
+.m-pe-solo .m-pe-legend .m-dot{width:10px;height:10px}
+.m-pe-solo .m-goal-stats{margin-top:18px;padding-top:16px;gap:10px}
+.m-pe-solo .m-goal-stats small{font-size:10.5px}
+.m-pe-solo .m-goal-stats span{font-size:21px}
+.m-pe-solo .m-section-hdr h2{font-size:15px}
+
+/* iPad Goals split — two cards stretch to equal height now that the
+   Backlog Insights card is gone */
+.i-split.i-goals-split{align-items:stretch}
+.i-goals-split .i-col-a>.m-section,
+.i-goals-split .i-col-b>.m-section{flex:1}
+/* iPad columns are narrower than the phone card, so footer $ values need a
+   smaller size to fit; the hero stat and padding grow to use the freed room */
+.i-page .m-pe-solo{padding:26px 24px}
+.i-page .m-pe-solo .m-pe-att-big{font-size:58px}
+.i-page .m-pe-solo .m-pe-att-row{margin:20px 0 6px}
+.i-page .m-pe-solo .m-goal-stats{margin-top:22px;padding-top:18px}
+.i-page .m-pe-solo .m-goal-stats span{font-size:17px}
+
 /* ─── DATA-AS-OF BANNER (Payments) ─── */
 .m-asof-banner{display:flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(4,159,217,.18);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;font-size:11px;font-weight:600;color:var(--accent-dark)}
 .m-asof-banner svg{color:var(--accent);flex-shrink:0}
@@ -692,11 +727,76 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-page .m-kso-cell-name{grid-column:auto}
 .i-page .m-kso-prog{grid-column:auto}
 
-/* Backlog mini list */
-.m-backlog-mini{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--divider)}
-.m-backlog-mini:last-child{border-bottom:none}
-.m-backlog-cust{flex:1;font-size:13px;font-weight:600;color:var(--text)}
-.m-backlog-amt{font-size:14px;font-weight:800;color:var(--text)}
+/* ─── BACKLOG INSIGHTS ─── */
+.m-blg-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch}
+.m-blg-chips::-webkit-scrollbar{display:none}
+.m-blg-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:96px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;text-align:left;transition:all .15s}
+.m-blg-chip small{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.m-blg-chip b{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+.m-blg-chip span{font-size:9.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.m-blg-chip.on{border-color:var(--accent);background:var(--accent-light);box-shadow:0 3px 10px rgba(4,159,217,.15)}
+.m-blg-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--accent-light);border:1px solid rgba(4,159,217,.18);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;font-size:11px;font-weight:600;color:var(--accent-dark)}
+.m-blg-summary b{font-size:12.5px;font-weight:800;white-space:nowrap}
+.m-blg-card{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);cursor:pointer}
+.m-blg-card:active{transform:scale(.995)}
+.m-blg-top{display:flex;align-items:center;gap:10px}
+.m-blg-who{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+.m-blg-who b{font-size:13.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-blg-who small{font-size:10px;color:var(--muted);font-weight:600}
+.m-blg-amt{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.m-blg-amt b{font-size:15px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+.m-blg-amt small{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-blg-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:11px;font-weight:700}
+.m-blg-pay{color:var(--text-2);font-weight:600}
+.m-blg-details{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;border-top:1px solid var(--divider);margin-top:10px;padding-top:10px}
+.m-blg-details div{display:flex;flex-direction:column;gap:1px}
+.m-blg-details small{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
+.m-blg-details b{font-size:12.5px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.i-main .m-blg-card{margin-bottom:0;min-width:0}   /* grid item: allow shrink below content min-width */
+.i-page .m-blg-chips{flex-wrap:wrap;overflow-x:visible}   /* iPad: all buckets visible, no scroll */
+
+/* ─── PAY ESTIMATOR ─── */
+.m-est-card{padding:16px 15px}
+.m-est-stats{margin-top:12px;padding-top:0;border-top:none}
+.m-est-inputs{display:flex;gap:10px;margin-top:12px}
+.m-est-input{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.m-est-input small{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-est-field{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:10px;background:var(--card-2);padding:8px 10px}
+.m-est-field span{font-size:12px;font-weight:800;color:var(--muted)}
+.m-est-field input{flex:1;min-width:0;border:none;background:none;color:var(--text);font-size:13.5px;font-weight:800;outline:none;font-variant-numeric:tabular-nums}
+.m-est-field input::-webkit-inner-spin-button,.m-est-field input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.m-est-extra{display:flex;align-items:center;border:1px solid var(--divider);border-radius:10px;background:var(--track);padding:8px 10px;font-size:13.5px;font-weight:900;color:var(--green);min-height:37px;font-variant-numeric:tabular-nums}
+.m-est-slider{width:100%;margin-top:14px;accent-color:var(--accent)}
+.m-est-slider-lbls{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted);font-weight:600;margin-top:2px}
+.m-est-slider-lbls b{color:var(--amber);font-size:11px;font-weight:800}
+.m-est-chart{margin-top:12px}
+.m-est-bars{display:flex;align-items:flex-end;gap:2px;height:92px}
+.m-est-bar{flex:1;background:var(--track);border-radius:2px 2px 0 0;transition:height .25s ease, background .25s ease}
+.m-est-bar.add{background:var(--amber)}
+.m-est-axis{display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);font-weight:600;margin-top:4px}
+.m-est-rt{margin-top:12px}
+.m-est-rt-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--card);color:var(--accent);font-size:11.5px;font-weight:800;padding:7px 14px;border-radius:16px;cursor:pointer}
+.m-est-table{margin-top:10px;border-top:1px solid var(--divider);padding-top:6px}
+.m-est-tr{display:grid;grid-template-columns:1.2fr .8fr 1fr .8fr;gap:6px;padding:6px 0;font-size:11px;font-weight:600;color:var(--text-2);border-bottom:1px solid var(--divider);align-items:center;font-variant-numeric:tabular-nums}
+.m-est-tr:last-child{border-bottom:none}
+.m-est-tr.m-est-th{font-size:8.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--muted)}
+.m-est-tr.on{color:var(--accent);font-weight:800}
+.m-est-sum-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--divider);font-size:12px}
+.m-est-sum-name{flex:1;font-weight:700;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-est-sum-add{font-size:11px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.m-est-sum-add.pos{color:var(--green)}
+.m-est-sum-row b{font-size:13px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+.m-est-sum-total{display:flex;align-items:center;gap:8px;padding:12px 0 2px;font-size:12.5px;font-weight:800;color:var(--text)}
+.m-est-sum-total span:first-child{flex:1}
+.m-est-sum-total b{font-size:18px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+.i-main .m-est-card,.i-main .m-est-sum{min-width:0}
+
+/* ─── MOBILE MORE SHEET (bottom-nav overflow) ─── */
+.m-more-backdrop{position:absolute;inset:0;z-index:30}
+.m-more-sheet{position:absolute;right:10px;bottom:118px;z-index:31;display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:186px}
+.m-more-sheet button{display:flex;align-items:center;gap:10px;border:none;background:none;color:var(--text);font-size:12.5px;font-weight:700;padding:10px 12px;border-radius:10px;cursor:pointer;text-align:left}
+.m-more-sheet button:hover{background:var(--track)}
+.m-more-sheet button.on{color:var(--accent);background:var(--accent-light)}
 
 /* Goal sheet popup */
 .m-gs-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -840,6 +940,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* Attainment bar charts */
 .m-team-chart-sub{display:block;font-size:10px;color:var(--muted);margin:-4px 0 12px;font-style:italic}
+/* Chart subtitle + sort select on one row */
+.m-team-chart-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 12px}
+.m-team-chart-controls .m-team-chart-sub{margin:0;flex:1}
+.m-team-chart-controls .m-seller-sort{margin-left:0;flex-shrink:0}
 .m-abars{display:flex;flex-direction:column;gap:9px}
 .m-abar-row{display:flex;align-items:center;gap:8px}
 .m-abar-name{width:78px;flex-shrink:0;font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -886,6 +990,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* Show all / top 5 toggle */
 .m-showall{display:flex;align-items:center;justify-content:center;gap:6px;margin:2px auto 14px;border:1px solid var(--border);background:var(--card);color:var(--accent);font-size:12.5px;font-weight:800;padding:10px 20px;border-radius:20px;cursor:pointer}
 .m-showall:active{transform:scale(.97)}
+.m-showall-tight{margin:10px auto 2px}   /* variant for use inside a section card */
 .m-showall svg{transition:transform .2s}
 .m-showall svg.up{transform:rotate(180deg)}
 
@@ -1235,6 +1340,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-device:not(.land) .i-split{gap:16px;margin-bottom:22px}
 .i-device:not(.land) .i-goaltab-row{margin-bottom:22px}
 .i-device:not(.land) .m-section-label{margin-top:4px}
+
+/* ─── SPIFF & BONUS PAGE ─── */
+.m-spf-pills{display:flex;gap:8px;margin:10px 0 12px}
+.m-spf-pill{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.m-spf-pill small{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.m-spf-pill b{font-size:18px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+.m-spf-pill-paid{background:var(--accent-light)}
+.m-spf-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:9px 12px;margin-bottom:12px}
+.m-spf-filters label{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--text-2)}
+.m-spf-filters select{border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-weight:600;padding:5px 6px;border-radius:8px;max-width:104px}
+.m-spf-count{margin-left:auto;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+.m-spf-card{background:var(--card);border:1px solid var(--divider);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);cursor:pointer}
+.m-spf-card:active{transform:scale(.995)}
+.m-spf-more{margin-left:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800;color:var(--accent);flex-shrink:0}
+.m-spf-details{border-top:1px solid var(--divider);padding-top:10px;margin-top:10px}
+.m-spf-details .m-spf-desc{margin-bottom:9px}
+.m-spf-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.m-spf-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.25}
+.m-spf-proj{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.m-spf-proj b{font-size:18px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+.m-spf-proj small{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-spf-tags{display:flex;gap:6px;margin:8px 0}
+.m-spf-type{font-size:10px;font-weight:800;border-radius:6px;padding:3px 9px}
+.m-spf-status{font-size:10px;font-weight:800;border:1px solid;border-radius:6px;padding:3px 9px}
+.m-spf-desc{font-size:11.5px;color:var(--text-2);line-height:1.5;margin:0 0 10px}
+.m-spf-prog-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px}
+.m-spf-prog-row b{color:var(--text);font-size:12.5px;font-variant-numeric:tabular-nums}
+.m-spf-bar{height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.m-spf-fill{height:100%;border-radius:4px;transition:width .3s}
+.m-spf-pct{display:block;font-size:10px;color:var(--muted);margin:4px 0 0}
+.m-spf-crit{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-top:1px solid var(--divider);padding-top:9px}
+.m-spf-crit span{font-size:11px;color:var(--text-2);line-height:1.45}
+.m-spf-crit span b{color:var(--text)}
+.m-spf-crit small{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+/* iPad: stat pills sit inline in the page header; grid handles card spacing */
+.i-head .m-spf-pills{margin:0}
+.i-head .m-spf-pill{flex:none;min-width:132px;padding:8px 12px}
+.i-main .m-spf-card{margin-bottom:0}
 
 /* ─── RECOVERABLE BALANCE HISTORY ─── */
 .m-recov-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.14);color:var(--green);border:1px solid rgba(16,185,129,.35);border-radius:10px;padding:6px 11px;font-size:13px;font-weight:800;flex-shrink:0;margin-right:10px;font-variant-numeric:tabular-nums}

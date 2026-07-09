@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Gift, Calculator, MoreHorizontal } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -29,7 +29,7 @@ const botResponses = {
   "payment":"Next payment: $8,408.25 on Jun 2, 2026. Previous: $6,830 (Apr). Lock date: May 28.",
   "backlog":"$115K in backlog. Estimated additional paycheck impact: +$1,200. Orders pending fulfillment across multiple months.",
   "goal":"Goal Sheet H1: PRI $109K (50% weight), NPR $87K (30%), NPR2 $90K (20%). Total target incentive: $75,500.",
-  "spiff":"Active: FY26 Attainment Milestone 2 ($15,250 potential, 65% progress), Q4FY24 Slam Dunk with Splunk ($8,330, 75%). Projected SPIFF earnings this period: $2,125.",
+  "spiff":"Active: Q2 Cloud Migration SPIFF ($5,000 potential, 25% progress), Partner Acceleration Q2 ($3,500, 25%). Projected SPIFF earnings this period: $2,125.",
   "best":"NPR (RRA-SW) is at 71% attainment — closest to the 100% accelerator threshold. NPR2 (SEC PRD) trails at 44%.",
   "default":"I can help with: attainment, earnings, payments, accelerators, backlog, goals, or SPIFFs. What would you like to know?"
 };
@@ -57,11 +57,49 @@ const planElements = [
   {id:"PE3", name:"Services", goal:"$90k Goal", bookingsAmt:"$85k", bookingsPct:94, revenueAmt:"$40k", revenuePct:44, backlogAmt:"$45k", backlogPct:50, attPct:44, color:PE_COLOR.PE3, blColor:"#93c5fd"}
 ];
 
+/* Glance section shows the two active programs + the latest completed one;
+   the full catalog lives on the SPIFF & Bonus page (spiffPrograms). */
 const spiffBonus = [
-  {status:"Achieved", statusColor:"#10b981", name:"FY26 Attainment Milestone 1", sub:"Bonus earned", amount:"$7,560", date:"Paid Apr 16, 2026", pct:100},
-  {status:"Active", statusColor:"#3b82f6", name:"FY26 Attainment Milestone 2", sub:"$400k from 80%", amount:"$15,250", date:"Est. Jun 16, 2026", pct:65},
-  {status:"Active", statusColor:"#3b82f6", name:"Q4FY24 Slam Dunk with Splunk", sub:"Partner incentive", amount:"$8,330", date:"Est. July 2026", pct:75, prog:"3/4"}
+  {status:"Active", statusColor:"#3b82f6", name:"Q2 Cloud Migration SPIFF", sub:"Cloud deals ≥ $15K TCV", amount:"$5,000", date:"Apr 1 – Jun 30, 2026", pct:25},
+  {status:"Active", statusColor:"#3b82f6", name:"Partner Acceleration Q2", sub:"Partner-sourced bookings", amount:"$3,500", date:"Apr 1 – Jun 30, 2026", pct:25},
+  {status:"Achieved", statusColor:"#10b981", name:"FY25 H2 Attainment Milestone", sub:"Bonus earned", amount:"$7,560", date:"Paid Apr 16, 2026", pct:100}
 ];
+
+/* ── SPIFF & Bonus page — every strategic incentive program (desktop reference).
+   Projected = open programs (Active + Eligible): 5,000+12,000+3,500+4,200 = 24,700.
+   Paid YTD = FY25 H2 milestone 7,560 + Splunk 8,330 + Q2 progress paid 2,125 = 18,015. ── */
+const SPIFF_TYPE_COLOR = {SPIFF:"#049fd9", Accelerator:"#dc2626", Bonus:"#b08a1d", Uplift:"#8b5cf6"};
+const SPIFF_STATUS_COLOR = {Active:"#10b981", Eligible:"#3b82f6", Completed:"#16a34a", Expired:"#6b7280"};
+const spiffPrograms = [
+  {name:"Q2 Cloud Migration SPIFF", type:"SPIFF", status:"Active", period:"Q2 2026", projected:"$5,000", earned:"$1,250", target:"$5,000", pct:25,
+    desc:"Earn bonus for closing cloud migration deals over $15K TCV. Stackable with ARR quota.",
+    criteria:"Close 3+ cloud migration deals ≥ $15K TCV each.", dates:"Apr 1, 2026 – Jun 30, 2026"},
+  {name:"ARR 100%+ Accelerator", type:"Accelerator", status:"Eligible", period:"H1 2026", projected:"$12,000", earned:"$0", target:"$12,000", pct:0,
+    desc:"Achieve 100%+ ARR attainment to unlock 1.5× commission multiplier for the remainder of H1.",
+    criteria:"Reach 100% ARR attainment before Jun 30, 2026.", dates:"Jan 1, 2026 – Jun 30, 2026"},
+  {name:"FY25 H2 Attainment Milestone", type:"Bonus", status:"Completed", period:"FY25 H2", projected:"$7,560", earned:"$7,560", target:"$7,560", pct:100,
+    desc:"Bonus awarded for exceeding 80% combined attainment in FY25 H2.",
+    criteria:"Combined PE attainment ≥ 80% for FY25 H2.", dates:"Jul 1, 2025 – Dec 31, 2025"},
+  {name:"Partner Acceleration Q2", type:"SPIFF", status:"Active", period:"Q2 2026", projected:"$3,500", earned:"$875", target:"$3,500", pct:25,
+    desc:"Drive partner-sourced bookings to qualify for quarterly SPIFF payout. Rewards collaborative deal origination.",
+    criteria:"$60K+ partner-sourced TCV in Q2.", dates:"Apr 1, 2026 – Jun 30, 2026"},
+  {name:"Services Attach Uplift", type:"Uplift", status:"Eligible", period:"H1 2026", projected:"$4,200", earned:"$0", target:"$4,200", pct:0,
+    desc:"Earn 10% uplift on services revenue when attached to a qualifying product deal.",
+    criteria:"Attach services on 5+ product deals in H1 2026.", dates:"Jan 1, 2026 – Jun 30, 2026"},
+  {name:"Q4FY24 Slam Dunk with Splunk", type:"Bonus", status:"Expired", period:"Q4 FY24", projected:"$8,330", earned:"$8,330", target:"$8,330", pct:100,
+    desc:"Special promotion for Splunk + Cisco Security bundles in Q4 FY24.",
+    criteria:"3+ Splunk bundle deals closed in Q4 FY24.", dates:"Oct 1, 2024 – Dec 31, 2024"}
+];
+const SPIFF_PERIODS  = ["All", "Q2 2026", "H1 2026", "FY25 H2", "Q4 FY24"];
+const SPIFF_STATUSES = ["All", "Active", "Eligible", "Completed", "Expired"];
+const SPIFF_TYPES    = ["All Types", "SPIFF", "Accelerator", "Bonus", "Uplift"];
+const SPIFF_PROJECTED = "$24,700", SPIFF_PAID_YTD = "$18,015";
+function filterSpiffs(f) {
+  return spiffPrograms.filter(p =>
+    (f.period==="All" || p.period===f.period) &&
+    (f.status==="All" || p.status===f.status) &&
+    (f.type==="All Types" || p.type===f.type));
+}
 
 const insightCards = [
   {peBadge:"Prod+Services", peColor:PE_COLOR.PE1, tag:"$18K ★", tagColor:"#dc2626", title:"High Value Booking", desc:"Stargate AI ($18K) is your largest eligible booking this period. Top backlog: Cortex Financial ($23K), Helix Networks ($14K). Clearing both pushes PE1 past the 50% threshold."},
@@ -200,7 +238,7 @@ const recentPaymentPeriods = [
             {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
       {pe:"KSO", name:"Key Sales Objectives", label:"KSO", weight:"—", pct:100, payout:"2,500.00", color:PE_COLOR.KSO}
     ]},
-    spiff:{total:"2,125.00", items:[{name:"Q4FY24 Slam Dunk with Splunk", amount:"$1,625.00"},{name:"Cloud Migration Accelerator", amount:"$500.00"}]},
+    spiff:{total:"2,125.00", items:[{name:"Q2 Cloud Migration SPIFF", amount:"$1,250.00"},{name:"Partner Acceleration Q2", amount:"$875.00"}]},
     draws:{total:"50.00", items:[{name:"Monthly Incentive Payment (MIPS)", amount:"$35.00"},{name:"Recoverable Draw", amount:"$15.00"}]},
     adj:{total:"73.50", items:[{name:"ICC True-up Adjustment", amount:"$73.50"}]},
     otb:{total:"100.00", items:[{name:"Security iACV Plan", amount:"$100.00"}]},
@@ -648,6 +686,32 @@ function MobileHeader({s}) {
 /* ════════════════════════════════════════════════════════════════
    AT A GLANCE
    ════════════════════════════════════════════════════════════════ */
+/* At A Glance · SPIFF & Bonus — first 2 programs with a see-more toggle,
+   shared by the mobile and iPad pages */
+function AagSpiffSection({s}) {
+  const visible = s.aagSpiffExpanded ? spiffBonus : spiffBonus.slice(0,2);
+  return <div className="m-section">
+    <div className="m-section-hdr"><h2>SPIFF & BONUS</h2></div>
+    {visible.map((sp,i)=><div key={i} className="m-spiff-card">
+      <div className="m-spiff-top">
+        <span className="m-spiff-status" style={{color:sp.statusColor, borderColor:sp.statusColor}}>{sp.status}</span>
+        <b className="m-spiff-amt" style={{color:sp.statusColor}}>{amt(sp.amount)}</b>
+      </div>
+      <b className="m-spiff-name">{sp.name}</b>
+      <span className="m-spiff-sub">{sp.sub}</span>
+      {sp.pct < 100 && <div className="m-spiff-bar-wrap">
+        <div className="m-spiff-bar" style={{width:sp.pct+"%", background:sp.statusColor}}></div>
+        {sp.prog && <span className="m-spiff-prog">{sp.prog}</span>}
+      </div>}
+      <small className="m-spiff-date">{sp.date}</small>
+    </div>)}
+    {spiffBonus.length > 2 && <button className="m-showall m-showall-tight" onClick={()=>s.setAagSpiffExpanded(!s.aagSpiffExpanded)}>
+      {s.aagSpiffExpanded ? "Show Fewer" : `See All ${spiffBonus.length} Incentives`}
+      <ChevronDown size={14} className={s.aagSpiffExpanded?"up":""}/>
+    </button>}
+  </div>;
+}
+
 function AtAGlancePage({s}) {
   const hero = monthlyPayCards.find(c=>c.current);
   const context = monthlyPayCards.filter(c=>!c.current);
@@ -702,23 +766,8 @@ function AtAGlancePage({s}) {
       </div>)}
     </div>
 
-    {/* SPIFF & Bonus — vertical list of cards */}
-    <div className="m-section">
-      <div className="m-section-hdr"><h2>SPIFF & BONUS</h2></div>
-      {spiffBonus.map((s,i)=><div key={i} className="m-spiff-card">
-        <div className="m-spiff-top">
-          <span className="m-spiff-status" style={{color:s.statusColor, borderColor:s.statusColor}}>{s.status}</span>
-          <b className="m-spiff-amt" style={{color:s.statusColor}}>{amt(s.amount)}</b>
-        </div>
-        <b className="m-spiff-name">{s.name}</b>
-        <span className="m-spiff-sub">{s.sub}</span>
-        {s.pct < 100 && <div className="m-spiff-bar-wrap">
-          <div className="m-spiff-bar" style={{width:s.pct+"%", background:s.statusColor}}></div>
-          {s.prog && <span className="m-spiff-prog">{s.prog}</span>}
-        </div>}
-        <small className="m-spiff-date">{s.date}</small>
-      </div>)}
-    </div>
+    {/* SPIFF & Bonus — first 2 programs, expandable */}
+    <AagSpiffSection s={s}/>
 
     {/* Insights — single column, image/chart-forward; pinned via Insight Canvas */}
     <div className="m-section">
@@ -792,10 +841,17 @@ function PaymentScheduleCard({p}) {
 /* Goal-sheet attainment bar. Hover pins a compact tooltip stack to the right
    end of the bar — the emptiest spot — instead of chasing the pointer. */
 function PbAttBar({item}) {
+  /* Two-tone fill matching the desktop reference: green = attainment before
+     the recent change, blue = the change itself. Both segments share the
+     track's % scale, so total fill = pct and the blue width = attChange. */
   const attW = Math.min(item.pct, 100);
+  const chg = Math.min(item.attChange || 0, attW);
   const [hover, setHover] = useState(false);
   return <div className="m-pb-pe-bar-wrap" onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
-    <div className="m-pb-pe-bar-track"><div className="m-pb-pe-bar-fill" style={{width:attW+"%", background:item.color}}></div></div>
+    <div className="m-pb-pe-bar-track">
+      <div className="m-pb-pe-bar-fill" style={{width:(attW-chg)+"%"}}></div>
+      {chg > 0 && <div className="m-pb-pe-bar-chg" style={{width:chg+"%"}}></div>}
+    </div>
     <div className="m-pb-pe-bar-marker" style={{left:"100%"}}></div>
     {hover && <div className="m-pbtips">
       <div className="m-pbtip m-pbtip-rev">Revenue Attainment: {item.pct}%</div>
@@ -852,8 +908,7 @@ function GoalSheetItemRow({item, onOpenCalc, onOpenPdf}) {
           <span className="m-pb-pe-name">{kid.label}</span>
           <span className="m-pb-pe-payout-link" onClick={()=>onOpenCalc(kid)}>{amt("$"+kid.payout)}</span>
         </div>
-        {/* green revenue-attainment bar, matching the desktop child rows */}
-        <PbAttBar item={{...kid, color:"var(--green)"}}/>
+        <PbAttBar item={kid}/>
         <div className="m-pb-kid-stats">
           <span className="m-pb-pe-att"><b>{kid.pct}%</b> attainment</span>
           {kid.attChange > 0 && <span className="m-pb-pe-change"><ArrowUp size={10}/> +{kid.attChange}%</span>}
@@ -1089,6 +1144,335 @@ function RecovBalancePopup({onClose}) {
           </div>
         </>}
       </div>
+    </div>
+  </div>;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SPIFF & BONUS (dedicated page — desktop reference)
+   ════════════════════════════════════════════════════════════════ */
+function SpiffStatPills() {
+  return <div className="m-spf-pills">
+    <div className="m-spf-pill"><small>Projected Earnings</small><b>{amt(SPIFF_PROJECTED)}</b></div>
+    <div className="m-spf-pill m-spf-pill-paid"><small>Paid YTD</small><b>{amt(SPIFF_PAID_YTD)}</b></div>
+  </div>;
+}
+
+function SpiffFilterRow({s}) {
+  const f = s.spiffFilters;
+  const set = k => e => s.setSpiffFilters(prev=>({...prev, [k]:e.target.value}));
+  const count = filterSpiffs(f).length;
+  return <div className="m-spf-filters">
+    <label>Period: <select value={f.period} onChange={set("period")}>{SPIFF_PERIODS.map(o=><option key={o}>{o}</option>)}</select></label>
+    <label>Status: <select value={f.status} onChange={set("status")}>{SPIFF_STATUSES.map(o=><option key={o}>{o}</option>)}</select></label>
+    <label>Type: <select value={f.type} onChange={set("type")}>{SPIFF_TYPES.map(o=><option key={o}>{o}</option>)}</select></label>
+    <span className="m-spf-count">{count} incentive{count===1?"":"s"}</span>
+  </div>;
+}
+
+/* One incentive program. Collapsed keeps the essentials (name, projected,
+   chips, progress bar); tapping the card expands the description and
+   criteria fine print — same dropdown pattern as the insight cards. */
+function SpiffProgramCard({p}) {
+  const [open, setOpen] = useState(false);
+  return <div className="m-spf-card" style={{borderLeftColor:SPIFF_TYPE_COLOR[p.type]}}
+    role="button" tabIndex={0} aria-expanded={open}
+    onClick={()=>setOpen(o=>!o)}
+    onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
+    <div className="m-spf-card-top">
+      <b className="m-spf-name">{p.name}</b>
+      <div className="m-spf-proj"><b>{amt(p.projected)}</b><small>Projected Earnings</small></div>
+    </div>
+    <div className="m-spf-tags">
+      <span className="m-spf-type" style={{color:SPIFF_TYPE_COLOR[p.type], background:SPIFF_TYPE_COLOR[p.type]+"1a"}}>{p.type}</span>
+      <span className="m-spf-status" style={{color:SPIFF_STATUS_COLOR[p.status], borderColor:SPIFF_STATUS_COLOR[p.status]+"66", background:SPIFF_STATUS_COLOR[p.status]+"14"}}>{p.status}</span>
+      <span className="m-spf-more">Details <ChevronDown size={12} className={`m-insight-chev ${open?"open":""}`}/></span>
+    </div>
+    <div className="m-spf-prog-row"><span>Progress</span><b>{amt(p.earned)} / {amt(p.target)}</b></div>
+    <div className="m-spf-bar"><div className="m-spf-fill" style={{width:p.pct+"%", background:p.pct===100?"var(--green)":"var(--accent)"}}/></div>
+    <small className="m-spf-pct">{p.pct}% complete</small>
+    {open && <div className="m-spf-details">
+      <p className="m-spf-desc">{p.desc}</p>
+      <div className="m-spf-crit">
+        <span><b>Criteria:</b> {p.criteria}</span>
+        <small>{p.dates}</small>
+      </div>
+    </div>}
+  </div>;
+}
+
+function SpiffBonusPage({s}) {
+  const list = filterSpiffs(s.spiffFilters);
+  const visible = s.spiffExpanded ? list : list.slice(0,2);
+  return <div className="m-page">
+    <MobileHeader s={s}/>
+    <h1 className="m-page-title" style={{marginBottom:4}}>SPIFF & Bonus</h1>
+    <p className="m-team-sub">SPIFFs, uplifts, bonuses, and other strategic incentive programs.</p>
+    <SpiffStatPills/>
+    <SpiffFilterRow s={s}/>
+    {visible.map(p=><SpiffProgramCard key={p.name} p={p}/>)}
+    {list.length>2 && <button className="m-showall" onClick={()=>s.setSpiffExpanded(!s.spiffExpanded)}>
+      {s.spiffExpanded ? "Show Fewer" : `See All ${list.length} Incentives`}
+      <ChevronDown size={14} className={s.spiffExpanded?"up":""}/>
+    </button>}
+    {list.length===0 && <div className="m-search-empty"><Gift size={30}/><b>No incentives match</b><span>Loosen the filters to see more programs.</span></div>}
+  </div>;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BACKLOG INSIGHTS (compressed mobile take on the desktop page)
+   Orders awaiting revenue recognition. Sums stay consistent with the
+   rest of the app: bucket backlogs total $115K (PE1 $42k + PE2 $28k +
+   PE3 $45k, matching the goals bars) and est. paycheck impacts total
+   the +$1,200 the assistant quotes. Helix/Cortex rows reuse their
+   Order Search SO numbers and amounts.
+   ════════════════════════════════════════════════════════════════ */
+const backlogOrders = [
+  {id:"SO-105078", customer:"Helix Networks",   pe:"PE1", booked:"Apr 2, 2026",  bookings:"$21,000", backlog:"$14,000", revenue:"$7,000",  fulfil:"Jun 18, 2026", days:23,   pay:"Jul 2026", bucket:"Jun"},
+  {id:"SO-104650", customer:"Cortex Financial", pe:"PE1", booked:"Mar 20, 2026", bookings:"$23,000", backlog:"$23,000", revenue:"—",       fulfil:"Jul 15, 2026", days:50,   pay:"Aug 2026", bucket:"Jul"},
+  {id:"SO-104930", customer:"Apex Industries",  pe:"PE2", booked:"Apr 10, 2026", bookings:"$12,000", backlog:"$12,000", revenue:"—",       fulfil:"Jul 28, 2026", days:63,   pay:"Aug 2026", bucket:"Jul"},
+  {id:"SO-104788", customer:"GlobalNet Inc",    pe:"PE3", booked:"Mar 28, 2026", bookings:"$52,000", backlog:"$38,000", revenue:"$14,000", fulfil:"Aug 22, 2026", days:88,   pay:"Sep 2026", bucket:"Aug"},
+  {id:"SO-105102", customer:"Nova Telecom",     pe:"PE1", booked:"Apr 20, 2026", bookings:"$8,000",  backlog:"$5,000",  revenue:"$3,000",  fulfil:"Sep 10, 2026", days:107,  pay:"Oct 2026", bucket:"Sep"},
+  {id:"SO-104415", customer:"Cascade Systems",  pe:"PE2", booked:"Feb 25, 2026", bookings:"$16,000", backlog:"$16,000", revenue:"—",       fulfil:"Sep 25, 2026", days:122,  pay:"Oct 2026", bucket:"Sep"},
+  {id:"SO-104220", customer:"Orion Tech",       pe:"PE3", booked:"Feb 12, 2026", bookings:"$10,000", backlog:"$7,000",  revenue:"$3,000",  fulfil:"—",            days:null, pay:"—",        bucket:"Beyond"}
+];
+const backlogBuckets = [
+  {id:"All",    label:"Total Backlog",  amt:"$115K", orders:7, est:"+$1,200 est. paycheck", color:"var(--accent)"},
+  {id:"Jun",    label:"June 2026",      amt:"$14K",  orders:1, est:"+$145 est.",  color:"var(--green)"},
+  {id:"Jul",    label:"July 2026",      amt:"$35K",  orders:2, est:"+$365 est.",  color:"var(--green)"},
+  {id:"Aug",    label:"August 2026",    amt:"$38K",  orders:1, est:"+$395 est.",  color:"var(--amber)"},
+  {id:"Sep",    label:"September 2026", amt:"$21K",  orders:2, est:"+$220 est.",  color:"var(--red)"},
+  {id:"Beyond", label:"Beyond",         amt:"$7K",   orders:1, est:"+$75 est.",   color:"#8b5cf6", note:"Oct+ or no date"}
+];
+const daysTone = d => d==null ? "var(--muted)" : d<=90 ? "var(--green)" : d<=140 ? "var(--amber)" : "var(--red)";
+
+/* Month filter chips (horizontal scroll) — the compressed stand-in for the
+   desktop page's bucket cards; tapping filters the order list */
+function BacklogBucketChips({s}) {
+  return <div className="m-blg-chips">
+    {backlogBuckets.map(b=><button key={b.id} className={`m-blg-chip ${s.backlogFilter===b.id?"on":""}`} onClick={()=>s.setBacklogFilter(b.id)}>
+      <small>{b.label}</small>
+      <b style={{color:b.color}}>{amt(b.amt)}</b>
+      <span>{b.orders} order{b.orders===1?"":"s"}</span>
+    </button>)}
+  </div>;
+}
+
+/* Selected bucket's est. paycheck impact, in the data-banner style */
+function BacklogSummaryStrip({s}) {
+  const b = backlogBuckets.find(x=>x.id===s.backlogFilter);
+  return <div className="m-blg-summary">
+    <span>{b.id==="All" ? "All periods" : b.label}{b.note ? ` · ${b.note}` : ""} · {b.orders} order{b.orders===1?"":"s"}</span>
+    <b>{maskText(b.est)}</b>
+  </div>;
+}
+
+/* One backlog order — collapsed to customer/SO/backlog/payment month;
+   tapping expands the remaining desktop-table fields */
+function BacklogOrderCard({o}) {
+  const [open, setOpen] = useState(false);
+  return <div className="m-blg-card" role="button" tabIndex={0} aria-expanded={open}
+    onClick={()=>setOpen(v=>!v)}
+    onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(v=>!v); } }}>
+    <div className="m-blg-top">
+      <span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>
+      <div className="m-blg-who"><b>{o.customer}</b><small>{o.id}</small></div>
+      <div className="m-blg-amt"><b>{amt(o.backlog)}</b><small>Backlog</small></div>
+      <ChevronDown size={14} className={`m-insight-chev ${open?"open":""}`}/>
+    </div>
+    <div className="m-blg-meta">
+      <span style={{color:daysTone(o.days)}}>{o.days==null ? "No fulfilment date" : `${o.days}d to fulfilment`}</span>
+      <span className="m-blg-pay">{o.pay==="—" ? "Payment TBD" : `Est. pay ${o.pay}`}</span>
+    </div>
+    {open && <div className="m-blg-details">
+      <div><small>Bookings</small><b>{amt(o.bookings)}</b></div>
+      <div><small>Revenue</small><b>{amt(o.revenue)}</b></div>
+      <div><small>Comp Book Date</small><b>{o.booked}</b></div>
+      <div><small>Expected Fulfilment</small><b>{o.fulfil}</b></div>
+    </div>}
+  </div>;
+}
+
+function BacklogPage({s}) {
+  const list = s.backlogFilter==="All" ? backlogOrders : backlogOrders.filter(o=>o.bucket===s.backlogFilter);
+  return <div className="m-page">
+    <MobileHeader s={s}/>
+    <h1 className="m-page-title" style={{marginBottom:4}}>Backlog Insights</h1>
+    <p className="m-team-sub">Orders awaiting revenue recognition. Payment dates and amounts are estimates.</p>
+    <BacklogBucketChips s={s}/>
+    <BacklogSummaryStrip s={s}/>
+    {list.map(o=><BacklogOrderCard key={o.id} o={o}/>)}
+  </div>;
+}
+
+function IPadBacklog({s}) {
+  const list = s.backlogFilter==="All" ? backlogOrders : backlogOrders.filter(o=>o.bucket===s.backlogFilter);
+  return <div className="i-page">
+    <IPadHeader title="Backlog Insights" sub="Orders awaiting revenue recognition. Payment dates and amounts are estimates." s={s}/>
+    <BacklogBucketChips s={s}/>
+    <BacklogSummaryStrip s={s}/>
+    <div className="i-grid-2">{list.map(o=><BacklogOrderCard key={o.id} o={o}/>)}</div>
+  </div>;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PAY ESTIMATOR (compressed mobile take on the desktop page)
+   One plan element at a time behind PE chips instead of three stacked
+   estimators. Seller-scale numbers stay consistent with the rest of
+   the app: goals/revenue match the goal-sheet rows (24/71/44% att.)
+   and each PE's target-incentive share follows the goal-sheet weights
+   (50/30/20 of the $75,500 TI). All three PEs share the same rate
+   table, confirmed against the desktop reference's PE1/PE2/PE3 pages.
+   ════════════════════════════════════════════════════════════════ */
+const EST_BRACKETS = [
+  {from:0,   to:50,       rate:0.75},
+  {from:50,  to:75,       rate:1.5},
+  {from:75,  to:100,      rate:1},
+  {from:100, to:120,      rate:5.25},
+  {from:120, to:200,      rate:2.5},
+  {from:200, to:Infinity, rate:1.5}
+];
+const estPlans = [
+  {pe:"PE1", name:"Prod+Services",      color:PE_COLOR.PE1, goal:109000, revenue:26000, ti:37750},
+  {pe:"PE2", name:"Recurring Software", color:PE_COLOR.PE2, goal:87000,  revenue:62000, ti:22650},
+  {pe:"PE3", name:"Services",           color:PE_COLOR.PE3, goal:90000,  revenue:40000, ti:15100}
+];
+/* Cumulative payout (% of TI share) at a given attainment % */
+const estPayoutPct = att => EST_BRACKETS.reduce((sum,b)=> sum + Math.max(0, Math.min(att,b.to)-b.from)*b.rate, 0);
+const estEarned = (p, addRev=0) => estPayoutPct((p.revenue+addRev)/p.goal*100)/100 * p.ti;
+const estUsd = n => "$" + Math.round(n).toLocaleString("en-US");
+const fmtGoalK = n => "$" + Math.round(n/1000) + "k";
+
+/* Payout curve — 5%-step bars to 150%; current attainment in the PE color,
+   the modeled additional attainment in amber, the rest unattained */
+function EstChart({p, addRev}) {
+  const attBase = p.revenue/p.goal*100;
+  const attNew = (p.revenue+addRev)/p.goal*100;
+  const maxPct = estPayoutPct(150);
+  return <div className="m-est-chart">
+    <div className="m-est-bars">
+      {Array.from({length:30},(_,i)=>(i+1)*5).map(st=>{
+        const cls = st<=attBase ? "cur" : st<=attNew ? "add" : "";
+        return <div key={st} className={`m-est-bar ${cls}`}
+          style={{height:Math.max(3, estPayoutPct(st)/maxPct*100)+"%", ...(cls==="cur"?{background:p.color}:{})}}/>;
+      })}
+    </div>
+    <div className="m-est-axis"><span>0%</span><span>50%</span><span>100%</span><span>150%</span></div>
+  </div>;
+}
+
+/* Collapsible rate table with the live attainment breakdown, like the
+   desktop's "Show Rate Table" */
+function EstRateTable({p, addRev}) {
+  const [open, setOpen] = useState(false);
+  const att = (p.revenue+addRev)/p.goal*100;
+  return <div className="m-est-rt">
+    <button className="m-est-rt-btn" onClick={()=>setOpen(o=>!o)} aria-expanded={open}>
+      {open?"Hide Rate Table":"Show Rate Table"} <ChevronDown size={12} className={`m-insight-chev ${open?"open":""}`}/>
+    </button>
+    {open && <div className="m-est-table">
+      <div className="m-est-tr m-est-th"><span>Quota %</span><span>Rate / 1%</span><span>Yours ({att.toFixed(1)}%)</span><span>Value</span></div>
+      {EST_BRACKETS.map((b,i)=>{
+        const seg = Math.max(0, Math.min(att,b.to)-b.from);
+        return <div key={i} className={`m-est-tr ${att>b.from && att<=b.to ? "on":""}`}>
+          <span>{b.to===Infinity ? `${b.from}+ %` : `${b.from}–${b.to}%`}</span>
+          <span>{b.rate}%</span>
+          <span>{seg>0 ? seg.toFixed(seg%1 ? 2 : 0) : "—"}</span>
+          <span>{seg>0 ? (seg*b.rate).toFixed(2) : "—"}</span>
+        </div>;
+      })}
+    </div>}
+  </div>;
+}
+
+/* The estimator for the selected PE: stats, additional-attainment input +
+   slider, computed additional earnings, payout curve, rate table */
+function EstimatorCard({s}) {
+  const p = estPlans[s.estPe];
+  const addRev = s.estAdd[p.pe] || 0;
+  const attBase = p.revenue/p.goal*100;
+  const base = estEarned(p);
+  const extra = estEarned(p, addRev) - base;
+  const max = Math.round(p.goal*1.5 - p.revenue);
+  const setAdd = v => s.setEstAdd(prev=>({...prev, [p.pe]: Math.max(0, Math.min(max, v))}));
+  return <div className="m-section m-est-card" style={{borderLeftColor:p.color}}>
+    <div className="m-section-hdr">
+      <div className="m-pe-left"><span className="m-pe-badge" style={{background:p.color}}>{p.pe}</span><b>{p.name}</b></div>
+      <span className="m-pe-goal">{fmtGoalK(p.goal)} Goal</span>
+    </div>
+    <div className="m-goal-stats m-est-stats">
+      <div><small>Revenue Att.</small><span style={{color:p.color}}>{Math.round(attBase)}%</span></div>
+      <div><small>Revenue</small><span>{amt(fmtGoalK(p.revenue))}</span></div>
+      <div><small>Est. Incentive (H1)</small><span className="m-goal-earn">{amt(estUsd(base))}</span></div>
+    </div>
+    <div className="m-est-inputs">
+      <label className="m-est-input"><small>Additional Attainment</small>
+        <div className="m-est-field"><span>$</span>
+          <input type="number" inputMode="numeric" min="0" max={max} step="1000" value={addRev||""} placeholder="0"
+            onChange={e=>setAdd(Number(e.target.value)||0)}/>
+        </div>
+      </label>
+      <div className="m-est-input"><small>Additional Earnings</small>
+        <b className="m-est-extra">{maskText(`+${estUsd(extra)}`)}</b>
+      </div>
+    </div>
+    <input type="range" className="m-est-slider" min="0" max={max} step="1000" value={addRev}
+      onChange={e=>setAdd(Number(e.target.value))} aria-label="Additional attainment"/>
+    <div className="m-est-slider-lbls"><span>$0</span><b>{addRev>0 ? `+${fmtGoalK(addRev)}` : ""}</b><span>{fmtGoalK(max)}</span></div>
+    <EstChart p={p} addRev={addRev}/>
+    <EstRateTable p={p} addRev={addRev}/>
+  </div>;
+}
+
+/* Estimated Earnings across all PEs — base + modeled additional per row */
+function EstSummary({s}) {
+  const rows = estPlans.map(p=>{
+    const base = estEarned(p);
+    const extra = estEarned(p, s.estAdd[p.pe]||0) - base;
+    return {p, extra, total: base+extra};
+  });
+  const grandExtra = rows.reduce((a,r)=>a+r.extra,0);
+  const grand = rows.reduce((a,r)=>a+r.total,0);
+  return <div className="m-section m-est-sum">
+    <div className="m-section-hdr"><h2>Estimated Earnings</h2><span className="m-badge">H1 2026</span></div>
+    {rows.map(({p,extra,total})=><div key={p.pe} className="m-est-sum-row">
+      <span className="m-pe-badge" style={{background:p.color}}>{p.pe}</span>
+      <span className="m-est-sum-name">{p.name}</span>
+      <span className={`m-est-sum-add ${extra>0?"pos":""}`}>{maskText(`+${estUsd(extra)}`)}</span>
+      <b>{amt(estUsd(total))}</b>
+    </div>)}
+    <div className="m-est-sum-total">
+      <span>Total</span>
+      <span className={`m-est-sum-add ${grandExtra>0?"pos":""}`}>{maskText(`+${estUsd(grandExtra)}`)}</span>
+      <b>{amt(estUsd(grand))}</b>
+    </div>
+  </div>;
+}
+
+function PayEstimatorPage({s}) {
+  return <div className="m-page">
+    <MobileHeader s={s}/>
+    <h1 className="m-page-title" style={{marginBottom:4}}>Pay Estimator</h1>
+    <p className="m-team-sub">Use this estimator to estimate your potential incentive compensation. This is not a commitment of the compensation you will receive.</p>
+    <div className="m-goaltab-scroll">
+      {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
+        style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+    </div>
+    <EstimatorCard s={s}/>
+    <EstSummary s={s}/>
+  </div>;
+}
+
+function IPadEstimator({s}) {
+  return <div className="i-page">
+    <IPadHeader title="Pay Estimator" sub="Use this estimator to estimate your potential incentive compensation. This is not a commitment of the compensation you will receive." s={s}/>
+    <div className="i-goaltab-row">
+      {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
+        style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+    </div>
+    <div className="i-split">
+      <div className="i-col-a"><EstimatorCard s={s}/></div>
+      <div className="i-col-b"><EstSummary s={s}/></div>
     </div>
   </div>;
 }
@@ -1330,15 +1714,11 @@ function NdrSection() {
 
 function GoalsPage({s}) {
   const tabIdx = s.goalIdx, setTabIdx = s.setGoalIdx;
-  const onOpenGoalSheet = () => s.setShowGoalSheet(true);
   const g = goalTabs[tabIdx];
 
   return <div className="m-page">
     <MobileHeader s={s}/>
-    <div className="m-page-title-row">
-      <h1 className="m-page-title">Goals</h1>
-      <button className="m-goalsheet-btn" onClick={onOpenGoalSheet}><FileText size={13}/> View Goal Sheet</button>
-    </div>
+    <h1 className="m-page-title">Goals</h1>
 
     {/* PE tab row */}
     <div className="m-goaltab-scroll">
@@ -1349,7 +1729,7 @@ function GoalsPage({s}) {
     {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <>
     {/* Selected goal — big attainment stat + full-width bar (matches At A Glance).
         Section rail, stat, and bar all bind to the active PE color. */}
-    <div className="m-section m-pe-flat" style={{borderLeftColor:g.color}}>
+    <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
       <div className="m-section-hdr">
         <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
         <span className="m-pe-goal">{g.goal} Goal</span>
@@ -1366,48 +1746,8 @@ function GoalsPage({s}) {
         <div><small>Incentive</small><span className="m-goal-earn">{amt(g.incentive)}</span></div>
       </div>
     </div>
-
-    {/* Backlog Insights mini-list (compact preview, not the full page) */}
-    <div className="m-section">
-      <div className="m-section-hdr"><h2>Backlog Insights</h2><span className="m-badge">Preview</span></div>
-      {[
-        {cust:"Helix Networks", pe:"PE1", amt:"$14K", color:PE_COLOR.PE1},
-        {cust:"Cortex Financial", pe:"PE1", amt:"$23K", color:PE_COLOR.PE1},
-        {cust:"GlobalNet Inc", pe:"PE3", amt:"$38K", color:PE_COLOR.PE3}
-      ].map((b,i)=><div key={i} className="m-backlog-mini">
-        <span className="m-pe-badge" style={{background:b.color}}>{b.pe}</span>
-        <span className="m-backlog-cust">{b.cust}</span>
-        <b className="m-backlog-amt">{b.amt}</b>
-      </div>)}
-    </div>
     </>}
   </div>;
-}
-
-/* View Goal Sheet popup — full-screen, read-only example goal sheet */
-function GoalSheetPopup({onClose}) {
-  return <FullScreenPopup title="Goal Sheet" onClose={onClose}>
-    <div className="m-gs-meta">
-      <div><small>Goaling Period</small><b>{goalSheetExample.period}</b></div>
-      <div><small>Target Incentive</small><b>{amt(goalSheetExample.target)}</b></div>
-    </div>
-    {goalSheetExample.rows.map((r,i)=><div key={i} className="m-gs-row">
-      <div className="m-gs-row-top">
-        <AttainDonut pct={r.att} color={r.color} size={64} stroke={9} sub=""/>
-        <div className="m-gs-row-info">
-          <div className="m-gs-row-hdr"><span className="m-pe-badge" style={{background:r.color}}>{r.id}</span><b>{r.label}</b><span className="m-gs-weight">{r.weight}</span></div>
-          <span className="m-gs-name">{r.name}</span>
-          <span className="m-gs-goal">Goal {r.goal}</span>
-        </div>
-      </div>
-      <div className="m-gs-splits">
-        <div><small>Bookings</small><b>{r.book}</b></div>
-        <div><small>Revenue</small><b>{r.rev}</b></div>
-        <div><small>Backlog</small><b>{r.back}</b></div>
-      </div>
-    </div>)}
-    <p className="m-gs-note">Read-only reference · figures reflect the current selling period.</p>
-  </FullScreenPopup>;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1558,15 +1898,27 @@ function tierColor(v) {
   return STATUS_COLOR["At Risk"];
 }
 
-/* Horizontal attainment bars, one per seller, colored by that chart's value */
+/* Horizontal attainment bars, one per seller, colored by that chart's value.
+   Collapsed to the first 5 rows; the sort select flips between worst-first
+   (coaching candidates) and best-first, matching Seller Performance. */
 function AttainmentChart({title, subtitle, rows, control}) {
   const SCALE = 120;                       // bar axis maxes at 120%
   const markerPos = (100/SCALE)*100;
+  const [sort, setSort] = useState("need");        // "need" = most coaching first | "best"
+  const [expanded, setExpanded] = useState(false);
+  const sorted = [...rows].sort((a,b)=> sort==="best" ? b.val-a.val : a.val-b.val);
+  const visible = expanded ? sorted : sorted.slice(0,5);
   return <div className="m-section">
     <div className="m-section-hdr"><h2>{title}</h2>{control}</div>
-    <small className="m-team-chart-sub">{subtitle}</small>
+    <div className="m-team-chart-controls">
+      <small className="m-team-chart-sub">{subtitle}</small>
+      <select className="m-seller-sort" value={sort} onChange={e=>setSort(e.target.value)} aria-label="Sort sellers">
+        <option value="need">Most coaching needed</option>
+        <option value="best">Top performers first</option>
+      </select>
+    </div>
     <div className="m-abars">
-      {rows.map(r=>{
+      {visible.map(r=>{
         const c = tierColor(r.val);
         return <div key={r.name} className="m-abar-row">
           <span className="m-abar-name">{r.name}</span>
@@ -1582,6 +1934,10 @@ function AttainmentChart({title, subtitle, rows, control}) {
       {Object.keys(STATUS_COLOR).map(s=><span key={s}><i style={{background:STATUS_COLOR[s]}}/>{s}</span>)}
       <span><i className="m-abar-goal-key"/>Goal</span>
     </div>
+    {rows.length > 5 && <button className="m-showall m-showall-tight" onClick={()=>setExpanded(!expanded)}>
+      {expanded ? "Show Fewer" : `Show All ${rows.length} Sellers`}
+      <ChevronDown size={14} className={expanded?"up":""}/>
+    </button>}
   </div>;
 }
 
@@ -1732,10 +2088,10 @@ function TeamPage({s}) {
     <TeamControls s={s}/>
 
     {/* Earned vs Target Incentive */}
-    <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period · highest to lowest earned" rows={earnedRows}/>
+    <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period" rows={earnedRows}/>
 
     {/* Bookings Attainment (per plan element) */}
-    <AttainmentChart title="Bookings Attainment" subtitle="Sorted by bookings · bar shows progress toward goal" rows={bookingRows}
+    <AttainmentChart title="Bookings Attainment" subtitle="Bar shows progress toward goal" rows={bookingRows}
       control={<div className="m-pe-select">{["PE1","PE2","PE3"].map(p=><button key={p} className={p===pe?"on":""} onClick={()=>setPe(p)}>{p}</button>)}</div>}/>
 
     <TeamMembersSection s={s}/>
@@ -2076,7 +2432,6 @@ function useCompXState() {
   const [theme, setTheme] = useState(getInitialTheme);
   const [calcItem, setCalcItem] = useState(null);
   const [pdfItem, setPdfItem] = useState(null);
-  const [showGoalSheet, setShowGoalSheet] = useState(false);
   const [sellerItem, setSellerItem] = useState(null);
   const [showAskIQ, setShowAskIQ] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -2087,6 +2442,13 @@ function useCompXState() {
   const [goalIdx, setGoalIdx] = useState(0);
   const [orderQuery, setOrderQuery] = useState("");
   const [orderType, setOrderType] = useState(ORDER_SEARCH_TYPES[0]);   // search-by field
+  const [spiffFilters, setSpiffFilters] = useState({period:"All", status:"All", type:"All Types"});
+  const [spiffExpanded, setSpiffExpanded] = useState(false);        // SPIFF page: first 2 ↔ all incentives
+  const [aagSpiffExpanded, setAagSpiffExpanded] = useState(false);  // At A Glance SPIFF section: first 2 ↔ all
+  const [backlogFilter, setBacklogFilter] = useState("All");        // Backlog Insights month bucket
+  const [estPe, setEstPe] = useState(0);                            // Pay Estimator selected plan element
+  const [estAdd, setEstAdd] = useState({PE1:0, PE2:0, PE3:0});      // Pay Estimator additional attainment $ per PE
+  const [moreOpen, setMoreOpen] = useState(false);                  // mobile bottom-nav More sheet
   const [teamPe, setTeamPe] = useState("PE1");
   const [teamExpanded, setTeamExpanded] = useState(false);          // first 2 ↔ all members
   const [teamSort, setTeamSort] = useState("need");                 // "need" = most coaching first | "best"
@@ -2120,10 +2482,12 @@ function useCompXState() {
 
   return {
     tab, setTab, viewMode, setViewMode, theme, toggleTheme,
-    calcItem, setCalcItem, pdfItem, setPdfItem, showGoalSheet, setShowGoalSheet,
+    calcItem, setCalcItem, pdfItem, setPdfItem,
     sellerItem, setSellerItem, showAskIQ, setShowAskIQ, notifOpen, setNotifOpen, reminders, setReminders,
     periodIdx, setPeriodIdx, openPayPeriod, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
-    orderQuery, setOrderQuery, orderType, setOrderType,
+    orderQuery, setOrderQuery, orderType, setOrderType, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
+    aagSpiffExpanded, setAagSpiffExpanded, backlogFilter, setBacklogFilter,
+    estPe, setEstPe, estAdd, setEstAdd, moreOpen, setMoreOpen,
     teamPe, setTeamPe, teamExpanded, setTeamExpanded, teamSort, setTeamSort, dismissedInsights, setDismissedInsights,
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
@@ -2145,7 +2509,6 @@ function FramePopups({s, variant="mobile"}) {
   return <>
     {s.calcItem && shell(<CompCalcPopup item={s.calcItem} month={s.currentMonth} onClose={()=>s.setCalcItem(null)}/>, ()=>s.setCalcItem(null))}
     {s.pdfItem && shell(<PdfPopup item={s.pdfItem} onClose={()=>s.setPdfItem(null)}/>, ()=>s.setPdfItem(null))}
-    {s.showGoalSheet && shell(<GoalSheetPopup onClose={()=>s.setShowGoalSheet(false)}/>, ()=>s.setShowGoalSheet(false))}
     {s.sellerItem && shell(<SellerBreakdownPopup s={s.sellerItem} onClose={()=>s.setSellerItem(null)}/>, ()=>s.setSellerItem(null))}
     {s.showAskIQ && shell(<AskIQPopup onClose={()=>s.setShowAskIQ(false)}/>, ()=>s.setShowAskIQ(false), "i-modal-lg")}
     {s.insightCanvasOpen && shell(<InsightCanvasPopup s={s} onClose={()=>s.setInsightCanvasOpen(false)}/>, ()=>s.setInsightCanvasOpen(false), "i-modal-xl")}
@@ -2157,8 +2520,16 @@ const NAV_TABS = [
   {id:"glance", label:"At A Glance", Icon:Home},
   {id:"payments", label:"Payments", Icon:DollarSign},
   {id:"goals", label:"Goals", Icon:Target},
-  {id:"orders", label:"Order Search", Icon:Search}
+  {id:"orders", label:"Order Search", Icon:Search},
+  {id:"spiff", label:"SPIFF & Bonus", Icon:Gift},
+  {id:"backlog", label:"Backlog", Icon:Layers},
+  {id:"estimator", label:"Pay Estimator", short:"Estimator", Icon:Calculator}
 ];
+/* Mobile bottom bar: the four core tabs; the rest live in the More sheet */
+const MOBILE_TAB_IDS = ["glance","payments","goals","estimator"];
+const MOBILE_MORE_IDS = ["orders","spiff","backlog"];
+const MOBILE_TABS = NAV_TABS.filter(t=>MOBILE_TAB_IDS.includes(t.id));
+const MOBILE_MORE = NAV_TABS.filter(t=>MOBILE_MORE_IDS.includes(t.id));
 
 /* ════════════════════════════════════════════════════════════════
    MOBILE FRAME (iPhone — CompX runs as a website in Safari, so the
@@ -2248,14 +2619,30 @@ function MobileFrame({s}) {
                 {s.tab==="payments" && <PaymentsPage s={s}/>}
                 {s.tab==="goals"    && <GoalsPage s={s}/>}
                 {s.tab==="orders"   && <OrderSearchPage s={s}/>}
+                {s.tab==="spiff"    && <SpiffBonusPage s={s}/>}
+                {s.tab==="backlog"  && <BacklogPage s={s}/>}
+                {s.tab==="estimator" && <PayEstimatorPage s={s}/>}
               </>}
         </div>
 
         {s.viewMode==="me" && <nav className="m-tabbar">
-          {NAV_TABS.map(t=><button key={t.id} className={`m-tab ${s.tab===t.id?"m-tab-on":""}`} onClick={()=>s.setTab(t.id)}>
-            <t.Icon size={18}/><span>{t.label}</span>
+          {MOBILE_TABS.map(t=><button key={t.id} className={`m-tab ${s.tab===t.id?"m-tab-on":""}`} onClick={()=>{s.setTab(t.id); s.setMoreOpen(false);}}>
+            <t.Icon size={18}/><span>{t.short||t.label}</span>
           </button>)}
+          <button className={`m-tab ${MOBILE_MORE_IDS.includes(s.tab)?"m-tab-on":""}`} onClick={()=>s.setMoreOpen(!s.moreOpen)} aria-expanded={s.moreOpen}>
+            <MoreHorizontal size={18}/><span>More</span>
+          </button>
         </nav>}
+
+        {s.viewMode==="me" && s.moreOpen && <>
+          <div className="m-more-backdrop" onClick={()=>s.setMoreOpen(false)}/>
+          <div className="m-more-sheet">
+            {MOBILE_MORE.map(t=><button key={t.id} className={s.tab===t.id?"on":""}
+              onClick={()=>{s.setTab(t.id); s.setMoreOpen(false);}}>
+              <t.Icon size={16}/>{t.label}
+            </button>)}
+          </div>
+        </>}
 
         <SafariBar mini={urlMini} onExpand={()=>setUrlMini(false)}/>
         <div className="m-home"/>
@@ -2328,15 +2715,7 @@ function IPadGlance({s}) {
     </div>
 
     <div className="i-grid-2">
-      <div className="m-section">
-        <div className="m-section-hdr"><h2>SPIFF & BONUS</h2></div>
-        {spiffBonus.map((sp,i)=><div key={i} className="m-spiff-card">
-          <div className="m-spiff-top"><span className="m-spiff-status" style={{color:sp.statusColor, borderColor:sp.statusColor}}>{sp.status}</span><b className="m-spiff-amt" style={{color:sp.statusColor}}>{amt(sp.amount)}</b></div>
-          <b className="m-spiff-name">{sp.name}</b><span className="m-spiff-sub">{sp.sub}</span>
-          {sp.pct<100 && <div className="m-spiff-bar-wrap"><div className="m-spiff-bar" style={{width:sp.pct+"%", background:sp.statusColor}}></div>{sp.prog && <span className="m-spiff-prog">{sp.prog}</span>}</div>}
-          <small className="m-spiff-date">{sp.date}</small>
-        </div>)}
-      </div>
+      <AagSpiffSection s={s}/>
       <div className="m-section">
         <div className="m-section-hdr"><h2>Insights</h2><InsightCanvasBtn s={s}/></div>
         <InsightCardsList s={s}/>
@@ -2366,15 +2745,14 @@ function IPadPayments({s}) {
 function IPadGoals({s}) {
   const g = goalTabs[s.goalIdx];
   return <div className="i-page">
-    <IPadHeader title="Goals" sub="Plan-element attainment · H1 2026" s={s}
-      right={<button className="m-goalsheet-btn" onClick={()=>s.setShowGoalSheet(true)}><FileText size={14}/> View Goal Sheet</button>}/>
+    <IPadHeader title="Goals" sub="Plan-element attainment · H1 2026" s={s}/>
     <div className="i-goaltab-row">
       {goalTabs.map((t,i)=><button key={t.id} className={`m-goaltab ${i===s.goalIdx?"on":""}`} onClick={()=>s.setGoalIdx(i)}
         style={i===s.goalIdx?{background:t.color, color:"#fff", borderColor:t.color}:{}}>{t.id}</button>)}
     </div>
-    {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <div className="i-split">
+    {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <div className="i-split i-goals-split">
       <div className="i-col-a">
-        <div className="m-section m-pe-flat" style={{borderLeftColor:g.color}}>
+        <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
           <div className="m-section-hdr">
             <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
             <span className="m-pe-goal">{g.goal} Goal</span>
@@ -2391,16 +2769,10 @@ function IPadGoals({s}) {
         </div>
       </div>
       <div className="i-col-b">
-        <div className="m-section m-pe-flat">
+        <div className="m-section m-pe-flat m-pe-solo">
           <div className="m-section-hdr"><h2>Bookings vs Revenue</h2></div>
           <BookingsBar pe={g}/>
           {g.id==="PE1" && <CompUpliftSection s={s}/>}
-        </div>
-        <div className="m-section">
-          <div className="m-section-hdr"><h2>Backlog Insights</h2><span className="m-badge">Preview</span></div>
-          {[{cust:"Helix Networks",pe:"PE1",amt:"$14K",color:PE_COLOR.PE1},{cust:"Cortex Financial",pe:"PE1",amt:"$23K",color:PE_COLOR.PE1},{cust:"GlobalNet Inc",pe:"PE3",amt:"$38K",color:PE_COLOR.PE3}].map((b,i)=><div key={i} className="m-backlog-mini">
-            <span className="m-pe-badge" style={{background:b.color}}>{b.pe}</span><span className="m-backlog-cust">{b.cust}</span><b className="m-backlog-amt">{b.amt}</b>
-          </div>)}
         </div>
       </div>
     </div>}
@@ -2433,6 +2805,21 @@ function IPadOrders({s}) {
   </div>;
 }
 
+function IPadSpiff({s}) {
+  const list = filterSpiffs(s.spiffFilters);
+  const visible = s.spiffExpanded ? list : list.slice(0,2);
+  return <div className="i-page">
+    <IPadHeader title="SPIFF & Bonus" sub="SPIFFs, uplifts, bonuses, and other strategic incentive programs." s={s} right={<SpiffStatPills/>}/>
+    <SpiffFilterRow s={s}/>
+    {list.length>0 ? <div className="i-grid-3">{visible.map(p=><SpiffProgramCard key={p.name} p={p}/>)}</div>
+      : <div className="m-search-empty"><Gift size={30}/><b>No incentives match</b><span>Loosen the filters to see more programs.</span></div>}
+    {list.length>2 && <button className="m-showall" onClick={()=>s.setSpiffExpanded(!s.spiffExpanded)}>
+      {s.spiffExpanded ? "Show Fewer" : `See All ${list.length} Incentives`}
+      <ChevronDown size={14} className={s.spiffExpanded?"up":""}/>
+    </button>}
+  </div>;
+}
+
 function IPadTeam({s}) {
   const earnedRows = teamEarnedRows();
   const bookingRows = teamBookingRows(s.teamPe);
@@ -2441,8 +2828,8 @@ function IPadTeam({s}) {
     <IPadHeader title="Team Dashboard" sub={`${TEAM_AS_OF} · ${REFRESH_NOTE}`} s={s}/>
     <TeamControls s={s}/>
     <div className="i-split">
-      <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period · highest to lowest earned" rows={earnedRows}/>
-      <AttainmentChart title="Bookings Attainment" subtitle="Sorted by bookings · progress toward goal" rows={bookingRows}
+      <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period" rows={earnedRows}/>
+      <AttainmentChart title="Bookings Attainment" subtitle="Bar shows progress toward goal" rows={bookingRows}
         control={<div className="m-pe-select">{["PE1","PE2","PE3"].map(pp=><button key={pp} className={pp===s.teamPe?"on":""} onClick={()=>s.setTeamPe(pp)}>{pp}</button>)}</div>}/>
     </div>
     <TeamMembersSection s={s} gridClass="i-grid-3"/>
@@ -2524,6 +2911,9 @@ function IPadFrame({s, landscape=false}) {
             {s.tab==="payments" && <IPadPayments s={s}/>}
             {s.tab==="goals"    && <IPadGoals s={s}/>}
             {s.tab==="orders"   && <IPadOrders s={s}/>}
+            {s.tab==="spiff"    && <IPadSpiff s={s}/>}
+            {s.tab==="backlog"  && <IPadBacklog s={s}/>}
+            {s.tab==="estimator" && <IPadEstimator s={s}/>}
           </>}
         </main>
       </div>
