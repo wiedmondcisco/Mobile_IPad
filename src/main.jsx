@@ -1522,8 +1522,8 @@ const ksoQuarters = [
   {q:"Q1 2026", status:"Reviewed", cap:"125%", bonusLabel:"Bonus Earned", bonus:"$2,500.00", date:"16 Nov 2025", dateLabel:"Reviewed",
     rows:[
       {name:"New Conversions", desc:"13 new logo targets for Q1 FY26", bonus:"$1,000.00", weight:"50%", prog:"14 of 13 targets", pct:100, tone:"gold"},
-      {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$500.00", weight:"10%", prog:"20% of 20% attainment", pct:100, tone:"green"},
-      {name:"Conversion Rate", desc:"60% rate, conversion rate for Q1 FY26", bonus:"$1,000.00", weight:"40%", prog:"13% of 13% conversion rate", pct:100, tone:"green"}
+      {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$500.00", weight:"10%", prog:"10% of 20% attainment", pct:50, tone:"blue"},
+      {name:"Conversion Rate", desc:"60% rate, conversion rate for Q1 FY26", bonus:"$1,000.00", weight:"40%", prog:"10% of 13% conversion rate", pct:77, tone:"gold"}
     ]},
   {q:"Q2 2026", status:"Reviewed", cap:"125%", bonusLabel:"Bonus Earned", bonus:"$4,100.00", date:"12 Feb 2026", dateLabel:"Reviewed",
     rows:[
@@ -1538,12 +1538,15 @@ const ksoQuarters = [
     ]},
   {q:"Q4 2026", status:"On Going", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$3,000.00", date:"11 Aug 2026", dateLabel:"Review Period Opens",
     rows:[
-      {name:"New Conversions", desc:"10 new logo targets for Q4 FY26", bonus:"$1,500.00", weight:"50%", prog:"2 of 10 targets", pct:20, tone:"blue"},
+      {name:"New Conversions", desc:"10 new logo targets for Q4 FY26", bonus:"$1,500.00", weight:"50%", prog:"5 of 10 targets", pct:50, tone:"blue"},
       {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$1,500.00", weight:"50%", prog:"0% of 5% attainment", pct:0, tone:"grey"}
     ]}
 ];
 
 function KsoSection() {
+  /* Quarter accordions (reference-style expand arrows) — the current
+     quarter's detail matters most, so only one opens at a time */
+  const [openQ, setOpenQ] = useState(0);
   return <>
     <div className="m-kso-info">
       <div className="m-kso-info-top">
@@ -1552,11 +1555,15 @@ function KsoSection() {
       </div>
       <p className="m-kso-info-note">Your plan elements represents 20% of your target Incentive (Compensation for the CS402 FY26 goal sheet)</p>
     </div>
-    {ksoQuarters.map(qt=>{
+    {ksoQuarters.map((qt,qi)=>{
       const sc = KSO_STATUS[qt.status];
-      return <div key={qt.q} className="m-kso-card">
-        <div className="m-kso-hdr">
+      const open = qi===openQ;
+      return <div key={qt.q} className={`m-kso-card ${open?"m-kso-open":""}`}>
+        <div className="m-kso-hdr" role="button" tabIndex={0} aria-expanded={open}
+          onClick={()=>setOpenQ(open ? -1 : qi)}
+          onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpenQ(open ? -1 : qi); } }}>
           <div className="m-kso-hdr-left">
+            <ChevronDown size={15} className={`m-insight-chev ${open?"open":""}`}/>
             <span className="m-kso-q">{qt.q}</span>
             <span className="m-kso-pill" style={{color:sc, borderColor:sc+"66", background:sc+"1a"}}>{qt.status}</span>
             <span className="m-kso-cap">Achievement Cap: <b>{qt.cap}</b></span>
@@ -1566,7 +1573,7 @@ function KsoSection() {
             <div className="m-kso-date"><b>{qt.date}</b><span>{qt.dateLabel}</span></div>
           </div>
         </div>
-        {qt.rows.map((r,i)=>{
+        {open && qt.rows.map((r,i)=>{
           const tone = KSO_TONE[r.tone];
           return <div key={i} className="m-kso-row">
             <div className="m-kso-cell-name"><b>{r.name}</b><span className="m-kso-row-desc">{r.desc}</span></div>
