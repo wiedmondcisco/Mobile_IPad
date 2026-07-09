@@ -9,7 +9,7 @@ import "./styles.css";
    PE color map: PE1 Prod+Services = gold, PE2 Recurring Software = green,
    PE3 Services = blue/purple — kept consistent across all pages.
    ════════════════════════════════════════════════════════════════ */
-const DATA_AS_OF = "Data as of Jun 30, 2026, 2:45 PM";
+const DATA_AS_OF = "Data as of May 26, 2026, 6:00 AM";
 const REFRESH_NOTE = "Refreshes daily at 6:00 AM PST";
 
 /* Hide-amounts (seller privacy): when on, payment/earnings figures render
@@ -22,15 +22,15 @@ const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, "$" + DOT
 
 /* StratComp IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
-  "attainment":"You're at 24% on PRI (CX-SVC RENEW), 71% on NPR (RRA-SW), and 44% on NPR2 (SEC PRD). Overall weighted: ~46%. You need significant revenue growth on PRI to hit accelerator.",
-  "earnings":"YTD earnings: $50,328. Current month (May 2026): $8,408.25 — Goal Sheet $5,858, SPIFFs $2,125, Draws $50, Adj $75, OTB $100, Past $200.",
-  "accelerator":"Accelerator kicks in at 100% attainment. Rate jumps from 1% to 5.25% per 1% attainment! Your best positioned PE is NPR at 71%.",
-  "close":"Your best positioned PE is NPR (Recurring Software) at 71%. You need about $8.8M more to reach 100%. PRI is at 24% needing ~$2.9M.",
+  "attainment":"You're at 24% on PRI (CX-SVC RENEW), 71% on NPR (RRA-SW), and 44% on NPR2 (SEC PRD). Overall weighted: ~42%. You need significant revenue growth on PRI to hit accelerator.",
+  "earnings":"YTD earnings: $25,409 paid (Jan–Apr). Current month (May 2026): $8,408.25 — Goal Sheet $5,859.75, SPIFFs $2,125, Draws $50, Adj $73.50, OTB $100, Past $200.",
+  "accelerator":"Accelerator kicks in at 100% attainment. Rate jumps from 1% to 2% per 1% attainment! Your best positioned PE is NPR at 71%.",
+  "close":"Your best positioned PE is NPR (Recurring Software) at 71%. You need about $25K more revenue to reach 100%. PRI is at 24% needing ~$83K.",
   "payment":"Next payment: $8,408.25 on Jun 2, 2026. Previous: $6,830 (Apr). Lock date: May 28.",
-  "backlog":"$207K in backlog. Estimated additional paycheck impact: +$3,200. Orders pending fulfillment across multiple months.",
-  "goal":"Goal Sheet H2: PRI $3.81M (50% weight), NPR $12.65M (30%), NPR2 $735K (20%). Total target incentive: $31,759.",
-  "spiff":"Active: Q2 Cloud Migration SPIFF ($5K potential, 25% progress), Partner Acceleration Q2 ($3,500, 25%). Total projected SPIFF earnings: $2,125.",
-  "best":"NPR2 (SEC PRD ACV) is at 167.59% attainment — already in accelerator zone! NPR (RRA-SW) is at 71%, closest to the 100% accelerator threshold.",
+  "backlog":"$115K in backlog. Estimated additional paycheck impact: +$1,200. Orders pending fulfillment across multiple months.",
+  "goal":"Goal Sheet H1: PRI $109K (50% weight), NPR $87K (30%), NPR2 $90K (20%). Total target incentive: $75,500.",
+  "spiff":"Active: FY26 Attainment Milestone 2 ($15,250 potential, 65% progress), Q4FY24 Slam Dunk with Splunk ($8,330, 75%). Projected SPIFF earnings this period: $2,125.",
+  "best":"NPR (RRA-SW) is at 71% attainment — closest to the 100% accelerator threshold. NPR2 (SEC PRD) trails at 44%.",
   "default":"I can help with: attainment, earnings, payments, accelerators, backlog, goals, or SPIFFs. What would you like to know?"
 };
 
@@ -47,7 +47,7 @@ const PE_COLOR = { PE1:"#f59e0b", PE2:"#10b981", PE3:"#3b82f6", KSO:"#6366f1", O
 
 const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"6,830.00", change:"▲ 10.4%", payDate:"Paid May 2, 2026"},
-  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,408.25", change:"▲ 37.5%", payDate:"Pay: Jun 2, 2026"},
+  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,408.25", change:"▲ 23.1%", payDate:"Pay: Jun 2, 2026"},
   {month:"JUN 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // no statement period yet — card stays inert
 ];
 
@@ -58,14 +58,14 @@ const planElements = [
 ];
 
 const spiffBonus = [
-  {status:"Achieved", statusColor:"#10b981", name:"FY26 Attainment Milestone 1", sub:"Bonus earned", amount:"$7,560", date:"Paid Jun 16, 2026", pct:100},
+  {status:"Achieved", statusColor:"#10b981", name:"FY26 Attainment Milestone 1", sub:"Bonus earned", amount:"$7,560", date:"Paid Apr 16, 2026", pct:100},
   {status:"Active", statusColor:"#3b82f6", name:"FY26 Attainment Milestone 2", sub:"$400k from 80%", amount:"$15,250", date:"Est. Jun 16, 2026", pct:65},
   {status:"Active", statusColor:"#3b82f6", name:"Q4FY24 Slam Dunk with Splunk", sub:"Partner incentive", amount:"$8,330", date:"Est. July 2026", pct:75, prog:"3/4"}
 ];
 
 const insightCards = [
-  {peBadge:"Prod+Services", peColor:PE_COLOR.PE1, tag:"$320K ★", tagColor:"#dc2626", title:"High Value Booking", desc:"Stargate AI ($320K) is your largest eligible booking this period. Top backlog: Cortex Financial ($230K), Helix Networks ($210K). Clearing either pushes PE1 past the 50% threshold."},
-  {peBadge:"Services", peColor:PE_COLOR.PE3, tag:"$92K ★", tagColor:"#dc2626", title:"Services Backlog Opportunity", desc:"Services sits at 44% attainment — $5.4K from the 50% tier. GlobalNet Inc ($92K backlog, PE3) clearing alone would jump you to 1.5x rate."},
+  {peBadge:"Prod+Services", peColor:PE_COLOR.PE1, tag:"$18K ★", tagColor:"#dc2626", title:"High Value Booking", desc:"Stargate AI ($18K) is your largest eligible booking this period. Top backlog: Cortex Financial ($23K), Helix Networks ($14K). Clearing both pushes PE1 past the 50% threshold."},
+  {peBadge:"Services", peColor:PE_COLOR.PE3, tag:"$38K ★", tagColor:"#dc2626", title:"Services Backlog Opportunity", desc:"Services sits at 44% attainment — $5K from the 50% tier. GlobalNet Inc ($38K backlog, PE3) clearing alone would lift you past the 75% tier."},
   {peBadge:"CA Review", peColor:"#6b7280", tag:"✓ Clear ★", tagColor:"#10b981", title:"Comp Assurance", desc:"No CA review triggered this period. Your May payment of $8,408 is 91% below the $100K threshold."}
 ];
 
@@ -120,15 +120,15 @@ const INSIGHT_CATS = [
 const INSIGHT_INDEX = INSIGHT_CATS.flatMap(c=>c.items.map(it=>({...it, cat:c.name, catColor:c.color})));
 
 const notifications = [
-  {type:"amber", title:"Goal Sheet acceptance due", desc:"Review and accept Q4 FY26 Goal Sheet by Jun 15."},
+  {type:"amber", title:"Goal Sheet acceptance due", desc:"Review and accept H2 FY26 Goal Sheet by Jun 15."},
   {type:"green", title:"Q2 Bonus Eligible", desc:"On track to earn quarterly bonus."},
-  {type:"blue", title:"New Comp Plan Released", desc:"Q4 FY26 Plan is now available."}
+  {type:"blue", title:"New Comp Plan Released", desc:"H2 FY26 Plan is now available."}
 ];
 
 /* My Reminders (second tab of the bell dropdown) — user-managed notes */
 const REMINDERS_SEED = [
   {id:1, text:"Follow up on PE2 deal with BlueStar Solutions", date:"2026-06-10", done:false},
-  {id:2, text:"Review Q4 goal sheet before acceptance window closes", date:"2026-06-15", done:false}
+  {id:2, text:"Review H2 goal sheet before acceptance window closes", date:"2026-06-15", done:false}
 ];
 const fmtRemDate = iso => iso
   ? new Date(iso+"T12:00:00").toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"})
@@ -137,18 +137,18 @@ const fmtRemDate = iso => iso
 /* Payments — periods with full breakdown + per-PE calculation data */
 const recentPaymentPeriods = [
   {month:"May 2026", amount:"8,408.25", status:"Open", payDate:"Jun 2, 2026", lockDate:"May 28, 2026", revDates:"May 1 – May 18, 2026",
-    goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"5,858.25", items:[
-      {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:24, attChange:4, payout:"1,585.54", color:PE_COLOR.PE1,
-        calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"50%", targetIncentive:"31,759.05", proration:"100%", payoutRate:"18%", result:"1,585.54", rateName:"CS402",
+    goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"5,859.75", items:[
+      {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:24, attChange:4, payout:"1,585.50", color:PE_COLOR.PE1,
+        calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"50%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4.2%", result:"1,585.50", rateName:"CS402",
           rateIncremental:[
-            {range:"0 – 50 %", peRate:".75%", prior:"20%", incr:"4%", mult:"18%", active:true},
+            {range:"0 – 50 %", peRate:".75%", prior:"20%", incr:"4%", mult:"4.2%", active:true},
             {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
             {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
             {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
             {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
           rateTotal:[
-            {range:"0 – 50 %", peRate:".75%", rev:"24%", mult:"18%", active:true},
+            {range:"0 – 50 %", peRate:".75%", rev:"24%", mult:"4.2%", active:true},
             {range:"50 – 75 %", peRate:"1.5%", rev:"-", mult:"-"},
             {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
@@ -158,41 +158,41 @@ const recentPaymentPeriods = [
            display-only; each child opens its own calc breakdown */
         children:[
           {pe:"PE1", label:"Prod+Services", color:PE_COLOR.PE1, pct:24, attChange:4, payout:"1,359.00",
-            calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"60%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"3%", totalEarned:"1,359.00", prevPaid:"0", result:"1,359.00"}},
-          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.64",
-            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"15%", totalEarned:"90.64", prevPaid:"0", result:"90.64"}},
-          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.64",
-            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"15%", totalEarned:"90.64", prevPaid:"0", result:"90.64"}},
-          {pe:"MY", label:"Services MY", color:"#3b82f6", pct:5, attChange:1, payout:"45.26",
-            calc:{incrementalAtt:"1%", totalAtt:"5%", weight:"1%", targetIncentive:"75,500.00", proration:"50%", payoutRate:"12%", totalEarned:"45.26", prevPaid:"0", result:"45.26"}}
+            calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"45%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4%", totalEarned:"1,359.00", prevPaid:"0", result:"1,359.00"}},
+          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.60",
+            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"6%", totalEarned:"90.60", prevPaid:"0", result:"90.60"}},
+          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.60",
+            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"6%", totalEarned:"90.60", prevPaid:"0", result:"90.60"}},
+          {pe:"MY", label:"Services MY", color:"#3b82f6", pct:5, attChange:1, payout:"45.30",
+            calc:{incrementalAtt:"1%", totalAtt:"5%", weight:"1%", targetIncentive:"75,500.00", proration:"50%", payoutRate:"12%", totalEarned:"45.30", prevPaid:"0", result:"45.30"}}
         ]},
       {pe:"PE2", name:"RRA-SW WO SEC_ACV|AG|WM|NPR", label:"Recurring Software", weight:"30%", pct:71, attChange:6, payout:"1,019.25", color:PE_COLOR.PE2,
-        calc:{incrementalAtt:"6%", totalAtt:"71%", weight:"30%", targetIncentive:"31,759.05", proration:"100%", payoutRate:"53.25%", result:"1,019.25", rateName:"CS402",
+        calc:{incrementalAtt:"6%", totalAtt:"71%", weight:"30%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4.5%", result:"1,019.25", rateName:"CS402",
           rateIncremental:[
-            {range:"0 – 50 %", peRate:".75%", prior:"65%", incr:"6%", mult:"37.5%", active:true},
-            {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"6%", mult:"15.75%", active:true},
+            {range:"0 – 50 %", peRate:".75%", prior:"-", incr:"-", mult:"-"},
+            {range:"50 – 75 %", peRate:".75%", prior:"65%", incr:"6%", mult:"4.5%", active:true},
             {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
             {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
             {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
           rateTotal:[
             {range:"0 – 50 %", peRate:".75%", rev:"-", mult:"-"},
-            {range:"50 – 75 %", peRate:"1.5%", rev:"71%", mult:"53.25%", active:true},
+            {range:"50 – 75 %", peRate:".75%", rev:"71%", mult:"4.5%", active:true},
             {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
             {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
             {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
-      {pe:"PE3", name:"SEC PRD ACV|WM|NPR", label:"Services", weight:"20%", pct:44, attChange:5, payout:"980.00", color:PE_COLOR.PE3,
-        calc:{incrementalAtt:"5%", totalAtt:"44%", weight:"20%", targetIncentive:"31,759.05", proration:"100%", payoutRate:"33%", result:"980.00", rateName:"CS402",
+      {pe:"PE3", name:"SEC PRD ACV|WM|NPR", label:"Services", weight:"20%", pct:44, attChange:5, payout:"755.00", color:PE_COLOR.PE3,
+        calc:{incrementalAtt:"5%", totalAtt:"44%", weight:"20%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"5%", result:"755.00", rateName:"CS402",
           rateIncremental:[
-            {range:"0 – 50 %", peRate:".75%", prior:"39%", incr:"5%", mult:"33%", active:true},
+            {range:"0 – 50 %", peRate:"1%", prior:"39%", incr:"5%", mult:"5%", active:true},
             {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
             {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
             {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
             {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
           rateTotal:[
-            {range:"0 – 50 %", peRate:".75%", rev:"44%", mult:"33%", active:true},
+            {range:"0 – 50 %", peRate:"1%", rev:"44%", mult:"5%", active:true},
             {range:"50 – 75 %", peRate:"1.5%", rev:"-", mult:"-"},
             {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
@@ -202,7 +202,7 @@ const recentPaymentPeriods = [
     ]},
     spiff:{total:"2,125.00", items:[{name:"Q4FY24 Slam Dunk with Splunk", amount:"$1,625.00"},{name:"Cloud Migration Accelerator", amount:"$500.00"}]},
     draws:{total:"50.00", items:[{name:"Monthly Incentive Payment (MIPS)", amount:"$35.00"},{name:"Recoverable Draw", amount:"$15.00"}]},
-    adj:{total:"75.00", items:[{name:"ICC True-up Adjustment", amount:"$75.00"}]},
+    adj:{total:"73.50", items:[{name:"ICC True-up Adjustment", amount:"$73.50"}]},
     otb:{total:"100.00", items:[{name:"Security iACV Plan", amount:"$100.00"}]},
     past:{total:"200.00", groups:[
       {fy:"FY23", half:"H2", dates:"Jul 1, 2023 – Dec 31, 2023", rate:"CS402", total:"120.00", items:[
@@ -216,7 +216,7 @@ const recentPaymentPeriods = [
         {pe:"PE3", name:"Renewable Software (SRenewed)", amount:"5.00"}]}
     ]}
   },
-  {month:"April 2026", amount:"6,830.00", status:"Paid", payDate:"May 8, 2026", lockDate:"May 1, 2026", revDates:"Apr 1 – Apr 30, 2026",
+  {month:"April 2026", amount:"6,830.00", status:"Paid", payDate:"May 2, 2026", lockDate:"Apr 28, 2026", revDates:"Apr 1 – Apr 30, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"4,605.00", items:[
       {pe:"PE1", label:"Prod+Services", weight:"50%", pct:22, attChange:3, payout:"1,320.00", color:PE_COLOR.PE1},
       {pe:"PE2", label:"Recurring Software", weight:"30%", pct:65, attChange:5, payout:"1,985.00", color:PE_COLOR.PE2},
@@ -225,7 +225,7 @@ const recentPaymentPeriods = [
     spiff:{total:"2,125.00", items:[{name:"Q4FY24 Slam Dunk", amount:"$2,125.00"}]},
     draws:{total:"50.00", items:[{name:"MIPS", amount:"$50.00"}]}, adj:{total:"50.00", items:[{name:"ICC Adj", amount:"$50.00"}]}, otb:{total:"0.00", items:[]}, past:{total:"0.00", items:[]}
   },
-  {month:"March 2026", amount:"6,189.00", status:"Paid", payDate:"Apr 8, 2026", lockDate:"Apr 1, 2026", revDates:"Mar 1 – Mar 31, 2026",
+  {month:"March 2026", amount:"6,189.00", status:"Paid", payDate:"Apr 2, 2026", lockDate:"Mar 28, 2026", revDates:"Mar 1 – Mar 31, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"3,964.00", items:[
       {pe:"PE1", label:"Prod+Services", weight:"50%", pct:20, attChange:2, payout:"1,100.00", color:PE_COLOR.PE1},
       {pe:"PE2", label:"Recurring Software", weight:"30%", pct:60, attChange:3, payout:"1,764.00", color:PE_COLOR.PE2},
@@ -255,15 +255,15 @@ function pastStatement([month, gsTotal, spiffTotal, pcts, payDate, lockDate, rev
 }
 const H2_FY25 = "Jul 25, 2025 - Jan 25, 2026", H1_FY26 = "Jan 26, 2026 - Jul 26, 2026";
 const olderPaymentPeriods = [
-  ["June 2025",     "3,412.00", "1,900.00", [18,42,28], "Jul 8, 2025", "Jul 1, 2025", "Jun 1 – Jun 30, 2025", H2_FY25],
-  ["July 2025",     "4,120.50", "1,827.00", [21,48,31], "Aug 8, 2025", "Aug 1, 2025", "Jul 1 – Jul 31, 2025", H2_FY25],
-  ["August 2025",   "3,845.00", "1,375.00", [24,51,33], "Sep 8, 2025", "Sep 1, 2025", "Aug 1 – Aug 31, 2025", H2_FY25],
-  ["September 2025","4,610.00", "2,090.00", [29,57,38], "Oct 8, 2025", "Oct 1, 2025", "Sep 1 – Sep 30, 2025", H2_FY25],
-  ["October 2025",  "3,988.00", "1,152.00", [33,61,41], "Nov 8, 2025", "Nov 1, 2025", "Oct 1 – Oct 31, 2025", H2_FY25],
-  ["November 2025", "5,240.00", "1,730.00", [38,68,46], "Dec 8, 2025", "Dec 1, 2025", "Nov 1 – Nov 30, 2025", H2_FY25],
-  ["December 2025", "4,455.00", "2,485.00", [45,74,52], "Jan 8, 2026", "Jan 2, 2026", "Dec 1 – Dec 31, 2025", H2_FY25],
-  ["January 2026",  "3,610.00", "1,240.00", [12,48,22], "Feb 8, 2026", "Feb 2, 2026", "Jan 1 – Jan 31, 2026", H1_FY26],
-  ["February 2026", "4,206.00", "1,425.00", [16,54,28], "Mar 8, 2026", "Mar 2, 2026", "Feb 1 – Feb 28, 2026", H1_FY26]
+  ["June 2025",     "3,412.00", "1,900.00", [18,42,28], "Jul 2, 2025", "Jun 28, 2025", "Jun 1 – Jun 30, 2025", H2_FY25],
+  ["July 2025",     "4,120.50", "1,827.00", [21,48,31], "Aug 2, 2025", "Jul 28, 2025", "Jul 1 – Jul 31, 2025", H2_FY25],
+  ["August 2025",   "3,845.00", "1,375.00", [24,51,33], "Sep 2, 2025", "Aug 28, 2025", "Aug 1 – Aug 31, 2025", H2_FY25],
+  ["September 2025","4,610.00", "2,090.00", [29,57,38], "Oct 2, 2025", "Sep 28, 2025", "Sep 1 – Sep 30, 2025", H2_FY25],
+  ["October 2025",  "3,988.00", "1,152.00", [33,61,41], "Nov 2, 2025", "Oct 28, 2025", "Oct 1 – Oct 31, 2025", H2_FY25],
+  ["November 2025", "5,240.00", "1,730.00", [38,68,46], "Dec 2, 2025", "Nov 28, 2025", "Nov 1 – Nov 30, 2025", H2_FY25],
+  ["December 2025", "4,455.00", "2,485.00", [45,74,52], "Jan 2, 2026", "Dec 28, 2025", "Dec 1 – Dec 31, 2025", H2_FY25],
+  ["January 2026",  "3,610.00", "1,240.00", [12,48,22], "Feb 2, 2026", "Jan 28, 2026", "Jan 1 – Jan 31, 2026", H1_FY26],
+  ["February 2026", "4,206.00", "1,425.00", [16,54,28], "Mar 2, 2026", "Feb 28, 2026", "Feb 1 – Feb 28, 2026", H1_FY26]
 ].map(pastStatement);
 
 /* Chronological (oldest → newest): June 2025 … May 2026 */
@@ -271,9 +271,9 @@ const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slic
 
 /* Goals — one entry per plan element tab (PE1, PE2, PE3, KSO, OTB, NDR) */
 const goalTabs = [
-  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,585.54"},
+  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,585.50"},
   {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.25"},
-  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.00"},
+  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$755.00"},
   {id:"KSO", name:"Key Sales Objectives",color:PE_COLOR.KSO, goal:"$2.5k", attPct:100,  bookingsAmt:"—",    bookingsPct:100, revenueAmt:"—",    revenuePct:100, backlogAmt:"—",    backlogPct:0,  incentive:"$2,500.00"},
   {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
   {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}
@@ -282,7 +282,7 @@ const goalTabs = [
 /* Example goal sheet rendered inside the View Goal Sheet popup */
 const goalSheetExample = {
   period:"H1 FY26 · Jan 26 – Jul 26, 2026",
-  target:"$31,759.05",
+  target:"$75,500.00",
   rows:[
     {id:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services",      goal:"$109,000", weight:"50%", att:24,   book:"$68k", rev:"$26k", back:"$42k", color:PE_COLOR.PE1},
     {id:"PE2", name:"RRA-SW WO SEC_ACV|NPR",label:"Recurring Software", goal:"$87,000",  weight:"30%", att:71, book:"$90k", rev:"$62k", back:"$28k", color:PE_COLOR.PE2},
@@ -295,13 +295,13 @@ const goalSheetExample = {
 
 /* Order Search — seller's orders (only shown after a search) */
 const orders = [
-  {id:"SO-105488", status:"Full Revenue", customer:"GlobalNet Inc",      partner:"Direct",           bookings:"$96,000",  backlog:"$0",       revenue:"$96,000"},
-  {id:"SO-105310", status:"Full Revenue", customer:"BlueStar Solutions", partner:"Insight Enterpr.", bookings:"$178,000", backlog:"$0",       revenue:"$178,000"},
-  {id:"SO-105188", status:"Full Revenue", customer:"Vertex Dynamics",    partner:"SHI Internat.",    bookings:"$145,000", backlog:"$0",       revenue:"$145,000"},
-  {id:"SO-105078", status:"Backlog",      customer:"Helix Networks",     partner:"CDW Corp.",        bookings:"$210,000", backlog:"$140,000", revenue:"$70,000"},
-  {id:"SO-104821", status:"Full Revenue", customer:"Acme Corp",          partner:"Direct",           bookings:"$125,000", backlog:"$0",       revenue:"$125,000"},
-  {id:"SO-104650", status:"Backlog",      customer:"Cortex Financial",   partner:"Direct",           bookings:"$230,000", backlog:"$230,000", revenue:"$0"},
-  {id:"SO-104512", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$88,500",  backlog:"$0",       revenue:"$88,500"}
+  {id:"SO-105488", status:"Full Revenue", customer:"GlobalNet Inc",      partner:"Direct",           bookings:"$9,600",  backlog:"$0",      revenue:"$9,600"},
+  {id:"SO-105310", status:"Full Revenue", customer:"BlueStar Solutions", partner:"Insight Enterpr.", bookings:"$17,800", backlog:"$0",      revenue:"$17,800"},
+  {id:"SO-105188", status:"Full Revenue", customer:"Vertex Dynamics",    partner:"SHI Internat.",    bookings:"$14,500", backlog:"$0",      revenue:"$14,500"},
+  {id:"SO-105078", status:"Backlog",      customer:"Helix Networks",     partner:"CDW Corp.",        bookings:"$21,000", backlog:"$14,000", revenue:"$7,000"},
+  {id:"SO-104821", status:"Full Revenue", customer:"Acme Corp",          partner:"Direct",           bookings:"$12,500", backlog:"$0",      revenue:"$12,500"},
+  {id:"SO-104650", status:"Backlog",      customer:"Cortex Financial",   partner:"Direct",           bookings:"$23,000", backlog:"$23,000", revenue:"$0"},
+  {id:"SO-104512", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$8,850",  backlog:"$0",      revenue:"$8,850"}
 ];
 
 /* Order Search — searchable field types (from the desktop reference).
@@ -312,21 +312,21 @@ const ORDER_TYPE_FIELDS = {"SO Number":["id"], "End Customer":["customer"], "Acc
 
 /* Revenue Transactions — shown by the PDF/breakdown icon on Payments (per plan element) */
 const revenueTxns = {
-  PE1:{total:"145,500.00", rows:[
-    {so:"SO-105201", date:"May 12, 2026", customer:"Meridian Corp",   rev:"$62,000.00"},
-    {so:"SO-105189", date:"May 8, 2026",  customer:"Apex Healthcare", rev:"$45,000.00"},
-    {so:"SO-104998", date:"Apr 28, 2026", customer:"NovaTech Inc",    rev:"$38,500.00"}
+  PE1:{total:"26,000.00", rows:[
+    {so:"SO-105201", date:"May 12, 2026", customer:"Meridian Corp",   rev:"$11,500.00"},
+    {so:"SO-105189", date:"May 8, 2026",  customer:"Apex Healthcare", rev:"$8,200.00"},
+    {so:"SO-104998", date:"Apr 28, 2026", customer:"NovaTech Inc",    rev:"$6,300.00"}
   ]},
-  PE2:{total:"317,000.00", rows:[
-    {so:"SO-105144", date:"Apr 22, 2026", customer:"ClearPath Systems",  rev:"$88,500.00"},
-    {so:"SO-105044", date:"Apr 7, 2026",  customer:"Quantum Analytics",  rev:"$52,000.00"},
-    {so:"SO-104512", date:"Mar 8, 2026",  customer:"BlueStar Solutions", rev:"$78,500.00"},
-    {so:"SO-104089", date:"Feb 22, 2026", customer:"Vector Systems",     rev:"$98,000.00"}
+  PE2:{total:"62,000.00", rows:[
+    {so:"SO-105144", date:"Apr 22, 2026", customer:"ClearPath Systems",  rev:"$18,500.00"},
+    {so:"SO-105044", date:"Apr 7, 2026",  customer:"Quantum Analytics",  rev:"$12,000.00"},
+    {so:"SO-104512", date:"Mar 8, 2026",  customer:"BlueStar Solutions", rev:"$15,500.00"},
+    {so:"SO-104089", date:"Feb 22, 2026", customer:"Vector Systems",     rev:"$16,000.00"}
   ]},
-  PE3:{total:"131,500.00", rows:[
-    {so:"SO-105112", date:"Apr 15, 2026", customer:"Summit Digital", rev:"$42,000.00"},
-    {so:"SO-104876", date:"Mar 20, 2026", customer:"Orion Networks", rev:"$55,500.00"},
-    {so:"SO-104650", date:"Mar 1, 2026",  customer:"Phoenix Labs",   rev:"$34,000.00"}
+  PE3:{total:"40,000.00", rows:[
+    {so:"SO-105112", date:"Apr 15, 2026", customer:"Summit Digital", rev:"$15,000.00"},
+    {so:"SO-104876", date:"Mar 20, 2026", customer:"Orion Networks", rev:"$14,500.00"},
+    {so:"SO-104650", date:"Mar 1, 2026",  customer:"Phoenix Labs",   rev:"$10,500.00"}
   ]}
 };
 
@@ -688,7 +688,7 @@ function AtAGlancePage({s}) {
     <div className="m-section-label"><span className="m-section-icon">⁘</span> PLAN ELEMENTS & INCENTIVES</div>
     <div className="m-section">
       <div className="m-section-hdr"><h2>PLAN ELEMENTS</h2><span className="m-badge">H1 2026</span></div>
-      <small className="m-pe-sub">All values in USD · Jan 1, 2026 – Jun 30, 2026</small>
+      <small className="m-pe-sub">All values in USD · Jan 26, 2026 – Jul 26, 2026</small>
       {planElements.map((pe,i)=><div key={i} className="m-pe-card m-pe-flat">
         <div className="m-pe-top">
           <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
@@ -1137,24 +1137,24 @@ const KSO_TONE = {gold:"#b08a1d", green:"#16a34a", blue:"#4f5ff5", grey:null};
 const ksoQuarters = [
   {q:"Q1 2026", status:"Reviewed", cap:"125%", bonusLabel:"Bonus Earned", bonus:"$2,500.00", date:"16 Nov 2025", dateLabel:"Reviewed",
     rows:[
-      {name:"New Conversions", desc:"6 New logo territory for Q1 FY26", bonus:"$1,000.00", weight:"50%", prog:"14 of 13 targets", pct:100, tone:"gold"},
-      {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$500.00", weight:"10%", prog:"10% of 20% attainment", pct:50, tone:"blue"},
-      {name:"Conversion Rate", desc:"60% rate, conversion rate for Q1 FY26", bonus:"$1,000.00", weight:"40%", prog:"10% of 13% conversion rate", pct:77, tone:"gold"}
+      {name:"New Conversions", desc:"13 new logo targets for Q1 FY26", bonus:"$1,000.00", weight:"50%", prog:"14 of 13 targets", pct:100, tone:"gold"},
+      {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$500.00", weight:"10%", prog:"20% of 20% attainment", pct:100, tone:"green"},
+      {name:"Conversion Rate", desc:"60% rate, conversion rate for Q1 FY26", bonus:"$1,000.00", weight:"40%", prog:"13% of 13% conversion rate", pct:100, tone:"green"}
     ]},
-  {q:"Q2 2026", status:"In Pending Review", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$4,100.00", date:"9 Feb 2026", dateLabel:"Review Period Opens",
+  {q:"Q2 2026", status:"Reviewed", cap:"125%", bonusLabel:"Bonus Earned", bonus:"$4,100.00", date:"12 Feb 2026", dateLabel:"Reviewed",
     rows:[
-      {name:"New Conversions", desc:"6 New logo territory for Q2 FY26", bonus:"$2,500.00", weight:"60%", prog:"5 of 5 targets", pct:100, tone:"green"},
+      {name:"New Conversions", desc:"5 new logo targets for Q2 FY26", bonus:"$2,500.00", weight:"60%", prog:"5 of 5 targets", pct:100, tone:"green"},
       {name:"Conversion Rate", desc:"60% rate, conversion rate for Q2 FY26", bonus:"$1,600.00", weight:"40%", prog:"5% of 5% conversion rate", pct:100, tone:"green"}
     ]},
-  {q:"Q3 2026", status:"On Going", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$4,900.00", date:"16 May 2026", dateLabel:"Review Period Opens",
+  {q:"Q3 2026", status:"In Pending Review", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$4,900.00", date:"16 May 2026", dateLabel:"Review Period Opened",
     rows:[
       {name:"Conversion Rate", desc:"60% rate, conversion rate for Q3 FY26", bonus:"$1,250.00", weight:"25%", prog:"5% of 5% conversion rate", pct:100, tone:"green"},
       {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$1,250.00", weight:"25%", prog:"0% of 25% attainment", pct:0, tone:"grey"},
-      {name:"New Conversions", desc:"6 New logo territory for Q3 FY26", bonus:"$2,400.00", weight:"100%", prog:"5 of 5 targets", pct:100, tone:"green"}
+      {name:"New Conversions", desc:"5 new logo targets for Q3 FY26", bonus:"$2,400.00", weight:"50%", prog:"5 of 5 targets", pct:100, tone:"green"}
     ]},
-  {q:"Q4 2026", status:"Upcoming", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$3,000.00", date:"11 Aug 2026", dateLabel:"Review Period Opens",
+  {q:"Q4 2026", status:"On Going", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$3,000.00", date:"11 Aug 2026", dateLabel:"Review Period Opens",
     rows:[
-      {name:"New Conversions", desc:"6 New logo territory for Q4 FY26", bonus:"$1,500.00", weight:"50%", prog:"5 of 10 targets", pct:50, tone:"blue"},
+      {name:"New Conversions", desc:"10 new logo targets for Q4 FY26", bonus:"$1,500.00", weight:"50%", prog:"2 of 10 targets", pct:20, tone:"blue"},
       {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$1,500.00", weight:"50%", prog:"0% of 5% attainment", pct:0, tone:"grey"}
     ]}
 ];
@@ -1207,14 +1207,14 @@ const ndrStats = [
   {label:"Achievement", value:"12.85%", hot:true},
   {label:"Target", value:"100%"}
 ];
-const ndrTrend = [["Jan",8.2],["Feb",9.3],["Mar",10.3],["Apr",11.4],["May",12.85]];
-const ndrAcv   = [["Jan",58],["Feb",70],["Mar",85],["Apr",97],["May",130]];
+const ndrTrend = [["Jan",1.65],["Feb",3.64],["Mar",6.05],["Apr",9.16],["May",12.85]];
+const ndrAcv   = [["Jan",58],["Feb",70],["Mar",85],["Apr",109.33],["May",130]];
 const ndrTxns = [
   {cat:"NET DOLLAR RETENTION Plan", atr:"$3,520,090.00", acv:"$452,330.00", kind:"plan"},
   {cat:"View Node Summary", kind:"link"},
   {cat:"View All Transactions", kind:"bold"},
   {cat:"Systematic Transactions", atr:"$3,520,090.00", acv:"$420,330.00", kind:"sub"},
-  {cat:"Manual Transactions", acv:"$30,000.00", kind:"sub"}
+  {cat:"Manual Transactions", acv:"$32,000.00", kind:"sub"}
 ];
 const ndrNodes = [
   {node:"West Region",    atr:"$1,280,040.00", acv:"$185,200.00", pct:"14.47%"},
@@ -1371,9 +1371,9 @@ function GoalsPage({s}) {
     <div className="m-section">
       <div className="m-section-hdr"><h2>Backlog Insights</h2><span className="m-badge">Preview</span></div>
       {[
-        {cust:"Helix Networks", pe:"PE1", amt:"$210K", color:PE_COLOR.PE1},
-        {cust:"Cortex Financial", pe:"PE1", amt:"$230K", color:PE_COLOR.PE1},
-        {cust:"GlobalNet Inc", pe:"PE3", amt:"$92K", color:PE_COLOR.PE3}
+        {cust:"Helix Networks", pe:"PE1", amt:"$14K", color:PE_COLOR.PE1},
+        {cust:"Cortex Financial", pe:"PE1", amt:"$23K", color:PE_COLOR.PE1},
+        {cust:"GlobalNet Inc", pe:"PE3", amt:"$38K", color:PE_COLOR.PE3}
       ].map((b,i)=><div key={i} className="m-backlog-mini">
         <span className="m-pe-badge" style={{background:b.color}}>{b.pe}</span>
         <span className="m-backlog-cust">{b.cust}</span>
@@ -1464,32 +1464,31 @@ function OrderSearchPage({s}) {
    Performance tiers keep their semantic colors (green/blue/amber/red);
    structure/brand stays on the purple-blue accent system.
    ════════════════════════════════════════════════════════════════ */
-const TEAM_AS_OF = "All data as of Jul 2, 2026, 10:24 AM";
+const TEAM_AS_OF = "All data as of May 26, 2026, 6:00 AM";
 
 const STATUS_COLOR = {
   "Exceeding":"#10b981", "On Track":"#3b82f6", "Watch":"#f59e0b", "At Risk":"#ef4444"
 };
 
-const teamSummary = {avgAtt:"88.2%", aboveGoal:4, onTrack:2, below75:4, size:10};
-
 /* earned = Earned vs Target Incentive %, bookings = Bookings Attainment %,
    revAtt = card revenue attainment, figures in $ */
 const teamSellers = [
-  {name:"Sarah Chen",   initials:"SC", status:"Exceeding", earned:107.1, bookings:115.6, revAtt:107, quota:"$1.6M", bookingsAmt:"$1.85M", payout:"$48.2K"},
-  {name:"Lisa Kumar",   initials:"LK", status:"Exceeding", earned:106.3, bookings:112.0, revAtt:106, quota:"$1.5M", bookingsAmt:"$1.68M", payout:"$42.5K"},
-  {name:"Mike Torres",  initials:"MT", status:"Exceeding", earned:97.3,  bookings:107.5, revAtt:97,  quota:"$1.6M", bookingsAmt:"$1.72M", payout:"$43.8K"},
-  {name:"Emily Davis",  initials:"ED", status:"Exceeding", earned:97.3,  bookings:101.3, revAtt:101, quota:"$1.8M", bookingsAmt:"$1.82M", payout:"$51.0K"},
-  {name:"Alex Johnson", initials:"AJ", status:"On Track",  earned:91.6,  bookings:92.5,  revAtt:92,  quota:"$2.1M", bookingsAmt:"$1.94M", payout:"$58.0K"},
-  {name:"David Park",   initials:"DP", status:"On Track",  earned:89.0,  bookings:90.0,  revAtt:90,  quota:"$1.7M", bookingsAmt:"$1.53M", payout:"$34.0K"},
-  {name:"John Smith",   initials:"JS", status:"Watch",     earned:69.3,  bookings:71.3,  revAtt:71,  quota:"$1.6M", bookingsAmt:"$1.14M", payout:"$31.2K"},
-  {name:"Bob Wilson",   initials:"BW", status:"Watch",     earned:71.3,  bookings:70.0,  revAtt:70,  quota:"$1.5M", bookingsAmt:"$1.05M", payout:"$28.5K"},
-  {name:"Rachel Lee",   initials:"RL", status:"Watch",     earned:67.0,  bookings:65.3,  revAtt:65,  quota:"$1.5M", bookingsAmt:"$980K",  payout:"$26.8K"},
-  {name:"Marcus Green", initials:"MG", status:"At Risk",   earned:49.1,  bookings:54.4,  revAtt:54,  quota:"$1.6M", bookingsAmt:"$870K",  payout:"$22.1K"}
+  {name:"Sarah Chen",    earned:107.1, bookings:115.6},
+  {name:"Lisa Kumar",    earned:106.3, bookings:112.0},
+  {name:"Mike Torres",   earned:97.3,  bookings:107.5},
+  {name:"Maya Chen",     earned:94.2,  bookings:96.4},
+  {name:"Priya Shah",    earned:90.4,  bookings:92.5},
+  {name:"Jordan Rivera", earned:78.6,  bookings:81.3},
+  {name:"Bob Wilson",    earned:71.3,  bookings:70.0},
+  {name:"John Smith",    earned:69.3,  bookings:71.3},
+  {name:"Daniel Kim",    earned:67.0,  bookings:66.2},
+  {name:"Rachel Lee",    earned:65.3,  bookings:65.0},
+  {name:"Marcus Green",  earned:54.4,  bookings:54.4}
 ];
 
 /* Seller performance cards — Top 5 shown first, expandable to all 10.
    Each member carries per-PE attainment for the three chip tiles. */
-const GS_PERIOD = "GS: 25-Jan-2026 – 25-Jul-2026";
+const GS_PERIOD = "GS: 26-Jan-2026 – 26-Jul-2026";
 const MEMBER_PE_META = [
   {id:"PE1", label:"Prod+Services"},
   {id:"PE2", label:"Annuity"},
@@ -1504,35 +1503,35 @@ const teamMembers = [
   {name:"Maya Chen",     initials:"MC", status:"On Track",  att:94,  pe:[96,93,94],    tones:["g","g","g"]},
   {name:"Priya Shah",    initials:"PS", status:"On Track",  att:90,  pe:[92,90,87],    tones:["g","g","b"]},
   {name:"Jordan Rivera", initials:"JR", status:"On Track",  att:78,  pe:[81,76,74],    tones:["g","b","a"]},
-  {name:"Bob Wilson",    initials:"BW", status:"At Risk",   att:71,  pe:[64,76,77],    tones:["r","a","b"]},
-  {name:"John Smith",    initials:"JS", status:"At Risk",   att:69,  pe:[65,76,80],    tones:["r","a","b"]},
+  {name:"Bob Wilson",    initials:"BW", status:"Watch",     att:71,  pe:[64,76,77],    tones:["r","a","b"]},
+  {name:"John Smith",    initials:"JS", status:"Watch",     att:69,  pe:[65,76,80],    tones:["r","a","b"]},
   {name:"Daniel Kim",    initials:"DK", status:"Watch",     att:67,  pe:[63,74,69],    tones:["a","a","a"]},
-  {name:"Rachel Lee",    initials:"RL", status:"At Risk",   att:65,  pe:[61,69,70],    tones:["r","a","a"]},
+  {name:"Rachel Lee",    initials:"RL", status:"Watch",     att:65,  pe:[61,69,70],    tones:["r","a","a"]},
   {name:"Marcus Green",  initials:"MG", status:"At Risk",   att:54,  pe:[50,56,63],    tones:["r","r","r"]}
 ];
 
 /* Team Insights — Canvas cards (supportive coaching tone; dismissible) */
 const teamInsights = [
-  {title:"3 Sellers Need Coaching", tag:"Coaching", metric:"3 need support", color:"#f59e0b",
-    desc:"Three sellers are currently below the expected attainment pace (below 65%). Early coaching can improve attainment and increase payout opportunities before period end.",
-    action:"Recommended focus: John Smith, Bob Wilson, Rachel Lee — Review pipeline, backlog, and upcoming opportunities with these sellers.",
-    names:"John Smith, Bob Wilson, Rachel Lee"},
+  {title:"4 Sellers Need Coaching", tag:"Coaching", metric:"4 need support", color:"#f59e0b",
+    desc:"Four sellers are currently below the expected attainment pace (below 70%). Early coaching can improve attainment and increase payout opportunities before period end.",
+    action:"Recommended focus: John Smith, Daniel Kim, Rachel Lee, Marcus Green — Review pipeline, backlog, and upcoming opportunities with these sellers.",
+    names:"John Smith, Daniel Kim, Rachel Lee +1 more"},
   {title:"Goal Coverage Health", tag:"Coverage", metric:"74%", color:"#3b82f6",
-    desc:"Your team has achieved $14.6M in bookings toward a $15.5M combined goal. You're building strong momentum — only $0.9M remains to reach full goal coverage.",
+    desc:"Your team has achieved $2.33M in bookings toward a $3.15M combined goal. You're building strong momentum — only $0.82M remains to reach full goal coverage.",
     action:"Keep the momentum going! Focus on advancing high-probability opportunities and converting qualified pipeline to close the remaining gap before period end."},
   {title:"Performance Spread — Opportunity to Level Up", tag:"Performance", metric:"Level up", color:"#f59e0b",
-    desc:"Your team is making solid progress. Top performers are leading the way at 118%, while emerging sellers at 54% have strong opportunities to increase attainment with focused coaching and collaboration.",
+    desc:"Your team is making solid progress. Top performers are leading the way at 107%, while emerging sellers at 54% have strong opportunities to increase attainment with focused coaching and collaboration.",
     action:"Encourage peer mentoring, pipeline reviews, and deal strategy sessions to help more sellers achieve their goals this period. Pair top performers with emerging sellers: connect Sarah Chen with John Smith, Lisa Kumar with Bob Wilson.",
-    names:"John Smith, Bob Wilson, Rachel Lee +1 more"},
-  {title:"Team Attainment Distribution", tag:"Attainment", metric:"89.6%", color:"#10b981",
-    desc:"Team of 10 averaging 89.6% attainment. Distribution: 4 exceeding goal, 2 on track (80–100%), 4 building momentum.",
-    action:"4 sellers building momentum — review deal strategy to accelerate this period."},
-  {title:"Top Performers — Celebrate & Scale", tag:"Recognition", metric:"4 exceeding goal", color:"#10b981",
-    desc:"4 team members exceeding goal at 109.8% average attainment. Great opportunity to share winning strategies across the team.",
-    action:"Recognize excellence: Sarah Chen, Mike Torres, Lisa Kumar, Emily Davis. Consider peer-led knowledge sharing.",
-    names:"Sarah Chen, Mike Torres, Lisa Kumar +1 more"},
+    names:"John Smith, Bob Wilson, Marcus Green +1 more"},
+  {title:"Team Attainment Distribution", tag:"Attainment", metric:"81.9%", color:"#10b981",
+    desc:"Team of 11 averaging 81.9% attainment. Distribution: 2 exceeding goal, 4 on track (75–100%), 5 building momentum.",
+    action:"5 sellers building momentum — review deal strategy to accelerate this period."},
+  {title:"Top Performers — Celebrate & Scale", tag:"Recognition", metric:"2 exceeding goal", color:"#10b981",
+    desc:"2 team members exceeding goal at 106.7% average attainment. Great opportunity to share winning strategies across the team.",
+    action:"Recognize excellence: Sarah Chen, Lisa Kumar. Consider peer-led knowledge sharing.",
+    names:"Sarah Chen, Lisa Kumar"},
   {title:"Forecasted End-of-Period Attainment", tag:"Forecast", metric:"96.2%", color:"#3b82f6",
-    desc:"Based on current pace (76% of period elapsed), team is projected to finish at 96.2% — close to full goal.",
+    desc:"Based on current pace (66% of period elapsed), team is projected to finish at 96.2% — close to full goal.",
     action:"Accelerate 3–4 deals in late stages to push team over 100% by period close."}
 ];
 
@@ -1750,16 +1749,16 @@ function TeamPage({s}) {
    Base data is PE1 (from the desktop reference); PE2/PE3 derive
    deterministically via weight/attainment factors.
    ════════════════════════════════════════════════════════════════ */
-const HIST_PERIODS = ["H1 2025","H2 2025","H1 2026","H2 2026"];
-const HIST_SHADE = {"H1 2025":"#8ecdf7","H2 2025":"#4aabf2","H1 2026":"#1e88e5","H2 2026":"#1565c0"};
+const HIST_PERIODS = ["H2 2024","H1 2025","H2 2025","H1 2026"];
+const HIST_SHADE = {"H2 2024":"#8ecdf7","H1 2025":"#4aabf2","H2 2025":"#1e88e5","H1 2026":"#1565c0"};
 /* per member: [earned, target, bookings, goal, att%] per period */
 const histData = {
   "Sarah Chen":   {trend:8.5, p:[[36800,38000,1320000,1400000,94.3],[40970,40500,1480000,1440000,102.8],[48200,45000,1850000,1600000,115.6],[24500,45000,980000,1600000,61.3]]},
   "Mike Torres":  {trend:5.6, p:[[33100,38000,1260000,1400000,90],[37230,40500,1376000,1440000,95.6],[43800,45000,1720000,1600000,107.5],[22800,45000,890000,1600000,55.6]]},
   "Lisa Kumar":   {trend:8.8, p:[[31400,34000,1180000,1300000,90.8],[36125,36000,1344000,1350000,99.6],[42500,40000,1680000,1500000,112],[22400,40000,840000,1500000,56]]},
-  "Emily Davis":  {trend:7,   p:[[28200,34000,1080000,1300000,83.1],[33065,36000,1216000,1350000,90.1],[38900,40000,1520000,1500000,101.3],[19800,40000,760000,1500000,50.7]]},
-  "Alex Johnson": {trend:7.2, p:[[30500,38000,1050000,1400000,75],[35020,40500,1184000,1440000,82.2],[41200,45000,1480000,1600000,92.5],[20100,45000,720000,1600000,45]]},
-  "David Park":   {trend:6.2, p:[[26800,34000,960000,1300000,73.8],[30260,36000,1080000,1350000,80],[35600,40000,1350000,1500000,90],[17900,40000,680000,1500000,45.3]]},
+  "Maya Chen":  {trend:7,   p:[[28200,34000,1080000,1300000,83.1],[33065,36000,1216000,1350000,90.1],[38900,40000,1520000,1500000,101.3],[19800,40000,760000,1500000,50.7]]},
+  "Priya Shah": {trend:7.2, p:[[30500,38000,1050000,1400000,75],[35020,40500,1184000,1440000,82.2],[41200,45000,1480000,1600000,92.5],[20100,45000,720000,1600000,45]]},
+  "Jordan Rivera":   {trend:6.2, p:[[26800,34000,960000,1300000,73.8],[30260,36000,1080000,1350000,80],[35600,40000,1350000,1500000,90],[17900,40000,680000,1500000,45.3]]},
   "John Smith":   {trend:3.3, p:[[23100,38000,840000,1400000,60],[26520,40500,912000,1440000,63.3],[31200,45000,1140000,1600000,71.3],[15200,45000,560000,1600000,35]]},
   "Bob Wilson":   {trend:2.2, p:[[21500,34000,780000,1300000,60],[24225,36000,840000,1350000,62.2],[28500,40000,1050000,1500000,70],[13800,40000,510000,1500000,34]]},
   "Rachel Lee":   {trend:4.3, p:[[19800,34000,700000,1300000,53.8],[22780,36000,784000,1350000,58.1],[26800,40000,980000,1500000,65.3],[12400,40000,460000,1500000,30.7]]},
@@ -2052,7 +2051,7 @@ function StatusBar() {
 /* iPad status bar (time + date on the left, radios on the right) */
 function IPadStatusBar() {
   return <div className="i-statusbar">
-    <span className="i-sb-time">9:41 AM · Tue Jul 2</span>
+    <span className="i-sb-time">9:41 AM · Tue May 26</span>
     <div className="m-sb-icons">
       <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
         {[[0,4],[4.5,6],[9,8.5],[13.5,11]].map(([x,h],i)=><rect key={i} x={x} y={11-h} width="3" height={h} rx="1" fill="currentColor"/>)}
@@ -2399,7 +2398,7 @@ function IPadGoals({s}) {
         </div>
         <div className="m-section">
           <div className="m-section-hdr"><h2>Backlog Insights</h2><span className="m-badge">Preview</span></div>
-          {[{cust:"Helix Networks",pe:"PE1",amt:"$210K",color:PE_COLOR.PE1},{cust:"Cortex Financial",pe:"PE1",amt:"$230K",color:PE_COLOR.PE1},{cust:"GlobalNet Inc",pe:"PE3",amt:"$92K",color:PE_COLOR.PE3}].map((b,i)=><div key={i} className="m-backlog-mini">
+          {[{cust:"Helix Networks",pe:"PE1",amt:"$14K",color:PE_COLOR.PE1},{cust:"Cortex Financial",pe:"PE1",amt:"$23K",color:PE_COLOR.PE1},{cust:"GlobalNet Inc",pe:"PE3",amt:"$38K",color:PE_COLOR.PE3}].map((b,i)=><div key={i} className="m-backlog-mini">
             <span className="m-pe-badge" style={{background:b.color}}>{b.pe}</span><span className="m-backlog-cust">{b.cust}</span><b className="m-backlog-amt">{b.amt}</b>
           </div>)}
         </div>
