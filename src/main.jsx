@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, Package, Download, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -20,17 +20,17 @@ const DOTS = "•••••";
 const amt = v => AMOUNTS_HIDDEN ? (String(v).startsWith("$") ? "$" + DOTS : DOTS) : v;
 const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, "$" + DOTS) : t;
 
-/* CompX IQ assistant — canned responses keyed by keyword (from original build) */
+/* StratComp IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
   "attainment":"You're at 24% on PRI (CX-SVC RENEW), 71% on NPR (RRA-SW), and 44% on NPR2 (SEC PRD). Overall weighted: ~46%. You need significant revenue growth on PRI to hit accelerator.",
   "earnings":"YTD earnings: $50,328. Current month (May 2026): $8,408.25 — Goal Sheet $5,858, SPIFFs $2,125, Draws $50, Adj $75, OTB $100, Past $200.",
   "accelerator":"Accelerator kicks in at 100% attainment. Rate jumps from 1% to 5.25% per 1% attainment! Your best positioned PE is NPR at 71%.",
-  "close":"Your best positioned PE is NPR (Recurring Software) at 70.7%. You need about $8.8M more to reach 100%. PRI is at 24% needing ~$2.9M.",
+  "close":"Your best positioned PE is NPR (Recurring Software) at 71%. You need about $8.8M more to reach 100%. PRI is at 24% needing ~$2.9M.",
   "payment":"Next payment: $8,408.25 on Jun 2, 2026. Previous: $6,830 (Apr). Lock date: May 28.",
   "backlog":"$207K in backlog. Estimated additional paycheck impact: +$3,200. Orders pending fulfillment across multiple months.",
   "goal":"Goal Sheet H2: PRI $3.81M (50% weight), NPR $12.65M (30%), NPR2 $735K (20%). Total target incentive: $31,759.",
   "spiff":"Active: Q2 Cloud Migration SPIFF ($5K potential, 25% progress), Partner Acceleration Q2 ($3,500, 25%). Total projected SPIFF earnings: $2,125.",
-  "best":"NPR2 (SEC PRD ACV) is at 167.59% attainment — already in accelerator zone! NPR (RRA-SW) is at 70.7%, closest to the 100% accelerator threshold.",
+  "best":"NPR2 (SEC PRD ACV) is at 167.59% attainment — already in accelerator zone! NPR (RRA-SW) is at 71%, closest to the 100% accelerator threshold.",
   "default":"I can help with: attainment, earnings, payments, accelerators, backlog, goals, or SPIFFs. What would you like to know?"
 };
 
@@ -46,14 +46,14 @@ function getInitialTheme() {
 const PE_COLOR = { PE1:"#f59e0b", PE2:"#10b981", PE3:"#3b82f6", KSO:"#6366f1", OTB:"#8b5cf6", NDR:"#06b6d4" };
 
 const monthlyPayCards = [
-  {month:"APR 2026", status:"Paid", amount:"6,830.00", change:"▲ 10.4%", payDate:"Paid May 2, 2026"},
-  {month:"MAY 2026", status:"Open", current:true, amount:"8,408.25", change:"▲ 37.5%", payDate:"Pay: Jun 2, 2026"},
-  {month:"JUN 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}
+  {month:"APR 2026", period:"April 2026", status:"Paid", amount:"6,830.00", change:"▲ 10.4%", payDate:"Paid May 2, 2026"},
+  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,408.25", change:"▲ 37.5%", payDate:"Pay: Jun 2, 2026"},
+  {month:"JUN 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // no statement period yet — card stays inert
 ];
 
 const planElements = [
   {id:"PE1", name:"Prod+Services", goal:"$109k Goal", bookingsAmt:"$68k", bookingsPct:63, revenueAmt:"$26k", revenuePct:24, backlogAmt:"$42k", backlogPct:39, attPct:24, color:PE_COLOR.PE1, blColor:"#fbbf24"},
-  {id:"PE2", name:"Recurring Software", goal:"$87k Goal", bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71, backlogAmt:"$28k", backlogPct:32, attPct:70.7, color:PE_COLOR.PE2, blColor:"#6ee7b7"},
+  {id:"PE2", name:"Recurring Software", goal:"$87k Goal", bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71, backlogAmt:"$28k", backlogPct:32, attPct:71, color:PE_COLOR.PE2, blColor:"#6ee7b7"},
   {id:"PE3", name:"Services", goal:"$90k Goal", bookingsAmt:"$85k", bookingsPct:94, revenueAmt:"$40k", revenuePct:44, backlogAmt:"$45k", backlogPct:50, attPct:44, color:PE_COLOR.PE3, blColor:"#93c5fd"}
 ];
 
@@ -69,14 +69,73 @@ const insightCards = [
   {peBadge:"CA Review", peColor:"#6b7280", tag:"✓ Clear ★", tagColor:"#10b981", title:"Comp Assurance", desc:"No CA review triggered this period. Your May payment of $8,408 is 91% below the $100K threshold."}
 ];
 
+/* ── Insight Canvas catalog (from the desktop reference) ──
+   Sellers pin up to MAX_PINS insights for their At A Glance feed;
+   with no pins, the AI-selected `insightCards` above are shown. */
+const MAX_PINS = 6;
+const INSIGHT_CATS = [
+  {name:"Fast Start", color:"#f59e0b", fast:true, items:[
+    {id:"what-selling", title:"What Am I Selling?", live:true, tags:["Seller"], cta:"View Plan", ctaTab:"goals", desc:"Review your active plan elements and quota targets for the current goal sheet period."},
+    {id:"who-selling-to", title:"Who Am I Selling To?", live:true, tags:["Seller"], cta:"View Territory", ctaTab:"orders", desc:"Explore your territory accounts, named customers, and top opportunities for this period."},
+    {id:"how-make-money", title:"How Do I Make Money?", live:true, tags:["Seller"], cta:"View Incentives", ctaTab:"payments", desc:"Understand your compensation structure, active SPIFs, and fastest paths to higher payout tiers."}]},
+  {name:"Attainment & Tiers", color:"#3b82f6", items:[
+    {id:"gap-next-tier", title:"Gap to Next Tier", live:true, tags:["Seller"], desc:"The % and $ needed to reach your next payout tier based on current revenue attainment."},
+    {id:"strongest-pe", title:"Strongest Plan Element", live:true, tags:["Seller"], desc:"Your top-performing plan element by attainment percentage this period."},
+    {id:"tier-milestone", title:"Tier Milestone", live:true, tags:["Seller"], desc:"You just crossed into a new attainment tier — your payout rate has increased accordingly."},
+    {id:"weakest-pe", title:"Weakest Plan Element", tags:["Seller"], desc:"The plan element most at risk of missing target — focus here to maximize payout."},
+    {id:"excellence-points", title:"Excellence Point Proximity", tags:["Seller"], desc:"How close you are to earning Excellence Points and what actions can accelerate them."},
+    {id:"proration-impact", title:"Proration Impact", tags:["Seller","Ops"], desc:"How mid-period plan changes or territory adjustments have affected your prorated quota."}]},
+  {name:"Payments & Payout", color:"#049fd9", items:[
+    {id:"payment-change", title:"Payment Change", live:true, tags:["Seller"], desc:"Month-over-month delta in your payout — what drove the change and what to expect next."},
+    {id:"payout-rate", title:"Current Payout Rate", live:true, tags:["Seller"], desc:"Your effective payout rate at current attainment levels across all active plan elements."},
+    {id:"adjustment-applied", title:"Adjustment Applied", live:true, tags:["Seller"], desc:"A compensation adjustment was applied to your account — review the change and reason code."},
+    {id:"payment-locked", title:"Payment Locked", live:true, tags:["Seller"], desc:"Your payment for this period has been locked — no further changes will affect this payout."},
+    {id:"lock-pay-date", title:"Lock / Pay Date", live:true, tags:["Seller"], desc:"Upcoming revenue lock and payment dates with estimated amounts based on current trajectory."},
+    {id:"adjustment-explain", title:"Adjustment Explanation", tags:["Seller","Ops"], desc:"Details on any manual adjustments applied this period and their impact on your payout."},
+    {id:"comp-velocity", title:"Compensation Velocity", tags:["Seller"], desc:"Your rate of earnings acceleration compared to the same point in prior periods."}]},
+  {name:"Orders & Pipeline", color:"#f97316", items:[
+    {id:"recent-order", title:"Recent Order", live:true, tags:["Seller"], desc:"Your most recent booked order, its plan element classification, and revenue recognition status."},
+    {id:"backlog-conversion", title:"Backlog Conversion", live:true, tags:["Seller"], desc:"Orders in backlog and their expected clearance timeline — shows estimated paycheck impact."},
+    {id:"backlog-converted", title:"Backlog Converted", live:true, tags:["Seller"], desc:"An order moved from backlog to revenue — see the payout impact on your current period."},
+    {id:"high-value-booking", title:"High-Value Booking", live:true, tags:["Seller"], desc:"A high-value order was recently booked to your plan — review its classification and impact."},
+    {id:"order-debooked", title:"Order Debooked", live:true, tags:["Seller"], desc:"A previously booked order was debooked — understand the revenue and payout impact."},
+    {id:"orders-summary", title:"Orders Summary", tags:["Seller"], desc:"Aggregate view of bookings, backlog, and revenue by plan element for the current period."},
+    {id:"pipeline-health", title:"Pipeline Health", tags:["Seller","Manager"], desc:"Assessment of your open opportunities and likelihood to close against remaining quota gap."}]},
+  {name:"Manager & Team", color:"#8b5cf6", items:[
+    {id:"team-attainment", title:"Team Attainment Distribution", live:true, tags:["Manager"], desc:"Breakdown of your team's attainment spread — who is ahead, on track, or at risk."},
+    {id:"at-risk-sellers", title:"At-Risk Sellers", live:true, tags:["Manager"], desc:"Team members unlikely to hit target based on current pace — suggested coaching actions included."},
+    {id:"top-performers", title:"Top Performers", live:true, tags:["Manager"], desc:"Your highest-attaining reps this period with deal composition and momentum details."},
+    {id:"member-milestone", title:"Team Member Milestone", live:true, tags:["Manager"], desc:"A team member crossed a significant attainment or tier milestone — worth recognizing."},
+    {id:"coaching-priority", title:"Coaching Priority", tags:["Manager"], desc:"AI-ranked list of team members by highest coaching ROI based on gap and close probability."},
+    {id:"team-momentum", title:"Team Momentum", tags:["Manager"], desc:"Week-over-week booking momentum across your team and which deals are driving growth."}]},
+  {name:"Ops & System", color:"#64748b", items:[
+    {id:"system-health", title:"System Health", tags:["Ops","Sio"], desc:"Status of data feeds, integration pipelines, and any known data quality issues affecting payroll."},
+    {id:"access-status", title:"Access Status", tags:["Ops"], desc:"Current provisioning status for sellers in your plan — flags missing access or stale profiles."},
+    {id:"dispute-volume", title:"Dispute Volume", tags:["Ops","Sio"], desc:"Open compensation disputes by age, plan element, and priority with resolution timeline."}]},
+  {name:"Self-Service", color:"#06b6d4", items:[
+    {id:"self-validation", title:"Self-Service Validation", tags:["Seller"], desc:"Verify your own attainment calculations and flag discrepancies before the lock date."},
+    {id:"fix-verification", title:"Fix Verification", tags:["Seller","Ops"], desc:"Confirm that a previously reported data fix has been applied correctly to your comp record."},
+    {id:"predictive-attainment", title:"Predictive Attainment", tags:["Seller","Manager"], desc:"ML-based projection of your period-end attainment given current pace, pipeline, and seasonality."}]}
+];
+const INSIGHT_INDEX = INSIGHT_CATS.flatMap(c=>c.items.map(it=>({...it, cat:c.name, catColor:c.color})));
+
 const notifications = [
   {type:"amber", title:"Goal Sheet acceptance due", desc:"Review and accept Q4 FY26 Goal Sheet by Jun 15."},
   {type:"green", title:"Q2 Bonus Eligible", desc:"On track to earn quarterly bonus."},
   {type:"blue", title:"New Comp Plan Released", desc:"Q4 FY26 Plan is now available."}
 ];
 
+/* My Reminders (second tab of the bell dropdown) — user-managed notes */
+const REMINDERS_SEED = [
+  {id:1, text:"Follow up on PE2 deal with BlueStar Solutions", date:"2026-06-10", done:false},
+  {id:2, text:"Review Q4 goal sheet before acceptance window closes", date:"2026-06-15", done:false}
+];
+const fmtRemDate = iso => iso
+  ? new Date(iso+"T12:00:00").toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"})
+  : "No date";
+
 /* Payments — periods with full breakdown + per-PE calculation data */
-const fullPaymentPeriods = [
+const recentPaymentPeriods = [
   {month:"May 2026", amount:"8,408.25", status:"Open", payDate:"Jun 2, 2026", lockDate:"May 28, 2026", revDates:"May 1 – May 18, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"5,858.25", items:[
       {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:24, attChange:4, payout:"1,585.54", color:PE_COLOR.PE1,
@@ -94,7 +153,19 @@ const fullPaymentPeriods = [
             {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
             {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
             {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
-            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
+            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]},
+        /* PE1 splits into product-line components — the parent total is
+           display-only; each child opens its own calc breakdown */
+        children:[
+          {pe:"PE1", label:"Prod+Services", color:PE_COLOR.PE1, pct:24, attChange:4, payout:"1,359.00",
+            calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"60%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"3%", totalEarned:"1,359.00", prevPaid:"0", result:"1,359.00"}},
+          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.64",
+            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"15%", totalEarned:"90.64", prevPaid:"0", result:"90.64"}},
+          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.64",
+            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"15%", totalEarned:"90.64", prevPaid:"0", result:"90.64"}},
+          {pe:"MY", label:"Services MY", color:"#3b82f6", pct:5, attChange:1, payout:"45.26",
+            calc:{incrementalAtt:"1%", totalAtt:"5%", weight:"1%", targetIncentive:"75,500.00", proration:"50%", payoutRate:"12%", totalEarned:"45.26", prevPaid:"0", result:"45.26"}}
+        ]},
       {pe:"PE2", name:"RRA-SW WO SEC_ACV|AG|WM|NPR", label:"Recurring Software", weight:"30%", pct:71, attChange:6, payout:"1,019.25", color:PE_COLOR.PE2,
         calc:{incrementalAtt:"6%", totalAtt:"71%", weight:"30%", targetIncentive:"31,759.05", proration:"100%", payoutRate:"53.25%", result:"1,019.25", rateName:"CS402",
           rateIncremental:[
@@ -133,7 +204,17 @@ const fullPaymentPeriods = [
     draws:{total:"50.00", items:[{name:"Monthly Incentive Payment (MIPS)", amount:"$35.00"},{name:"Recoverable Draw", amount:"$15.00"}]},
     adj:{total:"75.00", items:[{name:"ICC True-up Adjustment", amount:"$75.00"}]},
     otb:{total:"100.00", items:[{name:"Security iACV Plan", amount:"$100.00"}]},
-    past:{total:"200.00", items:[{name:"H2 FY25 Goal Sheet – Prod+Services", amount:"$120.00"},{name:"H2 FY25 Goal Sheet – RSW", amount:"$80.00"}]}
+    past:{total:"200.00", groups:[
+      {fy:"FY23", half:"H2", dates:"Jul 1, 2023 – Dec 31, 2023", rate:"CS402", total:"120.00", items:[
+        {pe:"PE1", name:"Product & Services Annual", amount:"75.00"},
+        {pe:"PE2", name:"Renewable Software & Customer Success (iACV)", amount:"45.00"}]},
+      {fy:"FY23", half:"H1", dates:"Jan 1, 2023 – Jun 30, 2023", rate:"CS402", total:"50.00", items:[
+        {pe:"PE1", name:"Product & Services Annual", amount:"50.00"}]},
+      {fy:"FY22", half:"H2", dates:"Jul 1, 2022 – Dec 31, 2022", rate:"CS402", total:"30.00", items:[
+        {pe:"PE1", name:"Product & Services Annual", amount:"15.00"},
+        {pe:"PE2", name:"Renewable Software & Customer Success (iACV)", amount:"10.00"},
+        {pe:"PE3", name:"Renewable Software (SRenewed)", amount:"5.00"}]}
+    ]}
   },
   {month:"April 2026", amount:"6,830.00", status:"Paid", payDate:"May 8, 2026", lockDate:"May 1, 2026", revDates:"Apr 1 – Apr 30, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"4,605.00", items:[
@@ -154,10 +235,44 @@ const fullPaymentPeriods = [
   }
 ];
 
+/* Older statement months (fake data) so Payments can show the last 12 months.
+   amount = goal sheet + SPIFF + $50 draws + $50 adj, so the breakdown donut sums. */
+const fmtAmt = n => n.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+function pastStatement([month, gsTotal, spiffTotal, pcts, payDate, lockDate, revDates, gsPeriod]) {
+  const g = parseFloat(gsTotal.replace(/,/g,""));
+  const sp = parseFloat(spiffTotal.replace(/,/g,""));
+  return {month, amount:fmtAmt(g+sp+100), status:"Paid", payDate, lockDate, revDates,
+    goalSheet:{period:gsPeriod, total:gsTotal, items:[
+      {pe:"PE1", label:"Prod+Services", weight:"50%", pct:pcts[0], attChange:2, payout:fmtAmt(g*0.5), color:PE_COLOR.PE1},
+      {pe:"PE2", label:"Recurring Software", weight:"30%", pct:pcts[1], attChange:3, payout:fmtAmt(g*0.3), color:PE_COLOR.PE2},
+      {pe:"PE3", label:"Services", weight:"20%", pct:pcts[2], attChange:2, payout:fmtAmt(g*0.2), color:PE_COLOR.PE3}
+    ]},
+    spiff:{total:spiffTotal, items:[{name:"Quarterly SPIFF", amount:"$"+spiffTotal}]},
+    draws:{total:"50.00", items:[{name:"MIPS", amount:"$50.00"}]},
+    adj:{total:"50.00", items:[{name:"ICC Adj", amount:"$50.00"}]},
+    otb:{total:"0.00", items:[]}, past:{total:"0.00", items:[]}
+  };
+}
+const H2_FY25 = "Jul 25, 2025 - Jan 25, 2026", H1_FY26 = "Jan 26, 2026 - Jul 26, 2026";
+const olderPaymentPeriods = [
+  ["June 2025",     "3,412.00", "1,900.00", [18,42,28], "Jul 8, 2025", "Jul 1, 2025", "Jun 1 – Jun 30, 2025", H2_FY25],
+  ["July 2025",     "4,120.50", "1,827.00", [21,48,31], "Aug 8, 2025", "Aug 1, 2025", "Jul 1 – Jul 31, 2025", H2_FY25],
+  ["August 2025",   "3,845.00", "1,375.00", [24,51,33], "Sep 8, 2025", "Sep 1, 2025", "Aug 1 – Aug 31, 2025", H2_FY25],
+  ["September 2025","4,610.00", "2,090.00", [29,57,38], "Oct 8, 2025", "Oct 1, 2025", "Sep 1 – Sep 30, 2025", H2_FY25],
+  ["October 2025",  "3,988.00", "1,152.00", [33,61,41], "Nov 8, 2025", "Nov 1, 2025", "Oct 1 – Oct 31, 2025", H2_FY25],
+  ["November 2025", "5,240.00", "1,730.00", [38,68,46], "Dec 8, 2025", "Dec 1, 2025", "Nov 1 – Nov 30, 2025", H2_FY25],
+  ["December 2025", "4,455.00", "2,485.00", [45,74,52], "Jan 8, 2026", "Jan 2, 2026", "Dec 1 – Dec 31, 2025", H2_FY25],
+  ["January 2026",  "3,610.00", "1,240.00", [12,48,22], "Feb 8, 2026", "Feb 2, 2026", "Jan 1 – Jan 31, 2026", H1_FY26],
+  ["February 2026", "4,206.00", "1,425.00", [16,54,28], "Mar 8, 2026", "Mar 2, 2026", "Feb 1 – Feb 28, 2026", H1_FY26]
+].map(pastStatement);
+
+/* Chronological (oldest → newest): June 2025 … May 2026 */
+const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slice().reverse()];
+
 /* Goals — one entry per plan element tab (PE1, PE2, PE3, KSO, OTB, NDR) */
 const goalTabs = [
   {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,585.54"},
-  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, goal:"$87k",  attPct:70.7, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.25"},
+  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.25"},
   {id:"PE3", name:"Services",            color:PE_COLOR.PE3, goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.00"},
   {id:"KSO", name:"Key Sales Objectives",color:PE_COLOR.KSO, goal:"$2.5k", attPct:100,  bookingsAmt:"—",    bookingsPct:100, revenueAmt:"—",    revenuePct:100, backlogAmt:"—",    backlogPct:0,  incentive:"$2,500.00"},
   {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
@@ -170,7 +285,7 @@ const goalSheetExample = {
   target:"$31,759.05",
   rows:[
     {id:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services",      goal:"$109,000", weight:"50%", att:24,   book:"$68k", rev:"$26k", back:"$42k", color:PE_COLOR.PE1},
-    {id:"PE2", name:"RRA-SW WO SEC_ACV|NPR",label:"Recurring Software", goal:"$87,000",  weight:"30%", att:70.7, book:"$90k", rev:"$62k", back:"$28k", color:PE_COLOR.PE2},
+    {id:"PE2", name:"RRA-SW WO SEC_ACV|NPR",label:"Recurring Software", goal:"$87,000",  weight:"30%", att:71, book:"$90k", rev:"$62k", back:"$28k", color:PE_COLOR.PE2},
     {id:"PE3", name:"SEC PRD ACV|WM|NPR",   label:"Services",           goal:"$90,000",  weight:"20%", att:44,   book:"$85k", rev:"$40k", back:"$45k", color:PE_COLOR.PE3},
     {id:"KSO", name:"Key Sales Objectives", label:"KSO",                goal:"$2,500",   weight:"—",   att:100,  book:"—",    rev:"—",    back:"—",    color:PE_COLOR.KSO},
     {id:"OTB", name:"On-Top Bonus",         label:"OTB",                goal:"$5,000",   weight:"—",   att:65,   book:"$3.3k",rev:"$2.1k",back:"$1.2k",color:PE_COLOR.OTB},
@@ -189,8 +304,11 @@ const orders = [
   {id:"SO-104512", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$88,500",  backlog:"$0",       revenue:"$88,500"}
 ];
 
-/* Order Search — recent history for the pre-populated zero-state */
-const recentSearches = ["GlobalNet", "Helix Networks", "SO-105078", "CDW Corp."];
+/* Order Search — searchable field types (from the desktop reference).
+   Demo data only carries SO number / customer / partner, so each type maps
+   to its closest field; unmapped types search across all of them. */
+const ORDER_SEARCH_TYPES = ["SO Number", "Deal ID", "PO Number", "Subscription Reference ID", "Book Date Range", "End Customer", "Account Name (UCD C4)", "Account ID (UCD C4)"];
+const ORDER_TYPE_FIELDS = {"SO Number":["id"], "End Customer":["customer"], "Account Name (UCD C4)":["customer","partner"], "Account ID (UCD C4)":["customer","partner"]};
 
 /* Revenue Transactions — shown by the PDF/breakdown icon on Payments (per plan element) */
 const revenueTxns = {
@@ -216,19 +334,26 @@ const revenueTxns = {
    DERIVATIONS (pure; shared by the mobile + iPad layouts so the two
    presentations never duplicate business logic)
    ════════════════════════════════════════════════════════════════ */
-const FILTER_DEFAULTS = {date:"Any time", status:"All", type:"All"};
-
-/* Payment Breakdown donut slices — blue→purple family, light-to-deep */
+/* Payment Breakdown donut slices — colors match the desktop/web palette:
+   indigo goal sheet, gold SPIFF, sky draws, lavender adjustments,
+   orange on-top, near-black past goal sheets */
 function paymentDonutItems(p) {
   return [
-    {label:"Goal Sheet", value:parseFloat(p.goalSheet.total.replace(/,/g,'')), color:"#4f5ff5"},
-    {label:"SPIFF & Bonus", value:parseFloat(p.spiff.total.replace(/,/g,'')), color:"#7b5ff5"},
-    {label:"Draws", value:parseFloat(p.draws.total.replace(/,/g,'')), color:"#6f9dff"},
-    {label:"Adjustments", value:parseFloat(p.adj.total.replace(/,/g,'')), color:"#a98bff"},
-    {label:"On-Top Bonus", value:parseFloat(p.otb.total.replace(/,/g,'')), color:"#3d3aa8"},
-    {label:"Past Goal Sheets", value:parseFloat(p.past.total.replace(/,/g,'')), color:"#c3b6ff"}
+    {label:"Goal Sheet", value:parseFloat(p.goalSheet.total.replace(/,/g,'')), color:"#3f3f9c"},
+    {label:"SPIFF & Bonus", value:parseFloat(p.spiff.total.replace(/,/g,'')), color:"#c9a232"},
+    {label:"Draws", value:parseFloat(p.draws.total.replace(/,/g,'')), color:"#7ec8f0"},
+    {label:"Adjustments", value:parseFloat(p.adj.total.replace(/,/g,'')), color:"#b9aede"},
+    {label:"On-Top Bonus", value:parseFloat(p.otb.total.replace(/,/g,'')), color:"#ed7024"},
+    /* near-black on the web; lifted in dark mode so the slice stays visible on the dark card */
+    {label:"Past Goal Sheets", value:parseFloat(p.past.total.replace(/,/g,'')),
+      color:document.documentElement.getAttribute("data-theme")==="dark" ? "#4b5670" : "#1e2430"}
   ].filter(d=>d.value>0);
 }
+
+/* Little type chips on accordion detail rows (desktop reference) */
+const SECTION_CHIP = {spiff:"SPIFF", otb:"OTB"};
+/* sections whose item amounts render in accent blue on the web */
+const ACCENT_AMT_SECTIONS = {spiff:true, adj:true, otb:true};
 
 function paymentSections(p) {
   return [
@@ -241,22 +366,11 @@ function paymentSections(p) {
   ];
 }
 
-function orderActiveCount(filters) {
-  return (filters.status!=="All"?1:0) + (filters.type!=="All"?1:0) + (filters.date!=="Any time"?1:0);
-}
-
-function deriveOrders(query, filters) {
+function deriveOrders(query, type) {
   const q = query.trim().toLowerCase();
-  const searched = q
-    ? orders.filter(o => o.customer.toLowerCase().includes(q) || o.id.toLowerCase().includes(q) || o.partner.toLowerCase().includes(q))
-    : orders;
-  const list = searched.filter(o => {
-    if (filters.status!=="All" && o.status!==filters.status) return false;
-    if (filters.type==="Direct" && o.partner!=="Direct") return false;
-    if (filters.type==="Partner" && o.partner==="Direct") return false;
-    return true;
-  });
-  return {q, searched, list};
+  const fields = ORDER_TYPE_FIELDS[type] || ["id", "customer", "partner"];
+  const list = q ? orders.filter(o => fields.some(f => o[f].toLowerCase().includes(q))) : orders;
+  return {q, list};
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -314,7 +428,7 @@ function SegmentDonut({items, total, size=180, stroke=26, centerTop, centerSub, 
           transition:"opacity .15s, filter .15s"}}/>)}
     </svg>
     <div className="m-donut2-center">
-      <b style={{fontSize:size*0.13}}>{centerTop}</b>
+      <b style={{fontSize:size*0.125}}>{centerTop}</b>
       {centerSub && <small>{centerSub}</small>}
     </div>
     {hv && <div className="m-donut-tip" style={{left:pos.x, top:pos.y}}>
@@ -370,7 +484,7 @@ function FullScreenPopup({title, subtitle, tabs, activeTab, onTab, onClose, chil
 }
 
 /* Horizontal formula: Weight × Target Incentive × Proration × Payout Rate = Result */
-function FormulaStrip({weight, targetIncentive, proration, payoutRate, result}) {
+function FormulaStrip({weight, targetIncentive, proration, payoutRate, result, totalEarned, prevPaid}) {
   const factors = [
     {v:weight, l:"Weight"},
     {v:amt(targetIncentive), l:"Target Incentive"},
@@ -383,7 +497,15 @@ function FormulaStrip({weight, targetIncentive, proration, payoutRate, result}) 
       <div className="m-formula-factor"><b>{f.v}</b><small>{f.l}</small></div>
     </React.Fragment>)}
     <span className="m-formula-op m-formula-eq">=</span>
-    <div className="m-formula-result">{amt(result)}</div>
+    {prevPaid !== undefined
+      ? <>
+        <div className="m-formula-factor"><b>{amt(totalEarned)}</b><small>Total Earned</small></div>
+        <span className="m-formula-op">−</span>
+        <div className="m-formula-factor"><b>{prevPaid}</b><small>Previously Paid</small></div>
+        <span className="m-formula-op m-formula-eq">=</span>
+        <div className="m-formula-factor"><b className="m-formula-result">{amt(result)}</b><small>Monthly Payment</small></div>
+      </>
+      : <div className="m-formula-result">{amt(result)}</div>}
   </div>;
 }
 
@@ -412,41 +534,130 @@ function HideBtn({s, light=false}) {
   </span>;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   AT A GLANCE
-   ════════════════════════════════════════════════════════════════ */
-function AtAGlancePage({s}) {
-  const showNotifs = s.notifOpen;
-  const setShowNotifs = s.setNotifOpen;
-  const hero = monthlyPayCards.find(c=>c.current);
-  const context = monthlyPayCards.filter(c=>!c.current);
+/* One collapsible insight card — details stay hidden behind a chevron
+   dropdown so the feed shows a clean list of titles. */
+function InsightCard({badge, badgeColor, tag, title, children}) {
+  const [open, setOpen] = useState(false);
+  return <div className="m-insight-card" role="button" tabIndex={0} aria-expanded={open}
+    onClick={()=>setOpen(o=>!o)}
+    onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
+    <div className="m-insight-top">
+      <span className="m-insight-badge" style={{color:badgeColor, borderColor:badgeColor}}>{badge}</span>
+      {tag}
+    </div>
+    <div className="m-insight-title-row">
+      <b className="m-insight-title">{title}</b>
+      <ChevronDown size={15} className={`m-insight-chev ${open?"open":""}`}/>
+    </div>
+    {open && <p className="m-insight-desc">{children}</p>}
+  </div>;
+}
 
-  return <div className="m-page">
-    {/* Header */}
+/* Insights section body (mobile + iPad): the seller's pinned Insight Canvas
+   picks, or the AI-selected cards when nothing is pinned. */
+function InsightCardsList({s}) {
+  const pinned = INSIGHT_INDEX.filter(it=>s.pinnedInsights.includes(it.id));
+  if (!pinned.length) return <>{insightCards.map((c,i)=>
+    <InsightCard key={i} badge={c.peBadge} badgeColor={c.peColor} title={c.title}
+      tag={<span className="m-insight-tag" style={{color:c.tagColor}}>{c.tag}</span>}>
+      {maskText(c.desc)}
+    </InsightCard>)}</>;
+  return <>{pinned.map(it=>
+    <InsightCard key={it.id} badge={it.cat} badgeColor={it.catColor} title={it.title}
+      tag={it.live ? <span className="ic-live">LIVE</span> : null}>
+      {it.desc}
+    </InsightCard>)}</>;
+}
+
+/* Section header button that opens the Insight Canvas */
+function InsightCanvasBtn({s}) {
+  return <button className="m-goalsheet-btn" onClick={()=>s.setInsightCanvasOpen(true)}>
+    <Layers size={13}/> Insight Canvas{s.pinnedInsights.length>0 && ` · ${s.pinnedInsights.length}`}
+  </button>;
+}
+
+/* Bell dropdown — Notifications | My Reminders tabs (desktop reference).
+   Reminders live in app state so they persist across pages and devices. */
+function NotifDropdown({s, onClose, ipad=false}) {
+  const [tab, setTab] = useState("notifications");
+  const [note, setNote] = useState("");
+  const [date, setDate] = useState("");
+  const add = () => {
+    if (!note.trim()) return;
+    s.setReminders(prev=>[...prev, {id:Date.now(), text:note.trim(), date, done:false}]);
+    setNote(""); setDate("");
+  };
+  const toggle = id => s.setReminders(prev=>prev.map(r=>r.id===id ? {...r, done:!r.done} : r));
+  const remove = id => s.setReminders(prev=>prev.filter(r=>r.id!==id));
+  return <div className={`m-notif-dropdown ${ipad?"i-notif-dropdown":""}`}>
+    <div className="m-ntabs">
+      <button className={tab==="notifications"?"on":""} onClick={()=>setTab("notifications")}>Notifications</button>
+      <button className={tab==="reminders"?"on":""} onClick={()=>setTab("reminders")}>My Reminders</button>
+      <button className="m-ntabs-close" onClick={onClose} aria-label="Close"><X size={15}/></button>
+    </div>
+    {tab==="notifications" && notifications.map((n,i)=><div key={i} className={`m-notif m-notif-${n.type}`}>
+      <div className="m-notif-dot"></div>
+      <div><b>{n.title}</b><span>{n.desc}</span></div>
+    </div>)}
+    {tab==="reminders" && <>
+      <div className="m-rem-add">
+        <input className="m-rem-note" placeholder="Add a reminder note..." value={note}
+          onChange={e=>setNote(e.target.value)} onKeyDown={e=>e.key==="Enter"&&add()}/>
+        <input className="m-rem-date" type="date" value={date} onChange={e=>setDate(e.target.value)} aria-label="Reminder date"/>
+        <button className="m-rem-addbtn" onClick={add}>Add</button>
+      </div>
+      {s.reminders.map(r=><div key={r.id} className={`m-rem-row ${r.done?"done":""}`}>
+        <button className={`m-rem-check ${r.done?"on":""}`} onClick={()=>toggle(r.id)}
+          role="checkbox" aria-checked={r.done} aria-label="Mark complete">
+          {r.done ? <CheckCircle2 size={21}/> : <span className="m-rem-circle"/>}
+        </button>
+        <div className="m-rem-txt">
+          <b>{r.text}</b>
+          <span><Calendar size={11}/> {fmtRemDate(r.date)}</span>
+        </div>
+        <button className="m-rem-x" onClick={()=>remove(r.id)} aria-label="Delete reminder"><X size={13}/></button>
+      </div>)}
+      {s.reminders.length===0 && <div className="m-rem-empty">No reminders yet — add one above.</div>}
+    </>}
+  </div>;
+}
+
+/* Universal mobile header — avatar, name/role, bell with unread count.
+   Shown on every mobile page so the top of the app reads consistently. */
+function MobileHeader({s}) {
+  return <>
     <div className="m-header">
       <div className="m-header-left">
         <img src="https://randomuser.me/api/portraits/men/32.jpg" className="m-avatar" alt=""/>
         <div>
-          <h1>Hi Alex!</h1>
+          <h1>Alex Johnson</h1>
           <span className="m-role">Enterprise Account Executive</span>
         </div>
       </div>
       <div className="m-header-actions">
-        <div className="m-bell" onClick={()=>setShowNotifs(!showNotifs)}><Bell size={18}/><span className="m-bell-dot"></span></div>
+        <div className="m-bell" onClick={()=>s.setNotifOpen(!s.notifOpen)}>
+          <Bell size={18}/><span className="m-bell-count">{notifications.length}</span>
+        </div>
       </div>
     </div>
+    {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
+      <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)}/></>}
+  </>;
+}
 
-    {showNotifs && <><div className="m-notif-overlay" onClick={()=>setShowNotifs(false)}/><div className="m-notif-dropdown">
-      <div className="m-notif-dropdown-hdr"><b>Notifications</b><span onClick={()=>setShowNotifs(false)}>✕</span></div>
-      {notifications.map((n,i)=><div key={i} className={`m-notif m-notif-${n.type}`}>
-        <div className="m-notif-dot"></div>
-        <div><b>{n.title}</b><span>{n.desc}</span></div>
-      </div>)}
-    </div></>}
+/* ════════════════════════════════════════════════════════════════
+   AT A GLANCE
+   ════════════════════════════════════════════════════════════════ */
+function AtAGlancePage({s}) {
+  const hero = monthlyPayCards.find(c=>c.current);
+  const context = monthlyPayCards.filter(c=>!c.current);
+
+  return <div className="m-page">
+    <MobileHeader s={s}/>
 
     {/* HERO — current month payment is the single largest element on the page; opens Payments */}
     <div className="m-hero" role="button" tabIndex={0} title="View Payments"
-      onClick={()=>s.setTab("payments")} onKeyDown={e=>e.key==="Enter"&&s.setTab("payments")}>
+      onClick={()=>s.openPayPeriod(hero.period)} onKeyDown={e=>e.key==="Enter"&&s.openPayPeriod(hero.period)}>
       <div className="m-hero-top">
         <span className="m-hero-label">Current Payment · {hero.month}</span>
         <span className={`m-pay-status m-status-${hero.status.toLowerCase()}`}>{hero.status}</span>
@@ -463,19 +674,14 @@ function AtAGlancePage({s}) {
 
     {/* Prev / next context — de-emphasized strip */}
     <div className="m-context-strip">
-      {context.map((c,i)=><div key={i} className="m-context-card">
+      {context.map((c,i)=><div key={i} className={`m-context-card ${c.period?"m-context-click":""}`}
+        role={c.period?"button":undefined} tabIndex={c.period?0:undefined} title={c.period?`View ${c.month} payment`:undefined}
+        onClick={c.period?()=>s.openPayPeriod(c.period):undefined}
+        onKeyDown={c.period?(e=>e.key==="Enter"&&s.openPayPeriod(c.period)):undefined}>
         <span className="m-context-month">{c.month}</span>
         <b className="m-context-amt">{amt("$"+c.amount)}</b>
         <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
       </div>)}
-    </div>
-
-    {/* Goaling Period Progress — stays a bar (timeline, not a proportion) */}
-    <div className="m-section">
-      <div className="m-section-hdr"><h2>Goaling Period Progress</h2><span className="m-badge">H1 2026</span></div>
-      <div className="m-gp-row"><span>Jan 1 – Jun 30, 2026</span><b>76%</b></div>
-      <div className="m-att-bar-wrap"><div className="m-att-bar" style={{width:"76%"}}></div></div>
-      <small className="m-gp-days">138 of 181 days elapsed</small>
     </div>
 
     {/* Plan Elements — donut is the dominant visual per card */}
@@ -483,15 +689,16 @@ function AtAGlancePage({s}) {
     <div className="m-section">
       <div className="m-section-hdr"><h2>PLAN ELEMENTS</h2><span className="m-badge">H1 2026</span></div>
       <small className="m-pe-sub">All values in USD · Jan 1, 2026 – Jun 30, 2026</small>
-      {planElements.map((pe,i)=><div key={i} className="m-pe-card">
+      {planElements.map((pe,i)=><div key={i} className="m-pe-card m-pe-flat">
         <div className="m-pe-top">
           <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
           <span className="m-pe-goal">{pe.goal}</span>
         </div>
-        <div className="m-pe-donut-row">
-          <AttainDonut pct={pe.attPct} color={pe.color} size={96} sub="REVENUE ATT."/>
-          <div className="m-pe-donut-side"><BookingsBar pe={pe}/></div>
+        <div className="m-pe-att-row">
+          <b className="m-pe-att-big" style={{color:pe.color}}>{pe.attPct}%</b>
+          <span className="m-pe-att-lbl">REVENUE ATT.</span>
         </div>
+        <BookingsBar pe={pe}/>
       </div>)}
     </div>
 
@@ -513,17 +720,10 @@ function AtAGlancePage({s}) {
       </div>)}
     </div>
 
-    {/* Insights — single column, image/chart-forward */}
+    {/* Insights — single column, image/chart-forward; pinned via Insight Canvas */}
     <div className="m-section">
-      <div className="m-section-hdr"><h2>Insights</h2></div>
-      {insightCards.map((c,i)=><div key={i} className="m-insight-card">
-        <div className="m-insight-top">
-          <span className="m-insight-badge" style={{color:c.peColor, borderColor:c.peColor}}>{c.peBadge}</span>
-          <span className="m-insight-tag" style={{color:c.tagColor}}>{c.tag}</span>
-        </div>
-        <b className="m-insight-title">{c.title}</b>
-        <p className="m-insight-desc">{maskText(c.desc)}</p>
-      </div>)}
+      <div className="m-section-hdr"><h2>Insights</h2><InsightCanvasBtn s={s}/></div>
+      <InsightCardsList s={s}/>
     </div>
   </div>;
 }
@@ -533,8 +733,22 @@ function AtAGlancePage({s}) {
    ════════════════════════════════════════════════════════════════ */
 /* Shared payment sub-components (consumed by mobile PaymentsPage + iPad) */
 function PeriodChips({s}) {
-  return <div className="m-period-scroll">
-    {fullPaymentPeriods.map((pr,i)=><div key={i} className={`m-period-item ${i===s.periodIdx?"m-period-active":""}`} onClick={()=>s.setPeriodIdx(i)}>
+  /* Chronological chips (oldest → newest); last 3 months by default,
+     toggle reveals the last 12. Keeps the selected chip in view. */
+  const wrapRef = useRef(null);
+  const all = fullPaymentPeriods.map((pr,i)=>({pr,i}));
+  const visible = s.showAllPeriods ? all : all.slice(-3);
+  useEffect(()=>{
+    if (!wrapRef.current) return;
+    if (s.showAllPeriods) wrapRef.current.querySelector(".m-period-active")?.scrollIntoView({inline:"nearest", block:"nearest"});
+    else wrapRef.current.scrollLeft = 0;   // keep the toggle visible at the left edge
+  }, [s.showAllPeriods]);
+  return <div className="m-period-scroll" ref={wrapRef}>
+    <button className="m-period-more" onClick={()=>s.setShowAllPeriods(!s.showAllPeriods)}>
+      {s.showAllPeriods ? "Last 3 months" : "Last 12 months"}
+      <ChevronRight size={13} className={s.showAllPeriods?"back":""}/>
+    </button>
+    {visible.map(({pr,i})=><div key={pr.month} className={`m-period-item ${i===s.periodIdx?"m-period-active":""}`} onClick={()=>s.setPeriodIdx(i)}>
       <span className="m-period-month">{pr.month}</span>
       <b className="m-period-amt">{amt("$"+pr.amount)}</b>
       <span className={`m-pay-status m-status-${pr.status.toLowerCase()}`}>{pr.status}</span>
@@ -546,9 +760,9 @@ function PaymentBreakdownCard({p, donutSize=180}) {
   const total = parseFloat(p.amount.replace(/,/g,''));
   const donutItems = paymentDonutItems(p);
   return <div className="m-section">
-    <div className="m-section-hdr"><h2>Payment Breakdown</h2><span className={`m-pay-status m-status-${p.status.toLowerCase()}`}>{p.status}</span></div>
+    <div className="m-section-hdr"><h2>Payment Breakdown · {p.month}</h2><span className={`m-pay-status m-status-${p.status.toLowerCase()}`}>{p.status}</span></div>
     <div className="m-donut-hero">
-      <SegmentDonut items={donutItems} total={total} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={amt(`$${p.amount}`)} centerSub={p.month} interactive/>
+      <SegmentDonut items={donutItems} total={total} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={amt(`$${p.amount}`)} centerSub="Total" interactive/>
     </div>
     <div className="m-leg2-list">
       {donutItems.map((d,i)=>{
@@ -575,23 +789,77 @@ function PaymentScheduleCard({p}) {
 /* Goal-sheet attainment bar with hover tooltips (desktop-reference style):
    green "Revenue Attainment" above the cursor, blue "Attainment Change"
    below. Follows the pointer, clamped to the bar's width. */
+/* Goal-sheet attainment bar. Hover pins a compact tooltip stack to the right
+   end of the bar — the emptiest spot — instead of chasing the pointer. */
 function PbAttBar({item}) {
   const attW = Math.min(item.pct, 100);
-  const [tipX, setTipX] = useState(null);
-  const wrapRef = useRef(null);
-  const move = e => {
-    if (!wrapRef.current) return;
-    const r = wrapRef.current.getBoundingClientRect();
-    setTipX(Math.min(88, Math.max(12, ((e.clientX - r.left) / r.width) * 100)));
-  };
-  return <div className="m-pb-pe-bar-wrap" ref={wrapRef}
-    onMouseMove={move} onMouseLeave={()=>setTipX(null)}>
+  const [hover, setHover] = useState(false);
+  return <div className="m-pb-pe-bar-wrap" onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
     <div className="m-pb-pe-bar-track"><div className="m-pb-pe-bar-fill" style={{width:attW+"%", background:item.color}}></div></div>
     <div className="m-pb-pe-bar-marker" style={{left:"100%"}}></div>
-    {tipX !== null && <>
-      <div className="m-pbtip m-pbtip-rev" style={{left:tipX+"%"}}>Revenue Attainment: {item.pct}%</div>
-      {item.attChange > 0 && <div className="m-pbtip m-pbtip-chg" style={{left:tipX+"%"}}>Attainment Change: ↑{item.attChange}%</div>}
+    {hover && <div className="m-pbtips">
+      <div className="m-pbtip m-pbtip-rev">Revenue Attainment: {item.pct}%</div>
+      {item.attChange > 0 && <div className="m-pbtip m-pbtip-chg">Attainment Change: ↑{item.attChange}%</div>}
+    </div>}
+  </div>;
+}
+
+/* One goal-sheet row. A row with `children` becomes a dropdown of component
+   rows — its parent total is display-only (not clickable); each child opens
+   its own Compensation Calculation popup. */
+function GoalSheetItemRow({item, onOpenCalc, onOpenPdf}) {
+  const [open, setOpen] = useState(false);
+  const kids = item.children;
+  return <div className="m-pb-pe-row">
+    <div className={`m-pb-pe-top ${kids?"m-pb-pe-expandable":""}`}
+      onClick={kids ? ()=>setOpen(o=>!o) : undefined}
+      role={kids?"button":undefined} tabIndex={kids?0:undefined} aria-expanded={kids?open:undefined}
+      onKeyDown={kids ? (e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }) : undefined}>
+      <span className="m-pb-pe-badge" style={{background:item.color+"22", color:item.color}}>{item.pe}</span>
+      <span className="m-pb-pe-name">{item.label || item.pe}</span>
+      {kids && <ChevronDown size={13} className={`m-insight-chev ${open?"open":""}`}/>}
+      <span className="m-pb-pe-weight">{item.weight}</span>
+    </div>
+    {item.pe!=="KSO" && <>
+      <PbAttBar item={item}/>
+      <div className="m-pb-pe-stats">
+        <span className="m-pb-pe-att"><b>{item.pct}%</b> attainment</span>
+        {item.attChange > 0 && <span className="m-pb-pe-change"><ArrowUp size={10}/> +{item.attChange}%</span>}
+      </div>
     </>}
+    <div className="m-pb-pe-actions">
+      {kids
+        ? <span className="m-pb-pe-payout-static" role="button" tabIndex={0} aria-expanded={open}
+            onClick={()=>setOpen(o=>!o)}
+            onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
+            {amt("$"+item.payout)}
+          </span>
+        : <span className={`m-pb-pe-payout-link ${item.calc?"":"m-no-link"}`} onClick={()=>item.calc && onOpenCalc(item)}>
+            {amt("$"+item.payout)}
+          </span>}
+      {item.calc && <button className="m-pb-pe-pdf" aria-label="Payment statement" onClick={()=>onOpenPdf(item)}>
+        <FileText size={14}/>
+      </button>}
+      {kids && <button className="m-pb-breakdown-btn" onClick={()=>setOpen(o=>!o)} aria-expanded={open}>
+        {open ? "Hide breakdown" : "Show me a breakdown"}
+        <ChevronDown size={12} className={`m-insight-chev ${open?"open":""}`}/>
+      </button>}
+    </div>
+    {kids && open && <div className="m-pb-kids">
+      {kids.map((kid,k)=><div key={k} className="m-pb-kid">
+        <div className="m-pb-kid-top">
+          <span className="m-pb-pe-badge" style={{background:kid.color+"22", color:kid.color}}>{kid.pe}</span>
+          <span className="m-pb-pe-name">{kid.label}</span>
+          <span className="m-pb-pe-payout-link" onClick={()=>onOpenCalc(kid)}>{amt("$"+kid.payout)}</span>
+        </div>
+        {/* green revenue-attainment bar, matching the desktop child rows */}
+        <PbAttBar item={{...kid, color:"var(--green)"}}/>
+        <div className="m-pb-kid-stats">
+          <span className="m-pb-pe-att"><b>{kid.pct}%</b> attainment</span>
+          {kid.attChange > 0 && <span className="m-pb-pe-change"><ArrowUp size={10}/> +{kid.attChange}%</span>}
+        </div>
+      </div>)}
+    </div>}
   </div>;
 }
 
@@ -608,36 +876,35 @@ function PaymentAccordion({p, s}) {
     </div>
 
     {expanded[sec.key] && sec.key==="goalSheet" && <div className="m-pb-body">
-      {p.goalSheet.items.map((item,j)=>{
-        return <div key={j} className="m-pb-pe-row">
-          <div className="m-pb-pe-top">
-            <span className="m-pb-pe-badge" style={{background:item.color+"22", color:item.color}}>{item.pe}</span>
-            <span className="m-pb-pe-name">{item.label || item.pe}</span>
-            <span className="m-pb-pe-weight">{item.weight}</span>
-          </div>
-          {item.pe!=="KSO" && <>
-            <PbAttBar item={item}/>
-            <div className="m-pb-pe-stats">
-              <span className="m-pb-pe-att"><b>{item.pct}%</b> attainment</span>
-              {item.attChange > 0 && <span className="m-pb-pe-change"><ArrowUp size={10}/> +{item.attChange}%</span>}
-            </div>
-          </>}
-          <div className="m-pb-pe-actions">
-            <span className={`m-pb-pe-payout-link ${item.calc?"":"m-no-link"}`} onClick={()=>item.calc && onOpenCalc(item)}>
-              {amt("$"+item.payout)}
-            </span>
-            {item.calc && <button className="m-pb-pe-pdf" aria-label="Payment statement" onClick={()=>onOpenPdf(item)}>
-              <FileText size={14}/>
-            </button>}
-          </div>
-        </div>;
-      })}
+      {p.goalSheet.items.map((item,j)=><GoalSheetItemRow key={j} item={item} onOpenCalc={onOpenCalc} onOpenPdf={onOpenPdf}/>)}
     </div>}
 
     {expanded[sec.key] && sec.key!=="goalSheet" && <div className="m-pb-body">
-      {p[sec.key].items.length>0 ? p[sec.key].items.map((item,j)=><div key={j} className="m-pb-detail-row">
-        <span>{item.name}</span><b>{amt(item.amount)}</b>
-      </div>) : <div className="m-pb-empty">No items this period.</div>}
+      {sec.key==="past" && p.past.groups
+        ? p.past.groups.map((g,j)=><div key={j} className="m-pb-past-group">
+            <div className="m-pb-past-hdr">
+              <span className="m-pb-chip">{g.fy}</span>
+              <span className="m-pb-chip">{g.half}</span>
+              <span className="m-pb-past-dates">{g.dates}</span>
+              <b className="m-pb-past-rate">{g.rate}</b>
+              <b className="m-pb-past-total">{amt(g.total)}</b>
+            </div>
+            {g.items.map((it,k)=><div key={k} className="m-pb-detail-row">
+              <span className="m-pb-detail-name">
+                <span className="m-pb-pe-badge" style={{background:PE_COLOR[it.pe]+"22", color:PE_COLOR[it.pe]}}>{it.pe}</span>
+                {it.name}
+              </span>
+              <b className="m-pb-sub-amt">{amt(it.amount)}</b>
+            </div>)}
+          </div>)
+        : p[sec.key].items.length>0 ? p[sec.key].items.map((item,j)=><div key={j} className="m-pb-detail-row">
+            <span className="m-pb-detail-name">
+              {SECTION_CHIP[sec.key] && <span className="m-pb-chip">{SECTION_CHIP[sec.key]}</span>}
+              {item.name}
+            </span>
+            <b className={ACCENT_AMT_SECTIONS[sec.key] ? "m-pb-sub-amt" : undefined}>{amt(item.amount)}</b>
+          </div>)
+        : <div className="m-pb-empty">No items this period.</div>}
     </div>}
   </div>)}</>;
 }
@@ -645,7 +912,11 @@ function PaymentAccordion({p, s}) {
 function PaymentsPage({s}) {
   const p = fullPaymentPeriods[s.periodIdx];
   return <div className="m-page">
-    <h1 className="m-page-title">Payments</h1>
+    <MobileHeader s={s}/>
+    <div className="m-page-title-row">
+      <h1 className="m-page-title">Payments</h1>
+      <button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button>
+    </div>
     <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
     <PeriodChips s={s}/>
     <PaymentBreakdownCard p={p}/>
@@ -673,22 +944,24 @@ function CompCalcPopup({item, month, onClose}) {
     <div className="m-calc-badge-row"><PePill pe={item.pe} label={item.label} color={item.color}/></div>
 
     {tab==="Payment Calculation" && <>
-      <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {item.pe} is <b>{amt(c.result)}</b>.</p>
+      <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {item.label || item.pe} is <b>{amt(c.result)}</b>.</p>
 
-      <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result}/>
+      <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result} totalEarned={c.totalEarned} prevPaid={c.prevPaid}/>
 
-      <Expandable title="How is the Payout Rate Multiplier determined?" defaultOpen>
+      <Expandable title="How is the Payout Rate Multiplier determined?" defaultOpen={!!c.rateIncremental}>
         <p className="m-exp-text">The payout rate multiplier is based on your incremental goal attainment for the month and the payout multiplier associated with your overall goal attainment for the goal period.</p>
-        <p className="m-rate-name">Rate Table: {c.rateName}</p>
-        <div className="m-rate-scroll">
-          <table className="m-rate-table m-rate-wide">
-            <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Prior Att.</th><th>Incr. Att.</th><th>Multiplier</th></tr></thead>
-            <tbody>{c.rateIncremental.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
-              <td>{r.range}</td><td>{r.peRate}</td><td>{r.prior}</td><td>{r.incr}</td><td>{r.mult}</td>
-            </tr>)}</tbody>
-          </table>
-        </div>
-        <div className="m-rate-total-row">Total: <b>{c.payoutRate}</b></div>
+        {c.rateIncremental && <>
+          <p className="m-rate-name">Rate Table: {c.rateName}</p>
+          <div className="m-rate-scroll">
+            <table className="m-rate-table m-rate-wide">
+              <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Prior Att.</th><th>Incr. Att.</th><th>Multiplier</th></tr></thead>
+              <tbody>{c.rateIncremental.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
+                <td>{r.range}</td><td>{r.peRate}</td><td>{r.prior}</td><td>{r.incr}</td><td>{r.mult}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+          <div className="m-rate-total-row">Total: <b>{c.payoutRate}</b></div>
+        </>}
       </Expandable>
 
       <Expandable title="Why is my proration not 100%?">
@@ -696,17 +969,19 @@ function CompCalcPopup({item, month, onClose}) {
       </Expandable>
 
       <Expandable title="What is my Total Payment against this Plan?">
-        <p className="m-exp-text">Based on your total attainment of <b>{c.totalAtt}</b> of your goal, your incentive payment for {item.pe} is <b>{amt(c.result)}</b>.</p>
-        <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result}/>
-        <p className="m-rate-name">Payout Rate Table</p>
-        <div className="m-rate-scroll">
-          <table className="m-rate-table m-rate-wide">
-            <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Rev. Att.</th><th>Multiplier</th></tr></thead>
-            <tbody>{c.rateTotal.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
-              <td>{r.range}</td><td>{r.peRate}</td><td>{r.rev}</td><td>{r.mult}</td>
-            </tr>)}</tbody>
-          </table>
-        </div>
+        <p className="m-exp-text">Based on your total attainment of <b>{c.totalAtt}</b> of your goal, your incentive payment for {item.label || item.pe} is <b>{amt(c.result)}</b>.</p>
+        <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result} totalEarned={c.totalEarned} prevPaid={c.prevPaid}/>
+        {c.rateTotal && <>
+          <p className="m-rate-name">Payout Rate Table</p>
+          <div className="m-rate-scroll">
+            <table className="m-rate-table m-rate-wide">
+              <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Rev. Att.</th><th>Multiplier</th></tr></thead>
+              <tbody>{c.rateTotal.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
+                <td>{r.range}</td><td>{r.peRate}</td><td>{r.rev}</td><td>{r.mult}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+        </>}
       </Expandable>
     </>}
 
@@ -735,7 +1010,6 @@ function PdfPopup({item, onClose}) {
         <button className="m-fs-close" onClick={onClose} aria-label="Close"><X size={18}/></button>
       </div>
       <div className="m-txn-actions">
-        <button className="m-txn-export"><Download size={14}/> Export</button>
         <button className="m-txn-iconbtn" aria-label="Filter"><Filter size={15}/></button>
         <button className="m-txn-iconbtn" aria-label="Refresh"><RefreshCw size={15}/></button>
       </div>
@@ -754,6 +1028,66 @@ function PdfPopup({item, onClose}) {
           <span>Total</span>
           <b>${t.total}</b>
         </div>
+      </div>
+    </div>
+  </div>;
+}
+
+/* Recoverable Balance History — what the seller owes back to Cisco, with the
+   payment transactions that created and cleared the balance (desktop reference) */
+function RecovBalancePopup({onClose}) {
+  const [open, setOpen] = useState(true);
+  return <div className="m-fs">
+    <div className="m-fs-hdr">
+      <div className="m-fs-hdr-text"><b>Recoverable Balance History</b></div>
+      <span className="m-recov-badge">● {amt("$0.00")}</span>
+      <button className="m-fs-close" onClick={onClose} aria-label="Close"><X size={18}/></button>
+    </div>
+    <div className="m-fs-body">
+      <p className="m-recov-desc">Your recoverable balance is the amount of incentive compensation that you owe back to Cisco.</p>
+      <p className="m-recov-desc">These are previous payment transactions that contributed to your recoverable balance.</p>
+      <p className="m-recov-asof">Total Recoverable Balance as of Nov 2025 (Cleared)</p>
+
+      <div className="m-section m-recov-card">
+        <div className="m-recov-hdr" role="button" tabIndex={0} aria-expanded={open}
+          onClick={()=>setOpen(o=>!o)}
+          onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
+          <ChevronDown size={15} className={`m-insight-chev ${open?"open":""}`}/>
+          <div className="m-recov-hdr-text">
+            <b>Oct 2025</b>
+            <span>Negative Earnings (No Recovery)</span>
+          </div>
+          <div className="m-recov-remaining">
+            <b>{amt("$0.00")}</b>
+            <small>Remaining Balance</small>
+          </div>
+          <CheckCircle2 size={20} className="m-recov-check"/>
+        </div>
+        <div className="m-recov-progress">
+          <small>{amt("$5000.00")} of {amt("$5000.00")} Paid</small>
+          <div className="m-recov-bar"><div className="m-recov-bar-fill" style={{width:"100%"}}/></div>
+        </div>
+
+        {open && <>
+          <div className="m-recov-txn">
+            <div><b>Oct 2025</b><span>Negative earnings — recoverable balance created</span></div>
+            <b className="m-recov-neg">−{amt("$5000.00")}</b>
+          </div>
+          <div className="m-recov-txn">
+            <div><b>Nov 2025</b><span>Final Recovery (Balance Cleared)</span></div>
+            <b className="m-recov-pos">{amt("$5000.00")}</b>
+          </div>
+          <div className="m-recov-total"><b>Remaining Draw Balance</b><b>{amt("$0.00")}</b></div>
+          <div className="m-rate-scroll">
+            <table className="m-rate-table m-rate-wide">
+              <thead><tr><th>Period</th><th>Description</th><th>Opening Balance</th><th>Recovery</th><th>Closing Balance</th></tr></thead>
+              <tbody>
+                <tr><td>Oct 2025</td><td>Negative Earnings (No Recovery)</td><td>—</td><td>—</td><td>{amt("−5,000.00")}</td></tr>
+                <tr><td>Nov 2025</td><td>Final Recovery (Balance Cleared)</td><td>{amt("−5,000.00")}</td><td>{amt("5,000.00")}</td><td>{amt("0.00")}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </>}
       </div>
     </div>
   </div>;
@@ -1000,6 +1334,7 @@ function GoalsPage({s}) {
   const g = goalTabs[tabIdx];
 
   return <div className="m-page">
+    <MobileHeader s={s}/>
     <div className="m-page-title-row">
       <h1 className="m-page-title">Goals</h1>
       <button className="m-goalsheet-btn" onClick={onOpenGoalSheet}><FileText size={13}/> View Goal Sheet</button>
@@ -1012,25 +1347,18 @@ function GoalsPage({s}) {
     </div>
 
     {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <>
-    {/* Selected goal — attainment donut dominant + supporting bar.
-        Section rail + gauge + bar + stat all bind to the active PE color. */}
-    <div className="m-section" style={{borderLeftColor:g.color}}>
+    {/* Selected goal — big attainment stat + full-width bar (matches At A Glance).
+        Section rail, stat, and bar all bind to the active PE color. */}
+    <div className="m-section m-pe-flat" style={{borderLeftColor:g.color}}>
       <div className="m-section-hdr">
         <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
         <span className="m-pe-goal">{g.goal} Goal</span>
       </div>
-      <div className="m-goal-donut-wrap">
-        <AttainDonut pct={g.attPct} color={g.color} size={140} stroke={16} sub="REVENUE ATT."/>
+      <div className="m-pe-att-row">
+        <b className="m-pe-att-big" style={{color:g.color}}>{g.attPct}%</b>
+        <span className="m-pe-att-lbl">REVENUE ATT.</span>
       </div>
       <BookingsBar pe={g}/>
-      {/* Pacing clarity — disambiguates the two progress indicators */}
-      <div className="m-pace-note" style={{background:g.color+"12", borderColor:g.color+"33"}}>
-        <span className="m-pace-dot" style={{background:g.color}}/>
-        <span className="m-pace-txt">
-          <b>Bookings</b> ({g.bookingsPct}%) tracks absolute pipeline-volume milestones.{" "}
-          <b style={{color:g.color}}>Revenue</b> ({g.revenuePct}%) is what determines your quota attainment &amp; payout.
-        </span>
-      </div>
       {g.id==="PE1" && <CompUpliftSection s={s}/>}
       <div className="m-goal-stats">
         <div><small>Goal</small><span>{g.goal}</span></div>
@@ -1101,84 +1429,32 @@ function OrderCard({o}) {
   </div>;
 }
 
-/* One row of chip options inside the filter bottom sheet */
-function FilterGroup({label, options, value, onPick}) {
-  return <div className="m-filter-group">
-    <div className="m-filter-label">{label}</div>
-    <div className="m-filter-chips">
-      {options.map(opt=><button key={opt} className={`m-filter-chip ${value===opt?"on":""}`} onClick={()=>onPick(opt)}>{opt}</button>)}
-    </div>
-  </div>;
-}
-
 function OrderSearchPage({s}) {
-  const query = s.orderQuery, setQuery = s.setOrderQuery;
-  const filterOpen = s.filterOpen, setFilterOpen = s.setFilterOpen;
-  const filters = s.filters, setFilters = s.setFilters;
-  const {q, list} = deriveOrders(query, filters);
-  const activeCount = orderActiveCount(filters);
-  const showResults = q || activeCount>0;         // browse-by-filter even with no text query
-  const recentOrders = orders.slice(0,3);
-  const clearFilters = () => setFilters(FILTER_DEFAULTS);
-
+  const {q, list} = deriveOrders(s.orderQuery, s.orderType);
   return <div className="m-page">
+    <MobileHeader s={s}/>
     <h1 className="m-page-title">Order Search</h1>
 
-    <div className="m-search-row">
-      <Search size={16} className="m-search-icon"/>
-      <input className="m-search-input" placeholder="Search seller's orders…" value={query} onChange={e=>setQuery(e.target.value)}/>
-      <button className={`m-search-filter ${activeCount>0?"on":""}`} aria-label="Filter" onClick={()=>setFilterOpen(true)}>
-        <Filter size={16}/>
-        {activeCount>0 && <span className="m-search-filter-badge">{activeCount}</span>}
-      </button>
+    {/* Search-by-field bar (desktop reference): [type ▾] [query] [go] */}
+    <div className="m-os-bar">
+      <select className="m-os-type" value={s.orderType} onChange={e=>s.setOrderType(e.target.value)} aria-label="Search by">
+        {ORDER_SEARCH_TYPES.map(t=><option key={t}>{t}</option>)}
+      </select>
+      <input className="m-os-input" placeholder={`Enter ${s.orderType}...`} value={s.orderQuery} onChange={e=>s.setOrderQuery(e.target.value)}/>
+      <button className="m-os-go" aria-label="Search"><Search size={15}/></button>
     </div>
 
-    {/* Pre-populated zero-state: recent searches + most-recent orders */}
-    {!showResults && <>
-      <div className="m-search-empty compact">
-        <Package size={30}/>
-        <b>Search a seller's orders</b>
-        <span>Enter an order number, customer, or partner — or pick up where you left off.</span>
-      </div>
-
-      <div className="m-os-block">
-        <div className="m-os-block-hdr">Recent Searches</div>
-        <div className="m-recent-chips">
-          {recentSearches.map(s=><button key={s} className="m-recent-chip" onClick={()=>setQuery(s)}>
-            <Search size={12}/>{s}
-          </button>)}
-        </div>
-      </div>
-
-      <div className="m-os-block">
-        <div className="m-os-block-hdr">Your 3 Most Recent Orders</div>
-        {recentOrders.map(o=><OrderCard key={o.id} o={o}/>)}
-      </div>
-    </>}
-
-    {showResults && <>
+    {q ? <>
       <div className="m-os-results-hdr">
-        <p className="m-search-count">{list.length} result{list.length===1?"":"s"}{!q && activeCount>0 ? " (filtered)" : ""}</p>
-        {activeCount>0 && <button className="m-os-clear" onClick={clearFilters}>Clear filters</button>}
+        <p className="m-search-count">{list.length} order{list.length===1?"":"s"} found</p>
+        <button className="m-os-clear" onClick={()=>s.setOrderQuery("")}>Clear</button>
       </div>
       {list.map(o=><OrderCard key={o.id} o={o}/>)}
-      {list.length===0 && <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different search or loosen your filters.</span></div>}
-    </>}
-
-    {/* Slide-up filter bottom sheet (Date · Status · Order Type) */}
-    {filterOpen && <div className="m-sheet-overlay" onClick={()=>setFilterOpen(false)}>
-      <div className="m-sheet" onClick={e=>e.stopPropagation()}>
-        <div className="m-sheet-hdr"><b>Filter Orders</b><X size={18} onClick={()=>setFilterOpen(false)}/></div>
-        <div className="m-sheet-body">
-          <FilterGroup label="Date" options={["Any time","This month","This quarter","This year"]} value={filters.date} onPick={v=>setFilters(f=>({...f,date:v}))}/>
-          <FilterGroup label="Status" options={["All","Full Revenue","Backlog"]} value={filters.status} onPick={v=>setFilters(f=>({...f,status:v}))}/>
-          <FilterGroup label="Order Type" options={["All","Direct","Partner"]} value={filters.type} onPick={v=>setFilters(f=>({...f,type:v}))}/>
-          <div className="m-sheet-actions">
-            <button className="m-sheet-clear" onClick={clearFilters}>Clear all</button>
-            <button className="m-sheet-apply" onClick={()=>setFilterOpen(false)}>Show {list.length} results</button>
-          </div>
-        </div>
-      </div>
+      {list.length===0 && <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or search type.</span></div>}
+    </> : <div className="m-search-empty">
+      <Search size={30}/>
+      <b>Search a seller's orders</b>
+      <span>Pick a field and enter a value above to look up orders.</span>
     </div>}
   </div>;
 }
@@ -1237,25 +1513,25 @@ const teamMembers = [
 
 /* Team Insights — Canvas cards (supportive coaching tone; dismissible) */
 const teamInsights = [
-  {title:"3 Sellers Need Coaching", metric:"3 need support", color:"#f59e0b",
+  {title:"3 Sellers Need Coaching", tag:"Coaching", metric:"3 need support", color:"#f59e0b",
     desc:"Three sellers are currently below the expected attainment pace (below 65%). Early coaching can improve attainment and increase payout opportunities before period end.",
     action:"Recommended focus: John Smith, Bob Wilson, Rachel Lee — Review pipeline, backlog, and upcoming opportunities with these sellers.",
     names:"John Smith, Bob Wilson, Rachel Lee"},
-  {title:"Goal Coverage Health", metric:"74%", color:"#3b82f6",
+  {title:"Goal Coverage Health", tag:"Coverage", metric:"74%", color:"#3b82f6",
     desc:"Your team has achieved $14.6M in bookings toward a $15.5M combined goal. You're building strong momentum — only $0.9M remains to reach full goal coverage.",
     action:"Keep the momentum going! Focus on advancing high-probability opportunities and converting qualified pipeline to close the remaining gap before period end."},
-  {title:"Performance Spread — Opportunity to Level Up", metric:"Opportunity to Grow Together", color:"#f59e0b",
+  {title:"Performance Spread — Opportunity to Level Up", tag:"Performance", metric:"Level up", color:"#f59e0b",
     desc:"Your team is making solid progress. Top performers are leading the way at 118%, while emerging sellers at 54% have strong opportunities to increase attainment with focused coaching and collaboration.",
     action:"Encourage peer mentoring, pipeline reviews, and deal strategy sessions to help more sellers achieve their goals this period. Pair top performers with emerging sellers: connect Sarah Chen with John Smith, Lisa Kumar with Bob Wilson.",
     names:"John Smith, Bob Wilson, Rachel Lee +1 more"},
-  {title:"Team Attainment Distribution", metric:"89.6%", color:"#10b981",
+  {title:"Team Attainment Distribution", tag:"Attainment", metric:"89.6%", color:"#10b981",
     desc:"Team of 10 averaging 89.6% attainment. Distribution: 4 exceeding goal, 2 on track (80–100%), 4 building momentum.",
     action:"4 sellers building momentum — review deal strategy to accelerate this period."},
-  {title:"Top Performers — Celebrate & Scale", metric:"4 exceeding goal", color:"#10b981",
+  {title:"Top Performers — Celebrate & Scale", tag:"Recognition", metric:"4 exceeding goal", color:"#10b981",
     desc:"4 team members exceeding goal at 109.8% average attainment. Great opportunity to share winning strategies across the team.",
     action:"Recognize excellence: Sarah Chen, Mike Torres, Lisa Kumar, Emily Davis. Consider peer-led knowledge sharing.",
     names:"Sarah Chen, Mike Torres, Lisa Kumar +1 more"},
-  {title:"Forecasted End-of-Period Attainment", metric:"96.2%", color:"#3b82f6",
+  {title:"Forecasted End-of-Period Attainment", tag:"Forecast", metric:"96.2%", color:"#3b82f6",
     desc:"Based on current pace (76% of period elapsed), team is projected to finish at 96.2% — close to full goal.",
     action:"Accelerate 3–4 deals in late stages to push team over 100% by period close."}
 ];
@@ -1268,13 +1544,6 @@ const TEAM_PE_FACTOR = {PE1:1, PE2:0.93, PE3:1.05};
 function teamBookingRows(pe) {
   return [...teamSellers].map(sel=>({...sel, val:Math.min(130, sel.bookings*TEAM_PE_FACTOR[pe])})).sort((a,b)=>b.val-a.val);
 }
-const teamStatCards = () => [
-  {v:teamSummary.avgAtt, l:"Team Avg Attainment", c:"var(--green)"},
-  {v:teamSummary.aboveGoal, l:"Above Goal", c:"var(--accent)"},
-  {v:teamSummary.onTrack, l:"On Track 75–100%", c:"var(--amber)"},
-  {v:teamSummary.below75, l:"Below 75%", c:"var(--red)"}
-];
-
 /* Status pill (theme-agnostic — color-tinted from the tier color);
    optionally carries the overall attainment: "Exceeding · 107%" */
 function StatusPill({status, att}) {
@@ -1321,22 +1590,29 @@ function AttainmentChart({title, subtitle, rows, control}) {
    sheet period, three per-PE attainment tiles). Whole card opens the
    member's breakdown popup. */
 function MemberCard({m, onOpen}) {
-  return <div className="m-member-card" onClick={onOpen} role="button" tabIndex={0}>
+  const [open, setOpen] = useState(false);   // collapsed row by default; chevron expands details
+  return <div className={`m-member-card ${open?"m-member-open":""}`} role="button" tabIndex={0} aria-expanded={open}
+    onClick={()=>setOpen(o=>!o)}
+    onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
     <div className="m-member-top">
       <span className="m-seller-av">{m.initials}</span>
       <div className="m-member-id"><b>{m.name}</b><StatusPill status={m.status} att={m.att}/></div>
+      <ChevronDown size={16} className={`m-member-chev ${open?"open":""}`}/>
     </div>
-    <div className="m-member-gs">{GS_PERIOD}</div>
-    <div className="m-member-pes">
-      {MEMBER_PE_META.map((meta,i)=>{
-        const tone = TONE_COLOR[m.tones[i]];
-        return <div key={meta.id} className="m-member-pe">
-          <span className="m-member-pe-chip" style={{color:tone, borderColor:tone+"88"}}>{meta.id}</span>
-          <small>{meta.label}</small>
-          <b style={{color:tone}}>{m.pe[i]}%</b>
-        </div>;
-      })}
-    </div>
+    {open && <>
+      <div className="m-member-gs">{GS_PERIOD}</div>
+      <div className="m-member-pes">
+        {MEMBER_PE_META.map((meta,i)=>{
+          const tone = TONE_COLOR[m.tones[i]];
+          return <div key={meta.id} className="m-member-pe">
+            <span className="m-member-pe-chip" style={{color:tone, borderColor:tone+"88"}}>{meta.id}</span>
+            <small>{meta.label}</small>
+            <b style={{color:tone}}>{m.pe[i]}%</b>
+          </div>;
+        })}
+      </div>
+      <button className="m-member-breakdown" onClick={e=>{e.stopPropagation(); onOpen();}}>Full breakdown →</button>
+    </>}
   </div>;
 }
 
@@ -1369,23 +1645,61 @@ function TeamControls({s}) {
     <span className="m-team-period">Period</span>
     <button className="m-team-ctl">H1 2026 <ChevronDown size={13}/></button>
     <button className="m-team-ctl" onClick={()=>s.setHistView(true)}>Historical Trend</button>
-    <button className="m-team-ctl">Export</button>
   </div>;
 }
 
 function TeamMembersSection({s, gridClass=""}) {
-  const list = s.teamExpanded ? teamMembers : teamMembers.slice(0,5);
+  /* Default surfaces the two sellers who most need coaching (lowest overall
+     attainment); the sort control flips to top performers first. */
+  const sorted = [...teamMembers].sort((a,b)=> s.teamSort==="best" ? b.att-a.att : a.att-b.att);
+  const list = s.teamExpanded ? sorted : sorted.slice(0,2);
   return <>
     <div className="m-section-label"><span className="m-section-icon">⁘</span> SELLER PERFORMANCE
-      <span className="m-label-right">{s.teamExpanded ? `All ${teamSummary.size} members` : `Top 5 of ${teamSummary.size}`}</span></div>
+      <span className="m-label-right">{list.length} of {teamMembers.length}</span>
+      <select className="m-seller-sort" value={s.teamSort} onChange={e=>s.setTeamSort(e.target.value)} aria-label="Sort sellers">
+        <option value="need">Most coaching needed</option>
+        <option value="best">Top performers first</option>
+      </select></div>
     <div className={gridClass}>
       {list.map(m=><MemberCard key={m.name} m={m} onOpen={()=>s.setSellerItem(m)}/>)}
     </div>
     <button className="m-showall" onClick={()=>s.setTeamExpanded(!s.teamExpanded)}>
-      {s.teamExpanded ? "Show Top 5" : `Show All ${teamSummary.size} Members`}
+      {s.teamExpanded ? "Show Fewer" : `Show All ${teamMembers.length} Sellers`}
       <ChevronDown size={14} className={s.teamExpanded?"up":""}/>
     </button>
   </>;
+}
+
+/* One team insight — styled like the At A Glance insight cards: badge chip
+   top-left, colored headline stat top-right, title + chevron below. Expanding
+   reveals nested sub-dropdowns for the details and the recommended action. */
+function TeamInsightCard({c, onDismiss}) {
+  const [open, setOpen] = useState(false);
+  return <div className="m-tinsight" role="button" tabIndex={0} aria-expanded={open}
+    onClick={()=>setOpen(o=>!o)}
+    onKeyDown={e=>{ if (e.target!==e.currentTarget) return;
+      if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
+    <div className="m-insight-top">
+      <span className="m-insight-badge" style={{color:c.color, borderColor:c.color}}>{c.tag}</span>
+      <span className="m-tinsight-stat">
+        <span className="m-insight-tag" style={{color:c.color}}>{c.metric} ★</span>
+        <button className="m-tinsight-x" aria-label="Dismiss insight" onClick={e=>{e.stopPropagation(); onDismiss();}}><X size={14}/></button>
+      </span>
+    </div>
+    <div className="m-insight-title-row">
+      <b className="m-insight-title">{c.title}</b>
+      <ChevronDown size={15} className={`m-insight-chev ${open?"open":""}`}/>
+    </div>
+    {open && <div className="m-tinsight-body" onClick={e=>e.stopPropagation()}>
+      <Expandable title="Details">
+        <p className="m-tinsight-desc">{c.desc}</p>
+      </Expandable>
+      <Expandable title="Recommended action">
+        <p className="m-tinsight-action">{c.action}</p>
+        {c.names && <p className="m-tinsight-names">{c.names}</p>}
+      </Expandable>
+    </div>}
+  </div>;
 }
 
 function TeamInsightsSection({s, gridClass=""}) {
@@ -1394,18 +1708,8 @@ function TeamInsightsSection({s, gridClass=""}) {
     <div className="m-section-label" style={{marginTop:6}}><span className="m-section-icon">✦</span> TEAM INSIGHTS — CANVAS
       <span className="m-canvas-chip"><Layers size={11}/> Canvas ({visible.length})</span></div>
     <div className={gridClass}>
-      {visible.map(({c,i})=><div key={i} className="m-tinsight">
-        <div className="m-tinsight-hdr">
-          <b className="m-tinsight-title">{c.title}</b>
-          <button className="m-tinsight-x" aria-label="Dismiss insight" onClick={()=>s.setDismissedInsights([...s.dismissedInsights, i])}><X size={14}/></button>
-        </div>
-        <div className="m-tinsight-metric" style={{color:c.color}}>{c.metric}</div>
-        <p className="m-tinsight-desc">{c.desc}</p>
-        <div className="m-tinsight-foot">
-          <p className="m-tinsight-action">{c.action}</p>
-          {c.names && <p className="m-tinsight-names">{c.names}</p>}
-        </div>
-      </div>)}
+      {visible.map(({c,i})=><TeamInsightCard key={i} c={c}
+        onDismiss={()=>s.setDismissedInsights([...s.dismissedInsights, i])}/>)}
     </div>
   </>;
 }
@@ -1420,14 +1724,10 @@ function TeamPage({s}) {
   if (s.histView) return <div className="m-page"><HistPage s={s}/></div>;
 
   return <div className="m-page">
+    <MobileHeader s={s}/>
     <h1 className="m-page-title" style={{marginBottom:4}}>Team Dashboard</h1>
     <p className="m-team-sub">Overview of your team's performance for H1 2026</p>
     <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{TEAM_AS_OF}</span><small>{REFRESH_NOTE}</small></div></div>
-
-    {/* Summary stat grid */}
-    <div className="m-team-stats">
-      {teamStatCards().map((st,i)=><div key={i} className="m-team-stat"><b style={{color:st.c}}>{st.v}</b><small>{st.l}</small></div>)}
-    </div>
 
     {/* Period / trend / export controls */}
     <TeamControls s={s}/>
@@ -1592,7 +1892,7 @@ function HistPage({s}) {
    Restored from the original build; opens from the top bar.
    ════════════════════════════════════════════════════════════════ */
 function AskIQPopup({onClose}) {
-  const [messages, setMessages] = useState([{from:"bot", text:"Hi Alex! I'm CompX IQ. Ask me about your attainment, earnings, payments, or goals."}]);
+  const [messages, setMessages] = useState([{from:"bot", text:"Hi Alex! I'm StratComp IQ. Ask me about your attainment, earnings, payments, or goals."}]);
   const [input, setInput] = useState("");
   const [showQuick, setShowQuick] = useState(true);
   const endRef = useRef(null);
@@ -1613,7 +1913,7 @@ function AskIQPopup({onClose}) {
   return <div className="m-fs m-askiq">
     <div className="m-fs-hdr">
       <div className="m-askiq-title"><span className="m-askiq-spark"><Sparkles size={16}/></span>
-        <div className="m-fs-hdr-text"><b>CompX IQ</b><small>AI compensation assistant</small></div>
+        <div className="m-fs-hdr-text"><b>StratComp IQ</b><small>AI compensation assistant</small></div>
       </div>
       <button className="m-fs-close" onClick={onClose} aria-label="Close"><X size={18}/></button>
     </div>
@@ -1636,6 +1936,87 @@ function AskIQPopup({onClose}) {
 
 /* Cisco logo — bar geometry from the official mark: short/medium bars share a common
    baseline, the two towers extend both above and below it */
+/* ════════════════════════════════════════════════════════════════
+   INSIGHT CANVAS — pin up to MAX_PINS insights for At A Glance.
+   No pins → the AI keeps selecting insights automatically.
+   ════════════════════════════════════════════════════════════════ */
+function InsightCanvasCard({it, cat, s, onClose}) {
+  const pinned = s.pinnedInsights.includes(it.id);
+  const full = !pinned && s.pinnedInsights.length >= MAX_PINS;
+  /* cap enforced inside the updater — render-time `full` is stale under rapid taps */
+  const toggle = () => s.setPinnedInsights(prev =>
+    prev.includes(it.id) ? prev.filter(x=>x!==it.id)
+    : prev.length >= MAX_PINS ? prev
+    : [...prev, it.id]);
+  return <div className={`ic-card ${cat.fast?"ic-card-fast":""} ${pinned?"ic-pinned":""} ${full?"ic-maxed":""}`}
+    style={cat.fast?{borderLeftColor:cat.color}:undefined}
+    role="checkbox" aria-checked={pinned} tabIndex={0}
+    onClick={toggle}
+    onKeyDown={e=>{ /* target check: ignore keydown bubbling up from the CTA button */
+      if (e.target!==e.currentTarget) return;
+      if (e.key==="Enter"||e.key===" ") { e.preventDefault(); toggle(); }
+    }}>
+    <div className="ic-card-top">
+      <span className={`ic-pin ${pinned?"on":""}`}/>
+      <b>{it.title}</b>
+      {it.live && <span className="ic-live">LIVE</span>}
+    </div>
+    {cat.fast && <span className="ic-fast-lbl" style={{color:cat.color}}>FAST START</span>}
+    <p className="ic-desc">{it.desc}</p>
+    <div className="ic-tags">{it.tags.map(t=><span key={t}>{t}</span>)}</div>
+    {it.cta && <button className="ic-cta" onClick={e=>{e.stopPropagation(); onClose(); s.setTab(it.ctaTab);}}>{it.cta} →</button>}
+  </div>;
+}
+
+function InsightCanvasPopup({s, onClose}) {
+  const [query, setQuery] = useState("");
+  const [cat, setCat] = useState("All Categories");
+  const [requested, setRequested] = useState(false);
+  const q = query.trim().toLowerCase();
+  const nPins = s.pinnedInsights.length;
+  return <div className="m-fs ic-fs">
+    <div className="ic-hdr">
+      <div className="ic-hdr-text">
+        <b>Insight Canvas</b>
+        <p>Pin up to <b>{MAX_PINS}</b> insights. No pins — AI selects {insightCards.length} insights for you.</p>
+      </div>
+      <button className="ic-close" onClick={onClose} aria-label="Close"><X size={17}/></button>
+    </div>
+    <div className="ic-tools">
+      <div className="ic-search"><Search size={14}/><input placeholder="Search insights..." value={query} onChange={e=>setQuery(e.target.value)}/></div>
+      <select className="ic-catsel" value={cat} onChange={e=>setCat(e.target.value)} aria-label="Filter by category">
+        <option>All Categories</option>
+        {INSIGHT_CATS.map(c=><option key={c.name}>{c.name}</option>)}
+      </select>
+    </div>
+    <div className="m-fs-body ic-body">
+      {INSIGHT_CATS.filter(c=>cat==="All Categories"||c.name===cat).map(c=>{
+        const items = c.items.filter(it=>!q || (it.title+" "+it.desc).toLowerCase().includes(q));
+        if (!items.length) return null;
+        return <div key={c.name} className="ic-cat">
+          <div className="ic-cat-hdr"><i style={{background:c.color}}/><h3>{c.name}</h3><span>({items.length})</span></div>
+          <div className="ic-grid">
+            {items.map(it=><InsightCanvasCard key={it.id} it={it} cat={c} s={s} onClose={onClose}/>)}
+          </div>
+        </div>;
+      })}
+      <div className="ic-cat">
+        <div className="ic-cat-hdr"><i style={{background:"var(--accent)"}}/><h3>Request a Custom Insight</h3></div>
+        <div className="ic-request">
+          <span>{requested ? "Request submitted — the comp team will follow up." : "Don't see what you need? Submit a request for a custom insight tailored to your workflow."}</span>
+          <button className="ic-req-btn" disabled={requested} onClick={()=>setRequested(true)}>
+            {requested ? "✓ Request Sent" : "+ Request Custom Insight"}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div className="ic-foot">
+      <span>{nPins===0 ? `No pins — AI selects ${insightCards.length} insights for you` : `${nPins} of ${MAX_PINS} pinned${nPins===MAX_PINS?" · max reached":""}`}</span>
+      <button className="ic-done" onClick={onClose}>Done</button>
+    </div>
+  </div>;
+}
+
 function CiscoLogo({className=""}) {
   const S = {y:10.24, h:6.41}, M = {y:5.93, h:10.72}, T = {y:0.03, h:19.74};
   return <div className={`cisco-logo ${className}`} aria-label="Cisco">
@@ -1700,14 +2081,16 @@ function useCompXState() {
   const [sellerItem, setSellerItem] = useState(null);
   const [showAskIQ, setShowAskIQ] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [periodIdx, setPeriodIdx] = useState(0);
+  const [reminders, setReminders] = useState(REMINDERS_SEED);
+  const [periodIdx, setPeriodIdx] = useState(fullPaymentPeriods.length-1);   // newest (current) month
+  const [showAllPeriods, setShowAllPeriods] = useState(false);               // last 3 ↔ last 12 months
   const [expanded, setExpanded] = useState({goalSheet:true});
   const [goalIdx, setGoalIdx] = useState(0);
   const [orderQuery, setOrderQuery] = useState("");
-  const [filters, setFilters] = useState(FILTER_DEFAULTS);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [orderType, setOrderType] = useState(ORDER_SEARCH_TYPES[0]);   // search-by field
   const [teamPe, setTeamPe] = useState("PE1");
-  const [teamExpanded, setTeamExpanded] = useState(false);          // Top 5 ↔ all members
+  const [teamExpanded, setTeamExpanded] = useState(false);          // first 2 ↔ all members
+  const [teamSort, setTeamSort] = useState("need");                 // "need" = most coaching first | "best"
   const [dismissedInsights, setDismissedInsights] = useState([]);   // canvas card indices
   const [upliftOpen, setUpliftOpen] = useState(false);              // Goals · PE1 comp uplift plans
   const [histView, setHistView] = useState(false);                  // Team → Historical Performance Trend
@@ -1719,6 +2102,9 @@ function useCompXState() {
   const [sideCollapsed, setSideCollapsed] = useState(false);        // iPad sidebar rail mode
   const [hideAmts, setHideAmts] = useState(false);                  // dot out payment figures (privacy)
   AMOUNTS_HIDDEN = hideAmts;
+  const [insightCanvasOpen, setInsightCanvasOpen] = useState(false);
+  const [pinnedInsights, setPinnedInsights] = useState([]);         // insight ids, max MAX_PINS
+  const [showRecovBal, setShowRecovBal] = useState(false);          // Recoverable Balance History popup
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -1726,18 +2112,27 @@ function useCompXState() {
   }, [theme]);
   const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
 
+  /* Deep-link: open Payments with a specific statement period selected */
+  const openPayPeriod = month => {
+    const idx = fullPaymentPeriods.findIndex(p => p.month === month);
+    if (idx >= 0) setPeriodIdx(idx);
+    setTab("payments");
+  };
+
   return {
     tab, setTab, viewMode, setViewMode, theme, toggleTheme,
     calcItem, setCalcItem, pdfItem, setPdfItem, showGoalSheet, setShowGoalSheet,
-    sellerItem, setSellerItem, showAskIQ, setShowAskIQ, notifOpen, setNotifOpen,
-    periodIdx, setPeriodIdx, expanded, setExpanded, goalIdx, setGoalIdx,
-    orderQuery, setOrderQuery, filters, setFilters, filterOpen, setFilterOpen,
-    teamPe, setTeamPe, teamExpanded, setTeamExpanded, dismissedInsights, setDismissedInsights,
+    sellerItem, setSellerItem, showAskIQ, setShowAskIQ, notifOpen, setNotifOpen, reminders, setReminders,
+    periodIdx, setPeriodIdx, openPayPeriod, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
+    orderQuery, setOrderQuery, orderType, setOrderType,
+    teamPe, setTeamPe, teamExpanded, setTeamExpanded, teamSort, setTeamSort, dismissedInsights, setDismissedInsights,
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
     histCmpMember, setHistCmpMember, histPeriods, setHistPeriods, histPe, setHistPe,
     sideCollapsed, setSideCollapsed, hideAmts, setHideAmts,
-    currentMonth: fullPaymentPeriods[0].month
+    insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
+    showRecovBal, setShowRecovBal,
+    currentMonth: fullPaymentPeriods[fullPaymentPeriods.length-1].month
   };
 }
 
@@ -1754,6 +2149,8 @@ function FramePopups({s, variant="mobile"}) {
     {s.showGoalSheet && shell(<GoalSheetPopup onClose={()=>s.setShowGoalSheet(false)}/>, ()=>s.setShowGoalSheet(false))}
     {s.sellerItem && shell(<SellerBreakdownPopup s={s.sellerItem} onClose={()=>s.setSellerItem(null)}/>, ()=>s.setSellerItem(null))}
     {s.showAskIQ && shell(<AskIQPopup onClose={()=>s.setShowAskIQ(false)}/>, ()=>s.setShowAskIQ(false), "i-modal-lg")}
+    {s.insightCanvasOpen && shell(<InsightCanvasPopup s={s} onClose={()=>s.setInsightCanvasOpen(false)}/>, ()=>s.setInsightCanvasOpen(false), "i-modal-xl")}
+    {s.showRecovBal && shell(<RecovBalancePopup onClose={()=>s.setShowRecovBal(false)}/>, ()=>s.setShowRecovBal(false))}
   </>;
 }
 
@@ -1831,11 +2228,14 @@ function MobileFrame({s}) {
 
         <div className="m-viewbar">
           <CiscoLogo className="m-cisco"/>
-          <div className="m-viewtoggle">
-            <button className={s.viewMode==="me"?"on":""} onClick={()=>s.setViewMode("me")}><User size={14}/> My Compensation</button>
-            <button className={s.viewMode==="team"?"on":""} onClick={()=>s.setViewMode("team")}><Users size={14}/> Team View</button>
-          </div>
-          <button className="m-askiq-open" onClick={()=>s.setShowAskIQ(true)} aria-label="Ask CompX IQ"><Sparkles size={16}/></button>
+          {/* Me/Team toggle lives on At A Glance only (team view keeps it so you can switch back) */}
+          {(s.tab==="glance" || s.viewMode==="team")
+            ? <div className="m-viewtoggle">
+                <button className={s.viewMode==="me"?"on":""} onClick={()=>s.setViewMode("me")}><User size={14}/> My Compensation</button>
+                <button className={s.viewMode==="team"?"on":""} onClick={()=>s.setViewMode("team")}><Users size={14}/> Team View</button>
+              </div>
+            : <div className="m-viewbar-spacer"/>}
+          <button className="m-askiq-open" onClick={()=>s.setShowAskIQ(true)} aria-label="Ask StratComp IQ"><Sparkles size={16}/></button>
           <button className="m-theme-toggle" onClick={s.toggleTheme} aria-label={s.theme==="dark"?"Switch to light mode":"Switch to dark mode"}>
             {s.theme==="dark" ? <Sun size={17}/> : <Moon size={17}/>}
           </button>
@@ -1877,14 +2277,9 @@ function IPadHeader({title, sub, s, right}) {
     </div>
     <div className="i-head-actions">
       {right}
-      <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/><span className="m-bell-dot"/></button>
+      <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/><span className="m-bell-count">{notifications.length}</span></button>
       {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
-        <div className="m-notif-dropdown i-notif-dropdown">
-          <div className="m-notif-dropdown-hdr"><b>Notifications</b><span onClick={()=>s.setNotifOpen(false)}>✕</span></div>
-          {notifications.map((n,i)=><div key={i} className={`m-notif m-notif-${n.type}`}>
-            <div className="m-notif-dot"></div><div><b>{n.title}</b><span>{n.desc}</span></div>
-          </div>)}
-        </div></>}
+        <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)} ipad/></>}
     </div>
   </div>;
 }
@@ -1897,7 +2292,7 @@ function IPadGlance({s}) {
     <div className="i-glance-top">
       {monthlyPayCards.map((c,i)=> c.current
         ? <div key={i} className="m-hero i-hero" role="button" tabIndex={0} title="View Payments"
-            onClick={()=>s.setTab("payments")} onKeyDown={e=>e.key==="Enter"&&s.setTab("payments")}>
+            onClick={()=>s.openPayPeriod(c.period)} onKeyDown={e=>e.key==="Enter"&&s.openPayPeriod(c.period)}>
             <div className="m-hero-top">
               <span className="m-hero-label">Current Payment · {c.month}</span>
               <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
@@ -1908,28 +2303,27 @@ function IPadGlance({s}) {
               <span className="m-hero-change">{c.change} vs Apr · {c.payDate}</span>
             </div>
           </div>
-        : <div key={i} className="m-context-card i-timeline-card">
+        : <div key={i} className={`m-context-card i-timeline-card ${c.period?"m-context-click":""}`}
+            role={c.period?"button":undefined} tabIndex={c.period?0:undefined} title={c.period?`View ${c.month} payment`:undefined}
+            onClick={c.period?()=>s.openPayPeriod(c.period):undefined}
+            onKeyDown={c.period?(e=>e.key==="Enter"&&s.openPayPeriod(c.period)):undefined}>
             <span className="m-context-month">{c.month}</span>
             <b className="m-context-amt">{amt("$"+c.amount)}</b>
             <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
             <small className="i-timeline-date">{c.payDate}</small>
           </div>)}
     </div>
-    <div className="m-section">
-      <div className="m-section-hdr"><h2>Goaling Period Progress</h2><span className="m-badge">H1 2026</span></div>
-      <div className="m-gp-row"><span>Jan 1 – Jun 30, 2026</span><b>76%</b></div>
-      <div className="m-att-bar-wrap"><div className="m-att-bar" style={{width:"76%"}}></div></div>
-      <small className="m-gp-days">138 of 181 days elapsed</small>
-    </div>
-
     <div className="m-section-label"><span className="m-section-icon">⁘</span> PLAN ELEMENTS & INCENTIVES</div>
     <div className="i-grid-3">
-      {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card">
+      {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card m-pe-flat">
         <div className="m-pe-top">
           <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
           <span className="m-pe-goal">{pe.goal}</span>
         </div>
-        <div className="i-pe-donut-wrap"><AttainDonut pct={pe.attPct} color={pe.color} size={120} sub="REVENUE ATT."/></div>
+        <div className="m-pe-att-row">
+          <b className="m-pe-att-big" style={{color:pe.color}}>{pe.attPct}%</b>
+          <span className="m-pe-att-lbl">REVENUE ATT.</span>
+        </div>
         <BookingsBar pe={pe}/>
       </div>)}
     </div>
@@ -1945,11 +2339,8 @@ function IPadGlance({s}) {
         </div>)}
       </div>
       <div className="m-section">
-        <div className="m-section-hdr"><h2>Insights</h2></div>
-        {insightCards.map((c,i)=><div key={i} className="m-insight-card">
-          <div className="m-insight-top"><span className="m-insight-badge" style={{color:c.peColor, borderColor:c.peColor}}>{c.peBadge}</span><span className="m-insight-tag" style={{color:c.tagColor}}>{c.tag}</span></div>
-          <b className="m-insight-title">{c.title}</b><p className="m-insight-desc">{maskText(c.desc)}</p>
-        </div>)}
+        <div className="m-section-hdr"><h2>Insights</h2><InsightCanvasBtn s={s}/></div>
+        <InsightCardsList s={s}/>
       </div>
     </div>
   </div>;
@@ -1958,7 +2349,8 @@ function IPadGlance({s}) {
 function IPadPayments({s}) {
   const p = fullPaymentPeriods[s.periodIdx];
   return <div className="i-page">
-    <IPadHeader title="Payments" sub={`${DATA_AS_OF} · ${REFRESH_NOTE}`} s={s} right={<HideBtn s={s}/>}/>
+    <IPadHeader title="Payments" sub={`${DATA_AS_OF} · ${REFRESH_NOTE}`} s={s}
+      right={<><button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button><HideBtn s={s}/></>}/>
     <PeriodChips s={s}/>
     <div className="i-split">
       <div className="i-col-a">
@@ -1983,12 +2375,15 @@ function IPadGoals({s}) {
     </div>
     {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <div className="i-split">
       <div className="i-col-a">
-        <div className="m-section" style={{borderLeftColor:g.color}}>
+        <div className="m-section m-pe-flat" style={{borderLeftColor:g.color}}>
           <div className="m-section-hdr">
             <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
             <span className="m-pe-goal">{g.goal} Goal</span>
           </div>
-          <div className="m-goal-donut-wrap"><AttainDonut pct={g.attPct} color={g.color} size={180} stroke={18} sub="REVENUE ATT."/></div>
+          <div className="m-pe-att-row">
+            <b className="m-pe-att-big" style={{color:g.color}}>{g.attPct}%</b>
+            <span className="m-pe-att-lbl">REVENUE ATT.</span>
+          </div>
           <div className="m-goal-stats">
             <div><small>Goal</small><span>{g.goal}</span></div>
             <div><small>Attainment</small><span style={{color:g.color}}>{g.attPct}%</span></div>
@@ -1997,13 +2392,9 @@ function IPadGoals({s}) {
         </div>
       </div>
       <div className="i-col-b">
-        <div className="m-section">
+        <div className="m-section m-pe-flat">
           <div className="m-section-hdr"><h2>Bookings vs Revenue</h2></div>
           <BookingsBar pe={g}/>
-          <div className="m-pace-note" style={{background:g.color+"12", borderColor:g.color+"33"}}>
-            <span className="m-pace-dot" style={{background:g.color}}/>
-            <span className="m-pace-txt"><b>Bookings</b> ({g.bookingsPct}%) tracks absolute pipeline-volume milestones. <b style={{color:g.color}}>Revenue</b> ({g.revenuePct}%) is what determines your quota attainment &amp; payout.</span>
-          </div>
           {g.id==="PE1" && <CompUpliftSection s={s}/>}
         </div>
         <div className="m-section">
@@ -2018,49 +2409,27 @@ function IPadGoals({s}) {
 }
 
 function IPadOrders({s}) {
-  const {q, list} = deriveOrders(s.orderQuery, s.filters);
-  const activeCount = orderActiveCount(s.filters);
-  const showResults = q || activeCount>0;
-  const recentOrders = orders.slice(0,3);
-  const clearFilters = () => s.setFilters(FILTER_DEFAULTS);
+  const {q, list} = deriveOrders(s.orderQuery, s.orderType);
   return <div className="i-page">
     <IPadHeader title="Order Search" sub="Look up a seller's orders" s={s}/>
-    <div className="m-search-row i-search-row">
-      <Search size={18} className="m-search-icon"/>
-      <input className="m-search-input" placeholder="Search by order #, customer, or partner…" value={s.orderQuery} onChange={e=>s.setOrderQuery(e.target.value)}/>
-      <button className={`m-search-filter ${activeCount>0?"on":""}`} aria-label="Filter" onClick={()=>s.setFilterOpen(true)}>
-        <Filter size={18}/>{activeCount>0 && <span className="m-search-filter-badge">{activeCount}</span>}
-      </button>
+    <div className="m-os-bar i-os-bar">
+      <select className="m-os-type" value={s.orderType} onChange={e=>s.setOrderType(e.target.value)} aria-label="Search by">
+        {ORDER_SEARCH_TYPES.map(t=><option key={t}>{t}</option>)}
+      </select>
+      <input className="m-os-input" placeholder={`Enter ${s.orderType}...`} value={s.orderQuery} onChange={e=>s.setOrderQuery(e.target.value)}/>
+      <button className="m-os-go" aria-label="Search"><Search size={16}/></button>
     </div>
-    {!showResults && <>
-      <div className="m-os-block"><div className="m-os-block-hdr">Recent Searches</div>
-        <div className="m-recent-chips">{recentSearches.map(x=><button key={x} className="m-recent-chip" onClick={()=>s.setOrderQuery(x)}><Search size={12}/>{x}</button>)}</div>
-      </div>
-      <div className="m-os-block"><div className="m-os-block-hdr">Your Most Recent Orders</div>
-        <div className="i-grid-3">{recentOrders.map(o=><OrderCard key={o.id} o={o}/>)}</div>
-      </div>
-    </>}
-    {showResults && <>
+    {q ? <>
       <div className="m-os-results-hdr">
-        <p className="m-search-count">{list.length} result{list.length===1?"":"s"}{!q && activeCount>0?" (filtered)":""}</p>
-        {activeCount>0 && <button className="m-os-clear" onClick={clearFilters}>Clear filters</button>}
+        <p className="m-search-count">{list.length} order{list.length===1?"":"s"} found</p>
+        <button className="m-os-clear" onClick={()=>s.setOrderQuery("")}>Clear</button>
       </div>
       {list.length>0 ? <div className="i-grid-3">{list.map(o=><OrderCard key={o.id} o={o}/>)}</div>
-        : <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different search or loosen your filters.</span></div>}
-    </>}
-    {s.filterOpen && <div className="m-sheet-overlay i-sheet-overlay" onClick={()=>s.setFilterOpen(false)}>
-      <div className="m-sheet i-sheet" onClick={e=>e.stopPropagation()}>
-        <div className="m-sheet-hdr"><b>Filter Orders</b><X size={18} onClick={()=>s.setFilterOpen(false)}/></div>
-        <div className="m-sheet-body">
-          <FilterGroup label="Date" options={["Any time","This month","This quarter","This year"]} value={s.filters.date} onPick={v=>s.setFilters(f=>({...f,date:v}))}/>
-          <FilterGroup label="Status" options={["All","Full Revenue","Backlog"]} value={s.filters.status} onPick={v=>s.setFilters(f=>({...f,status:v}))}/>
-          <FilterGroup label="Order Type" options={["All","Direct","Partner"]} value={s.filters.type} onPick={v=>s.setFilters(f=>({...f,type:v}))}/>
-          <div className="m-sheet-actions">
-            <button className="m-sheet-clear" onClick={clearFilters}>Clear all</button>
-            <button className="m-sheet-apply" onClick={()=>s.setFilterOpen(false)}>Show {list.length} results</button>
-          </div>
-        </div>
-      </div>
+        : <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or search type.</span></div>}
+    </> : <div className="m-search-empty">
+      <Search size={30}/>
+      <b>Search a seller's orders</b>
+      <span>Pick a field and enter a value above to look up orders.</span>
     </div>}
   </div>;
 }
@@ -2071,9 +2440,6 @@ function IPadTeam({s}) {
   if (s.histView) return <div className="i-page"><HistPage s={s}/></div>;
   return <div className="i-page">
     <IPadHeader title="Team Dashboard" sub={`${TEAM_AS_OF} · ${REFRESH_NOTE}`} s={s}/>
-    <div className="i-team-stats">
-      {teamStatCards().map((st,i)=><div key={i} className="m-team-stat"><b style={{color:st.c}}>{st.v}</b><small>{st.l}</small></div>)}
-    </div>
     <TeamControls s={s}/>
     <div className="i-split">
       <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period · highest to lowest earned" rows={earnedRows}/>
@@ -2146,7 +2512,7 @@ function IPadFrame({s, landscape=false}) {
               : <div className="i-navitem on" title="Team Dashboard"><Users size={19}/><span>Team Dashboard</span></div>}
           </nav>
           <div className="i-side-foot">
-            <button className="i-side-askiq" onClick={()=>s.setShowAskIQ(true)} title="Ask CompX IQ"><Sparkles size={16}/><span>Ask CompX IQ</span></button>
+            <button className="i-side-askiq" onClick={()=>s.setShowAskIQ(true)} title="Ask StratComp IQ"><Sparkles size={16}/><span>Ask StratComp IQ</span></button>
             <button className="i-side-theme" onClick={s.toggleTheme} title={s.theme==="dark"?"Light mode":"Dark mode"}>
               {s.theme==="dark" ? <Sun size={17}/> : <Moon size={17}/>}<span>{s.theme==="dark"?"Light mode":"Dark mode"}</span>
             </button>

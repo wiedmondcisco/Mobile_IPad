@@ -96,15 +96,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-header h1{font-size:20px;font-weight:700;color:var(--text)}
 .m-role{font-size:11px;color:var(--muted);font-weight:500}
 .m-bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer}
-.m-bell-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg)}
+.m-bell-count{position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
 
 /* ─── NOTIFICATIONS DROPDOWN ─── */
 .m-notif-overlay{position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.2)}
 .m-notif-dropdown{position:absolute;top:56px;right:16px;left:16px;z-index:50;background:var(--card);border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.15);padding:12px;animation:m-slideDown .2s ease}
 @keyframes m-slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.m-notif-dropdown-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.m-notif-dropdown-hdr b{font-size:14px;color:var(--text)}
-.m-notif-dropdown-hdr span{font-size:16px;color:var(--muted);cursor:pointer;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bg)}
+/* Bell dropdown tabs: Notifications | My Reminders */
+.m-ntabs{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.m-ntabs button{border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:12px;font-weight:700;padding:8px 13px;border-radius:12px;cursor:pointer;transition:all .15s}
+.m-ntabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.m-ntabs .m-ntabs-close{margin-left:auto;width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--muted)}
+/* My Reminders tab */
+.m-rem-add{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.m-rem-note{flex:1 1 100%;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:10px;padding:9px 11px;font-size:12.5px;outline:none}
+.m-rem-note::placeholder{color:var(--muted)}
+.m-rem-note:focus{border-color:var(--accent)}
+.m-rem-date{flex:1;min-width:0;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:10px;padding:7px 9px;font-size:12px;outline:none}
+.m-rem-addbtn{border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12.5px;font-weight:800;padding:8px 18px;border-radius:10px;cursor:pointer}
+.m-rem-addbtn:hover{border-color:var(--accent);color:var(--accent)}
+.m-rem-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--divider)}
+.m-rem-row:last-child{border-bottom:none}
+/* rounded-square check well: empty circle → green check-circle when done */
+.m-rem-check{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--card-2);color:var(--green);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;padding:0}
+.m-rem-circle{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:block}
+.m-rem-check:hover .m-rem-circle{border-color:var(--green)}
+.m-rem-txt{flex:1;min-width:0}
+.m-rem-txt b{display:block;font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-rem-txt span{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:2px}
+.m-rem-row.done{opacity:.55}
+.m-rem-row.done .m-rem-txt b{text-decoration:line-through;color:var(--muted)}
+.m-rem-x{width:32px;height:32px;border:1px solid var(--border);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
+.m-rem-x:hover{border-color:var(--red);color:var(--red)}
+.m-rem-empty{font-size:12px;color:var(--muted);text-align:center;padding:14px 0}
 .m-notif{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--bg);margin-bottom:6px}
 .m-notif:last-child{margin-bottom:0}
 .m-notif b{display:block;font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
@@ -115,7 +139,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-notif-blue .m-notif-dot{background:var(--accent)}
 
 /* ─── PAYMENT CARDS ─── */
-.m-section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.m-section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .m-section-icon{color:var(--accent);font-size:14px}
 .m-pay-scroll{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 0 14px}
 .m-pay-card{background:var(--card);border-radius:var(--radius-sm);padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border:1px solid var(--divider)}
@@ -175,7 +199,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-spiff-card:last-child{border-bottom:none;padding-bottom:0}
 .m-spiff-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .m-spiff-status{font-size:10px;font-weight:600;border:1px solid;padding:2px 8px;border-radius:4px}
-.m-spiff-amt{font-size:16px;font-weight:700}
+.m-spiff-amt{font-size:18px;font-weight:700}
 .m-spiff-name{font-size:12px;color:var(--text);display:block;margin-bottom:2px}
 .m-spiff-sub{font-size:10px;color:var(--muted);display:block;margin-bottom:6px}
 .m-spiff-bar-wrap{height:5px;background:var(--track);border-radius:3px;position:relative;margin-bottom:4px}
@@ -188,9 +212,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-insight-card:last-child{margin-bottom:0}
 .m-insight-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .m-insight-badge{font-size:9px;font-weight:600;border:1px solid;padding:2px 8px;border-radius:4px}
-.m-insight-tag{font-size:11px;font-weight:700}
-.m-insight-title{font-size:13px;color:var(--text);display:block;margin-bottom:4px}
-.m-insight-desc{font-size:11px;color:var(--muted);line-height:1.45;margin:0}
+.m-insight-tag{font-size:12.5px;font-weight:700}
+.m-insight-title{font-size:13px;color:var(--text);display:block}
+.m-insight-desc{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 0}
+/* Collapsible card: chevron dropdown reveals the description */
+.m-insight-card{cursor:pointer;transition:border-color .15s}
+.m-insight-card:hover{border-color:var(--accent)}
+.m-insight-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.m-insight-chev{color:var(--muted);flex-shrink:0;transition:transform .18s}
+.m-insight-chev.open{transform:rotate(180deg)}
 
 /* ─── VIEW MORE & SUB-PAGES ─── */
 .m-view-more{font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;margin-left:auto}
@@ -198,14 +228,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-subpage-hdr{display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer}
 .m-subpage-hdr .m-page-title{margin-bottom:0;font-size:18px}
 .m-back-icon{transform:rotate(180deg);color:var(--accent)}
-
-/* ─── ATTAINMENT BARS ─── */
-.m-att-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.m-att-row:last-child{margin-bottom:0}
-.m-att-pe{font-size:11px;color:var(--muted);min-width:95px;font-weight:500}
-.m-att-bar-wrap{flex:1;height:7px;background:var(--track);border-radius:4px;overflow:hidden}
-.m-att-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.m-att-val{font-size:12px;font-weight:700;color:var(--accent);min-width:40px;text-align:right}
 
 /* ─── PAYMENT HERO ─── */
 .m-pay-hero{background:linear-gradient(135deg,#049fd9 0%,#0380b0 100%);border-radius:var(--radius);padding:16px;margin-bottom:12px;color:white}
@@ -224,9 +246,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-period-scroll::-webkit-scrollbar{height:3px}
 .m-period-scroll::-webkit-scrollbar-thumb{background:rgba(4,159,217,.2);border-radius:3px}
 .m-period-item{min-width:100px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;cursor:pointer;transition:all .15s}
+.m-period-more{flex-shrink:0;display:inline-flex;align-items:center;gap:3px;align-self:stretch;border:1px dashed var(--border);background:none;color:var(--accent);font-size:11px;font-weight:700;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap}
+.m-period-more svg{transition:transform .2s}
+.m-period-more svg.back{transform:rotate(180deg)}
 .m-period-active{border-color:var(--accent);background:var(--accent-light)}
 .m-period-month{font-size:10px;font-weight:600;color:var(--text);display:block}
-.m-period-amt{font-size:13px;color:var(--text);display:block;margin:2px 0}
+.m-period-amt{font-size:15px;color:var(--text);display:block;margin:2px 0}
 .m-period-item .m-pay-status{font-size:8px}
 
 /* ─── YTD / DONUT ─── */
@@ -234,8 +259,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-donut-chart{position:relative;width:90px;height:90px;flex-shrink:0}
 .m-donut-chart svg{width:100%;height:100%}
 .m-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.m-donut-center b{font-size:12px;font-weight:700;color:var(--text)}
-.m-donut-center small{font-size:8px;color:var(--muted)}
+.m-donut-center b{font-size:14px;font-weight:700;color:var(--text)}
+.m-donut-center small{font-size:9px;color:var(--muted)}
 .m-donut-legend{flex:1;display:flex;flex-direction:column;gap:4px}
 .m-donut-leg{display:flex;align-items:center;gap:6px;font-size:10px}
 .m-donut-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
@@ -251,7 +276,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pb-hdr-text{flex:1;display:flex;flex-direction:column}
 .m-pb-hdr-text b{font-size:12px;color:var(--text)}
 .m-pb-hdr-text small{font-size:9px;color:var(--muted)}
-.m-pb-amt{font-size:13px;font-weight:700;color:var(--text);flex-shrink:0}
+.m-pb-amt{font-size:15px;font-weight:700;color:var(--text);flex-shrink:0}
 .m-pb-body{padding:0 12px 12px;border-top:1px solid var(--divider)}
 
 /* PE Rows inside Goal Sheet */
@@ -263,35 +288,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pb-pe-weight{font-size:10px;color:var(--muted);font-weight:500}
 .m-pb-pe-bar-wrap{position:relative;margin-bottom:6px;padding-right:8px}
 /* hover tooltips on the goal-sheet attainment bars */
-.m-pbtip{position:absolute;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#fff;padding:5px 10px;border-radius:7px;pointer-events:none;z-index:8;box-shadow:0 5px 14px rgba(0,0,0,.3)}
-.m-pbtip-rev{bottom:calc(100% + 7px);background:#0f7a4d}
-.m-pbtip-rev::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0f7a4d}
-.m-pbtip-chg{top:calc(100% + 7px);background:#1e40af}
-.m-pbtip-chg::after{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-bottom-color:#1e40af}
+/* hover tooltips: pinned over the bar's empty right side, one compact row —
+   fixed in place so they never cover the row's labels or amounts */
+.m-pbtips{position:absolute;top:50%;right:12px;transform:translateY(-50%);display:flex;align-items:center;gap:4px;z-index:8;pointer-events:none}
+.m-pbtip{white-space:nowrap;font-size:9px;font-weight:700;color:#fff;padding:3px 7px;border-radius:6px;box-shadow:0 5px 14px rgba(0,0,0,.3)}
+.m-pbtip-rev{background:#0f7a4d}
+.m-pbtip-chg{background:#1e40af}
 .m-pb-pe-bar-track{height:8px;background:var(--track);border-radius:4px;overflow:hidden;border:2px solid var(--border)}
 .m-pb-pe-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
 .m-pb-pe-bar-marker{position:absolute;top:-1px;width:2px;height:10px;background:var(--text);border-radius:1px}
 .m-pb-pe-stats{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
-.m-pb-pe-att{font-size:11px;color:var(--text)}
+.m-pb-pe-att{font-size:12.5px;color:var(--text)}
 .m-pb-pe-att b{font-weight:700}
-.m-pb-pe-change{font-size:10px;color:var(--green);display:inline-flex;align-items:center;gap:2px;font-weight:600}
+/* attainment-change chip: blue, so it reads apart from the green attainment */
+.m-pb-pe-change{font-size:10px;color:#3b82f6;display:inline-flex;align-items:center;gap:2px;font-weight:700}
 .m-pb-pe-rev{font-size:10px;color:var(--muted);margin-left:auto}
 .m-pb-pe-actions{display:flex;align-items:center;gap:12px}
-.m-pb-pe-payout-link{font-size:15px;font-weight:700;color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+/* PE component breakdown (children of a goal-sheet row) */
+.m-pb-pe-expandable{cursor:pointer}
+.m-pb-kids{margin-top:10px;border-left:2px solid var(--divider);padding-left:10px}
+.m-pb-kid{padding:8px 0;border-bottom:1px solid var(--divider)}
+.m-pb-kid:last-child{border-bottom:none;padding-bottom:2px}
+.m-pb-kid-top{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.m-pb-kid-top .m-pb-pe-payout-link{font-size:13px;flex-shrink:0}
+.m-pb-kid .m-pb-pe-bar-wrap{margin-bottom:5px}
+.m-pb-kid-stats{display:flex;align-items:center;gap:10px;margin-top:3px;padding-left:2px}
+.m-pb-pe-payout-link{font-size:17px;font-weight:700;color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
 .m-pb-pe-payout-link svg{opacity:.6}
 .m-pb-pe-txn-link{font-size:10px;color:var(--accent);display:inline-flex;align-items:center;gap:3px;cursor:pointer;font-weight:500}
 .m-pb-pe-txn-link:hover{text-decoration:underline}
 
-/* Bottom Sheet Overlay */
-/* spans the website viewport only: below the status bar, above Safari's bar */
-.m-sheet-overlay{position:fixed;left:0;right:0;top:50px;bottom:var(--safari-h,0px);background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:m-fadeIn .2s ease}
 @keyframes m-fadeIn{from{opacity:0}to{opacity:1}}
-.m-sheet{width:100%;max-width:390px;max-height:70%;background:var(--card);border-radius:18px 18px 0 0;overflow:hidden;animation:m-slideUp .25s ease;display:flex;flex-direction:column}
-@keyframes m-slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.m-sheet-hdr{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
-.m-sheet-hdr b{font-size:14px;color:var(--text)}
-.m-sheet-hdr svg{color:var(--muted);cursor:pointer}
-.m-sheet-body{padding:16px;overflow-y:auto;flex:1}
 
 /* Calculation Panel */
 .m-calc-formula{background:var(--bg);border-radius:var(--radius-sm);padding:12px;font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5}
@@ -310,21 +337,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-txn-row:last-child{border-bottom:none}
 .m-txn-main{display:flex;justify-content:space-between;align-items:center}
 .m-txn-main b{font-size:12px;color:var(--text)}
-.m-txn-rev{font-size:12px;font-weight:700;color:var(--green)}
+.m-txn-rev{font-size:13px;font-weight:700;color:var(--green)}
 .m-txn-sub{font-size:10px;color:var(--muted);margin-top:2px}
 
 /* Detail rows */
 .m-pb-detail-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--divider)}
 .m-pb-detail-row:last-child{border-bottom:none}
 .m-pb-detail-row span{font-size:11px;color:var(--muted)}
-.m-pb-detail-row b{font-size:11px;color:var(--text)}
+.m-pb-detail-row b{font-size:12.5px;color:var(--text)}
+/* Detail-row type chips + past-goal-sheet groups (desktop reference) */
+.m-pb-detail-name{display:flex;align-items:center;gap:8px;flex:1;min-width:0;padding-right:10px;color:var(--text)}
+.m-pb-chip{display:inline-flex;align-items:center;border:1px solid var(--border);background:var(--card-2);color:var(--text-2);font-size:9px;font-weight:800;letter-spacing:.4px;padding:3px 8px;border-radius:7px;flex-shrink:0}
+.m-pb-sub-amt{color:var(--accent) !important}
+.m-pb-past-group{margin-bottom:12px}
+.m-pb-past-group:last-child{margin-bottom:0}
+.m-pb-past-hdr{display:flex;align-items:center;gap:6px;padding:9px 0 8px;border-bottom:1px solid var(--divider)}
+.m-pb-past-dates{font-size:10.5px;color:var(--muted);font-weight:600}
+.m-pb-past-rate{font-size:11px;font-weight:800;color:var(--text);margin-left:2px}
+.m-pb-past-total{margin-left:auto;font-size:14px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.m-pb-past-group .m-pb-detail-row{padding-left:8px}
 
 /* Schedule */
 .m-sched-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--divider)}
 .m-sched-row:last-child{border-bottom:none}
 .m-sched-row svg{color:var(--accent)}
 .m-sched-row span{flex:1;font-size:11px;color:var(--muted)}
-.m-sched-row b{font-size:11px;color:var(--text)}
+.m-sched-row b{font-size:12.5px;color:var(--text)}
 
 /* ─── GOALS - RING ─── */
 .m-goal-hero{display:flex;align-items:center;gap:20px;background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
@@ -406,9 +444,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-donut-tip-txt span{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .m-donut2{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .m-donut2 svg{display:block}
+/* Center total in accent blue, sized to stay inside the hole (desktop reference) */
 .m-donut2-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.05}
-.m-donut2-center b{font-weight:900;color:var(--text);letter-spacing:-.4px}
-.m-donut2-center small{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.m-donut2-center b{font-weight:900;color:var(--accent);letter-spacing:-.4px}
+.m-donut2-center small{font-size:11px;color:var(--accent);font-weight:700;margin-top:3px}
 
 /* ─── AT A GLANCE: HERO ─── */
 .m-hero{background:var(--hero-grad);border-radius:20px;padding:18px 18px 16px;margin-bottom:12px;color:#fff;box-shadow:0 10px 26px var(--hero-glow);cursor:pointer;transition:transform .15s,filter .15s}
@@ -440,17 +479,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-context-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .m-context-card{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius-sm);padding:9px 11px;display:flex;flex-direction:column;gap:2px}
 .m-context-month{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.3px}
-.m-context-amt{font-size:16px;font-weight:800;color:var(--text)}
+/* Card deep-links to its period on the Payments page */
+.m-context-click{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.m-context-click:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.m-context-click:active{transform:scale(.98)}
+.m-context-amt{font-size:19px;font-weight:800;color:var(--text)}
 .m-context-card .m-pay-status{align-self:flex-start;margin-top:2px}
 
-/* Goaling period progress */
-.m-gp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:6px}
-.m-gp-row b{color:var(--text);font-size:14px}
-.m-gp-days{display:block;font-size:10px;color:var(--muted);margin-top:6px}
 
 /* Plan element donut card layout */
-.m-pe-donut-row{display:flex;align-items:center;gap:14px;margin-top:6px}
-.m-pe-donut-side{flex:1;min-width:0}
+/* Flat plan-element card (At A Glance) — donut replaced by a big attainment
+   stat, with the bookings bar and labels scaled up to fill the room */
+.m-pe-att-row{display:flex;align-items:baseline;gap:8px;margin:10px 0 2px}
+.m-pe-att-big{font-size:34px;font-weight:900;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+.m-pe-att-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.6px}
+.m-pe-flat{padding:14px 15px}
+.m-pe-flat .m-pe-left b{font-size:14px}
+.m-pe-flat .m-pe-goal{font-size:11.5px}
+.m-pe-flat .m-pe-bar-section{margin-top:14px}
+.m-pe-flat .m-pe-book-row{font-size:12.5px;justify-content:flex-start;margin-bottom:8px}
+.m-pe-flat .m-pe-book-icon{width:10px;height:10px}
+.m-pe-flat .m-pe-bar-track{height:16px;border-radius:8px;margin-bottom:8px}
+.m-pe-flat .m-pe-bar-bookings{border-radius:8px}
+.m-pe-flat .m-pe-bar-100{top:-6px;bottom:-6px;width:2px}
+.m-pe-flat .m-pe-bar-100 span{font-size:9.5px;top:-16px}
+.m-pe-flat .m-pe-legend{font-size:11.5px;font-weight:600;gap:6px 14px;flex-wrap:wrap}
+.m-pe-flat .m-pe-legend .m-dot{width:9px;height:9px}
 
 /* ─── DATA-AS-OF BANNER (Payments) ─── */
 .m-asof-banner{display:flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(4,159,217,.18);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:12px;font-size:11px;font-weight:600;color:var(--accent-dark)}
@@ -489,7 +543,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-formula-factor small{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:3px}
 .m-formula-op{font-size:14px;color:#9aa3b2;font-weight:500}
 .m-formula-eq{font-size:18px;color:var(--text);font-weight:700}
-.m-formula-result{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-.5px}
+.m-formula-result{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-.5px}
 
 /* wide rate tables (scroll horizontally on phone) */
 .m-rate-name{font-size:12px;font-weight:800;color:var(--text);margin:12px 0 8px}
@@ -528,8 +582,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-txn-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .m-txn-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.25;letter-spacing:-.2px}
 .m-txn-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px}
-.m-txn-export{display:inline-flex;align-items:center;gap:6px;background:var(--accent-grad);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px var(--hero-glow)}
-.m-txn-export:active{transform:scale(.96)}
 .m-txn-iconbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .m-txn-iconbtn:active{transform:scale(.94)}
 .m-txn-list{background:var(--card);border-radius:var(--radius);padding:4px 14px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
@@ -539,11 +591,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-txn-row2{display:flex;flex-direction:column;gap:3px;padding:12px 0;border-bottom:1px solid var(--divider)}
 .m-txn-line1{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .m-txn-so{font-size:14px;font-weight:700;font-style:italic;color:var(--accent)}
-.m-txn-rev{font-size:15px;font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
+.m-txn-rev{font-size:16px;font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
 .m-txn-line2{font-size:12px;color:var(--muted)}
 .m-txn-total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:2px;border-top:2px solid var(--border)}
 .m-txn-total span{font-size:14px;font-weight:800;color:var(--text)}
-.m-txn-total b{font-size:17px;font-weight:900;font-style:italic;color:var(--green);font-variant-numeric:tabular-nums}
+.m-txn-total b{font-size:19px;font-weight:900;font-style:italic;color:var(--green);font-variant-numeric:tabular-nums}
 
 /* Comp calc content */
 .m-calc-badge-row{margin-bottom:8px}
@@ -576,11 +628,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-goaltab-scroll::-webkit-scrollbar{display:none}
 .m-goaltab{flex-shrink:0;min-width:52px;padding:9px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .15s}
 .m-goaltab.on{box-shadow:0 3px 10px rgba(0,0,0,.15)}
-.m-goal-donut-wrap{display:flex;justify-content:center;padding:6px 0 14px}
 .m-goal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .m-goal-stats div{display:flex;flex-direction:column;gap:2px}
 .m-goal-stats small{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
-.m-goal-stats span{font-size:15px;font-weight:800;color:var(--text)}
+.m-goal-stats span{font-size:17px;font-weight:800;color:var(--text)}
 .m-goal-earn{color:var(--green)!important}
 
 /* ─── COMP UPLIFT PLANS (Goals · PE1) ─── */
@@ -592,7 +643,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-uplift-card{border:1px solid var(--border);border-radius:12px;padding:12px 13px;margin-top:10px;background:var(--card-2)}
 .m-uplift-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .m-uplift-name{font-size:11px;font-weight:800;color:var(--text);letter-spacing:.3px;line-height:1.3;word-break:break-word}
-.m-uplift-pct{font-size:15px;font-weight:900;color:var(--green);flex-shrink:0;font-variant-numeric:tabular-nums}
+.m-uplift-pct{font-size:17px;font-weight:900;color:var(--green);flex-shrink:0;font-variant-numeric:tabular-nums}
 .m-uplift-sub{display:block;font-size:11px;color:var(--muted);margin:4px 0 12px}
 .m-uplift-bar{position:relative;margin-bottom:9px}
 .m-uplift-track{height:7px;background:var(--bar-track);border-radius:4px;overflow:hidden}
@@ -620,7 +671,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-kso-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-left:auto}
 .m-kso-bonus-blk{display:flex;flex-direction:column;align-items:flex-end}
 .m-kso-bonus-blk small{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-.m-kso-bonus-blk b{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.3px}
+.m-kso-bonus-blk b{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-.3px}
 .m-kso-date{font-size:10.5px;color:var(--muted);display:flex;gap:5px;align-items:baseline}
 .m-kso-date b{color:var(--text-2);font-weight:700}
 /* objective rows: mobile = 2-col grid (name + progress span both) */
@@ -631,7 +682,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-kso-row-desc{display:block;font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:2px}
 .m-kso-fig{display:flex;flex-direction:column;gap:1px}
 .m-kso-fig small{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-.m-kso-fig b{font-size:13.5px;font-weight:800;color:var(--text)}
+.m-kso-fig b{font-size:15px;font-weight:800;color:var(--text)}
 .m-kso-prog{grid-column:1/-1}
 .m-kso-prog-lbl{display:block;font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:5px}
 .m-kso-bar{height:7px;background:var(--track);border-radius:4px;overflow:hidden}
@@ -668,13 +719,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* Blue-underlined payout link (Comp Calc trigger) */
 .m-pb-pe-payout-link.m-no-link{color:var(--text);cursor:default;text-decoration:none}
+/* parent-with-children total: accent blue like the links; tapping it (or the
+   button beside it) expands the component breakdown instead of a popup */
+.m-pb-pe-payout-static{font-size:17px;font-weight:700;color:var(--accent);cursor:pointer}
+.m-pb-breakdown-btn{display:inline-flex;align-items:center;gap:5px;border:none;background:var(--accent-light);color:var(--accent);font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:9px;cursor:pointer}
+.m-pb-breakdown-btn:hover{filter:brightness(1.05)}
 
 /* ─── ORDER SEARCH ─── */
-.m-search-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0 8px 0 12px;height:46px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.m-search-icon{color:var(--muted);flex-shrink:0}
-.m-search-input{flex:1;border:none;outline:none;background:none;font-size:15px;color:var(--text);min-width:0}
-.m-search-input::placeholder{color:var(--muted)}
-.m-search-filter{width:34px;height:34px;border-radius:9px;border:none;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+/* Order search bar (desktop reference): [search-by field ▾] [query] [go] */
+.m-os-bar{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.m-os-type{flex-shrink:0;max-width:42%;height:44px;border:1.5px solid var(--accent);background:var(--card);color:var(--text);font-size:12px;font-weight:700;padding:0 8px;border-radius:10px;cursor:pointer}
+.m-os-input{flex:1;min-width:0;height:44px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13.5px;padding:0 12px;border-radius:10px;outline:none}
+.m-os-input::placeholder{color:var(--muted)}
+.m-os-input:focus{border-color:var(--accent)}
+.m-os-go{flex-shrink:0;width:44px;height:44px;border:none;border-radius:50%;background:var(--accent-grad);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px var(--hero-glow)}
+.m-os-go:active{transform:scale(.94)}
 .m-search-count{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px}
 .m-search-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:56px 24px;color:var(--muted)}
 .m-search-empty svg{color:#c4ccd8}
@@ -700,39 +759,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-leg2{display:flex;align-items:center;gap:10px;background:var(--card-2);border:1px solid var(--divider);border-left:3px solid;border-radius:10px;padding:8px 11px}
 .m-leg2-badge{flex-shrink:0;min-width:38px;text-align:center;font-size:11px;font-weight:800;color:#fff;padding:3px 6px;border-radius:6px;font-variant-numeric:tabular-nums;letter-spacing:.2px}
 .m-leg2-label{flex:1;font-size:12.5px;font-weight:700;color:var(--text)}
-.m-leg2-val{font-size:12.5px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.m-leg2-val{font-size:14px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
 
 /* ─── GOALS: pacing clarity note ─── */
-.m-pace-note{display:flex;gap:9px;align-items:flex-start;border:1px solid;border-radius:10px;padding:10px 12px;margin-top:12px}
-.m-pace-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.m-pace-txt{font-size:11.5px;line-height:1.5;color:var(--text-2)}
-.m-pace-txt b{color:var(--text);font-weight:800}
 
 /* ─── ORDER SEARCH: recent home + filter badge ─── */
-.m-search-empty.compact{padding:24px 24px 14px}
-.m-search-filter{position:relative}
-.m-search-filter.on{background:var(--accent);color:#fff}
-.m-search-filter-badge{position:absolute;top:-4px;right:-4px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--card)}
-.m-os-block{margin-bottom:16px}
-.m-os-block-hdr{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:0 2px 8px}
-.m-recent-chips{display:flex;flex-wrap:wrap;gap:8px}
-.m-recent-chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:8px 13px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s}
-.m-recent-chip svg{color:var(--muted)}
-.m-recent-chip:active{transform:scale(.96);border-color:var(--accent)}
 .m-os-results-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .m-os-results-hdr .m-search-count{margin-bottom:0}
 .m-os-clear{border:none;background:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;padding:2px 4px}
 
 /* ─── FILTER BOTTOM SHEET ─── */
-.m-filter-group{margin-bottom:16px}
-.m-filter-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.m-filter-chips{display:flex;flex-wrap:wrap;gap:8px}
-.m-filter-chip{background:var(--card-2);border:1.5px solid var(--border);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--text-2);cursor:pointer;transition:all .15s}
-.m-filter-chip.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px var(--hero-glow)}
-.m-sheet-actions{display:flex;gap:10px;padding-top:6px;margin-top:2px;border-top:1px solid var(--divider)}
-.m-sheet-clear{flex:0 0 auto;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer}
-.m-sheet-apply{flex:1;background:var(--accent-grad);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 3px 10px var(--hero-glow)}
-.m-sheet-clear:active,.m-sheet-apply:active{transform:scale(.98)}
 
 /* ─── SAFARI BROWSER CHROME (bottom address bar, iOS style) ───
    CompX is a website, so the phone shows Safari chrome. Scrolling down
@@ -792,6 +828,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* Persistent top bar: cisco logo + segmented view toggle + theme toggle */
 .m-viewbar{flex-shrink:0;display:flex;align-items:center;gap:9px;padding:6px 11px 10px;background:var(--bg)}
 .m-viewtoggle{flex:1;display:flex;gap:3px;background:var(--track);border-radius:12px;padding:3px}
+.m-viewbar-spacer{flex:1}
 .m-viewtoggle button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;background:none;border-radius:9px;padding:8px 6px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
 .m-viewtoggle button svg{flex-shrink:0}
 .m-viewtoggle button.on{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.12)}
@@ -801,12 +838,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* Team header */
 .m-team-sub{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.4}
 
-/* Summary stat grid (2×2) */
-.m-team-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.m-team-stat{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius-sm);padding:11px 13px;display:flex;flex-direction:column;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.m-team-stat b{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;font-variant-numeric:tabular-nums}
-.m-team-stat small{font-size:10px;color:var(--muted);font-weight:600}
-
 /* Attainment bar charts */
 .m-team-chart-sub{display:block;font-size:10px;color:var(--muted);margin:-4px 0 12px;font-style:italic}
 .m-abars{display:flex;flex-direction:column;gap:9px}
@@ -815,7 +846,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-abar-track{flex:1;position:relative;height:11px;background:var(--bar-track);border-radius:6px;overflow:visible}
 .m-abar-fill{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 .m-abar-goal{position:absolute;top:-3px;bottom:-3px;width:1.5px;background:var(--text-3)}
-.m-abar-val{width:48px;flex-shrink:0;text-align:right;font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.m-abar-val{width:54px;flex-shrink:0;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
 .m-abar-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:13px;padding-top:11px;border-top:1px solid var(--divider)}
 .m-abar-legend span{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--muted)}
 .m-abar-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
@@ -836,16 +867,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-member-card{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);padding:13px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);cursor:pointer;transition:border-color .15s}
 .m-member-card:active{border-color:var(--accent)}
 .m-seller-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--accent-grad);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:.3px}
-.m-member-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.m-member-top{display:flex;align-items:center;gap:10px}
+.m-member-open .m-member-top{margin-bottom:8px}
+.m-member-chev{color:var(--muted);flex-shrink:0;margin-left:auto;transition:transform .18s}
+.m-member-chev.open{transform:rotate(180deg)}
+.m-member-breakdown{display:block;margin:10px 0 0 auto;border:none;background:none;color:var(--accent);font-size:11.5px;font-weight:700;cursor:pointer;padding:2px 0}
+.m-member-breakdown:hover{text-decoration:underline}
 .m-member-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
 .m-member-id b{font-size:14px;font-weight:800;color:var(--text)}
-.m-tstat{font-size:9.5px;font-weight:700;border:1px solid;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.m-tstat{font-size:11px;font-weight:700;border:1px solid;padding:2px 8px;border-radius:20px;white-space:nowrap}
 .m-member-gs{font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:10px}
 .m-member-pes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .m-member-pe{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid var(--divider);border-radius:10px;padding:9px 4px;background:var(--card-2)}
 .m-member-pe-chip{font-size:9px;font-weight:800;border:1px solid var(--border);color:var(--muted);padding:1px 7px;border-radius:5px;letter-spacing:.3px}
 .m-member-pe small{font-size:9px;color:var(--muted);font-weight:600;text-align:center;line-height:1.15}
-.m-member-pe b{font-size:14.5px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+.m-member-pe b{font-size:16.5px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
 
 /* Show all / top 5 toggle */
 .m-showall{display:flex;align-items:center;justify-content:center;gap:6px;margin:2px auto 14px;border:1px solid var(--border);background:var(--card);color:var(--accent);font-size:12.5px;font-weight:800;padding:10px 20px;border-radius:20px;cursor:pointer}
@@ -854,18 +890,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-showall svg.up{transform:rotate(180deg)}
 
 /* Section-label right-side chips */
-.m-label-right{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;text-transform:none}
+.m-label-right{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;text-transform:none;white-space:nowrap}
+.m-seller-sort{margin-left:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:10px;font-weight:700;padding:4px 4px;border-radius:8px;letter-spacing:0;text-transform:none;cursor:pointer;min-width:0}
 .m-canvas-chip{margin-left:auto;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:9px;letter-spacing:0;text-transform:none}
 
 /* Team insight cards (Canvas — dismissible) */
-.m-tinsight{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.m-tinsight-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.m-tinsight-title{font-size:12px;font-weight:700;color:var(--text);line-height:1.3}
+.m-tinsight{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);cursor:pointer;transition:border-color .15s}
+.m-tinsight:hover{border-color:var(--accent)}
+.m-tinsight-stat{display:inline-flex;align-items:center;gap:8px}
+.m-tinsight-body{margin-top:10px;cursor:default}
+/* nested sub-dropdowns inside an expanded team insight */
+.m-tinsight .m-exp{border:1px solid var(--divider);box-shadow:none;background:var(--card-2);margin:0 0 8px}
+.m-tinsight .m-exp:last-child{margin-bottom:0}
+.m-tinsight .m-exp-hdr{padding:10px 12px}
+.m-tinsight .m-exp-hdr span{font-size:11.5px}
+.m-tinsight .m-exp-body{padding:0 12px 11px}
+.m-tinsight .m-tinsight-desc{margin:0}
+.m-tinsight .m-tinsight-action{margin:0}
 .m-tinsight-x{border:none;background:none;color:var(--muted);cursor:pointer;padding:2px;border-radius:6px;flex-shrink:0;display:flex}
 .m-tinsight-x:hover{color:var(--text)}
-.m-tinsight-metric{font-size:24px;font-weight:900;letter-spacing:-.5px;margin:8px 0 8px;line-height:1.12}
 .m-tinsight-desc{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0 0 10px}
-.m-tinsight-foot{border-top:1px solid var(--divider);padding-top:9px}
 .m-tinsight-action{font-size:11.5px;font-weight:700;line-height:1.5;margin:0;color:var(--accent)}
 .m-tinsight-names{font-size:10.5px;color:var(--muted);font-style:italic;margin:7px 0 0}
 
@@ -938,7 +982,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-ndr-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
 .m-ndr-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .m-ndr-stat small{display:block;font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-.m-ndr-stat b{font-size:14.5px;font-weight:800;color:var(--text);white-space:nowrap}
+.m-ndr-stat b{font-size:16px;font-weight:800;color:var(--text);white-space:nowrap}
 .m-ndr-stat.on{border-color:rgba(13,148,136,.45);box-shadow:0 0 0 1px rgba(13,148,136,.2)}
 .m-ndr-stat.on b{color:#0d9488}
 .m-ndr-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
@@ -1123,10 +1167,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-timeline-card{justify-content:center;gap:4px;padding:14px 16px}
 .i-timeline-card .m-context-amt{font-size:22px}
 .i-timeline-date{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
-.i-pe-donut-wrap{display:flex;justify-content:center;padding:8px 0 12px}
 .i-goaltab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-.i-team-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.i-search-row{height:54px;margin-bottom:20px;max-width:680px}
+.i-os-bar{max-width:680px;margin-bottom:20px}
+.i-os-bar .m-os-type{max-width:230px;font-size:13px;padding:0 10px}
+.i-os-bar .m-os-input{font-size:14.5px;height:48px}
+.i-os-bar .m-os-go{width:48px;height:48px}
 
 /* Roomier, larger-type feel on iPad (phone components run small) */
 .i-main .m-section{margin-bottom:0;padding:18px 20px;border-radius:18px}
@@ -1138,14 +1183,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-main .m-hero-label{font-size:12px}
 .i-main .m-context-amt{font-size:20px}
 .i-main .m-pe-left b{font-size:14px}
-.i-main .m-tinsight-metric{font-size:26px}
-.i-main .m-tinsight-title,.i-main .m-insight-title,.i-main .m-spiff-name{font-size:13.5px}
-.i-main .m-team-stat b{font-size:26px}
+.i-main .m-insight-title,.i-main .m-spiff-name{font-size:13.5px}
 .i-main .m-abar-name{width:94px;font-size:12px}
 .i-main .m-abar-val{font-size:12.5px}
 .i-main .m-order-mid b{font-size:17px}
 .i-main .m-seller-id b{font-size:15px}
-.i-main .m-search-input{font-size:16px}
 
 /* iPad modal shell — reuses the phone popups as centered cards */
 .i-modal-scrim{position:absolute;inset:0;top:calc(30px + var(--isafari-h,0px));z-index:400;background:rgba(4,6,12,.55);display:flex;align-items:center;justify-content:center;padding:36px;animation:m-fadeIn .2s ease;transition:top .25s ease}
@@ -1170,8 +1212,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* iPad filter sheet → centered dialog instead of bottom sheet */
 /* iPad: dialog scrim sits below status bar + Safari toolbar */
-.i-sheet-overlay{align-items:center;top:calc(30px + var(--isafari-h,0px));bottom:0}
-.i-sheet{width:460px;max-width:92%;max-height:80%;border-radius:20px}
 
 /* ─── PORTRAIT POLISH ───
    The portrait content column is narrow next to the sidebar, so give it
@@ -1189,14 +1229,85 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-device:not(.land) .i-hero .m-hero-amt{font-size:36px;letter-spacing:-1px}
 .i-device:not(.land) .i-hero .m-hero-asof{flex-wrap:wrap}
 .i-device:not(.land) .i-timeline-card .m-context-amt{font-size:17px}
-/* Team: 2×2 stats instead of 4 squeezed across */
-.i-device:not(.land) .i-team-stats{grid-template-columns:1fr 1fr;gap:16px}
 /* Looser rhythm between blocks */
 .i-device:not(.land) .i-grid-2,
 .i-device:not(.land) .i-grid-3,
 .i-device:not(.land) .i-split{gap:16px;margin-bottom:22px}
 .i-device:not(.land) .i-goaltab-row{margin-bottom:22px}
 .i-device:not(.land) .m-section-label{margin-top:4px}
+
+/* ─── RECOVERABLE BALANCE HISTORY ─── */
+.m-recov-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.14);color:var(--green);border:1px solid rgba(16,185,129,.35);border-radius:10px;padding:6px 11px;font-size:13px;font-weight:800;flex-shrink:0;margin-right:10px;font-variant-numeric:tabular-nums}
+.m-recov-desc{font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 8px}
+.m-recov-asof{font-size:10.5px;color:var(--muted);font-weight:600;text-align:right;margin:10px 0}
+.m-recov-card{padding:14px}
+.m-recov-hdr{display:flex;align-items:center;gap:9px;cursor:pointer}
+.m-recov-hdr-text{flex:1;min-width:0}
+.m-recov-hdr-text b{display:block;font-size:13.5px;font-weight:800;color:var(--accent)}
+.m-recov-hdr-text span{font-size:11px;color:var(--text-2);font-weight:600}
+.m-recov-remaining{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.m-recov-remaining b{font-size:16px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+.m-recov-remaining small{font-size:9px;color:var(--muted);font-weight:600}
+.m-recov-check{color:var(--green);flex-shrink:0}
+.m-recov-progress{margin:10px 0 4px}
+.m-recov-progress small{display:block;font-size:10.5px;font-weight:700;color:var(--text-2);margin-bottom:4px;text-align:right}
+.m-recov-bar{height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.m-recov-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--green))}
+.m-recov-txn{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--divider)}
+.m-recov-txn div b{display:block;font-size:12.5px;font-weight:800;color:var(--accent)}
+.m-recov-txn div span{font-size:11px;color:var(--muted)}
+.m-recov-txn>b{font-size:14px;font-variant-numeric:tabular-nums;flex-shrink:0}
+.m-recov-neg{color:var(--red)}
+.m-recov-pos{color:var(--green)}
+.m-recov-total{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.m-recov-total b{font-size:13.5px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+
+/* ─── INSIGHT CANVAS ─── */
+.ic-hdr{flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px 14px;background:var(--accent-grad);color:#fff}
+.ic-hdr-text>b{display:block;font-size:19px;font-weight:800;letter-spacing:-.3px;margin-bottom:3px}
+.ic-hdr-text p{font-size:11.5px;font-weight:500;opacity:.92}
+.ic-hdr-text p b{font-weight:800}
+.ic-close{width:32px;height:32px;border-radius:9px;border:none;background:rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ic-close:hover{background:rgba(255,255,255,.3)}
+.ic-tools{flex-shrink:0;display:flex;gap:9px;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--border)}
+.ic-search{flex:1;display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;padding:8px 11px;background:var(--bg);color:var(--muted)}
+.ic-search input{flex:1;border:none;outline:none;background:none;font-size:12.5px;color:var(--text);min-width:0}
+.ic-catsel{border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);font-size:12px;font-weight:600;padding:8px 9px;max-width:150px}
+.ic-body{padding:14px 18px 18px}
+.ic-cat{margin-bottom:18px}
+.ic-cat-hdr{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.ic-cat-hdr i{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ic-cat-hdr h3{font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
+.ic-cat-hdr span{font-size:11px;font-weight:600;color:var(--muted)}
+.ic-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.ic-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 13px;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.ic-card:hover{border-color:var(--accent);box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.ic-card-fast{border-left:3px solid;background:var(--card-2)}
+.ic-pinned{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ic-maxed{opacity:.55;cursor:not-allowed}
+.ic-maxed:hover{border-color:var(--border);box-shadow:none}
+.ic-card-top{display:flex;align-items:center;gap:8px;width:100%}
+.ic-card-top b{font-size:13px;font-weight:700;color:var(--text);flex:1}
+.ic-pin{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .15s}
+.ic-pinned .ic-pin,.ic-pin.on{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--card)}
+.ic-live{font-size:9px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--accent);border-radius:5px;padding:3px 6px;flex-shrink:0}
+.ic-fast-lbl{font-size:9.5px;font-weight:800;letter-spacing:.6px}
+.ic-desc{font-size:11.5px;line-height:1.5;color:var(--text-2)}
+.ic-tags{display:flex;gap:5px;flex-wrap:wrap}
+.ic-tags span{font-size:10px;font-weight:600;color:var(--text-3);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px}
+.ic-cta{align-self:flex-start;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:700;padding:7px 12px;cursor:pointer;margin-top:2px}
+.ic-cta:hover{filter:brightness(1.08)}
+.ic-request{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1.5px dashed var(--border);border-radius:12px;padding:13px 14px;flex-wrap:wrap}
+.ic-request span{font-size:12px;color:var(--text-2);flex:1;min-width:180px}
+.ic-req-btn{border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;padding:9px 13px;cursor:pointer;flex-shrink:0}
+.ic-req-btn:disabled{background:rgba(16,185,129,.15);color:var(--green);cursor:default}
+.ic-foot{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--card);border-top:1px solid var(--border)}
+.ic-foot>span{font-size:12px;font-weight:600;color:var(--text-2)}
+.ic-done{border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:10px 22px;cursor:pointer}
+.ic-done:hover{filter:brightness(1.08)}
+/* iPad modal variant: wider shell, multi-column catalog */
+.i-modal-shell.i-modal-xl{width:900px;height:92%;max-height:92%}
+.i-modal-shell .ic-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 
 /* ─── UTILITIES ─── */
 /* Scale the whole device down on viewports too narrow to show the full frame */
