@@ -793,6 +793,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-est-sum-total b{font-size:18px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
 .i-main .m-est-card,.i-main .m-est-sum{min-width:0}
 
+/* ─── PAYMENT HISTORY POPUP ─── */
+.m-ph-ranges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.m-ph-ranges button{border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:11px;font-weight:700;padding:7px 13px;border-radius:18px;cursor:pointer}
+.m-ph-ranges button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.m-ph-table{margin-top:2px}
+.m-ph-tr{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:10px 8px;border-bottom:1px solid var(--divider)}
+.m-ph-tr.m-ph-th{background:var(--track);border-radius:8px;border-bottom:none;padding:9px 8px;margin-bottom:2px}
+.m-ph-tr.m-ph-th span{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-ph-date{font-size:11px;color:var(--text-2);font-weight:600;white-space:nowrap}
+.m-ph-details{font-size:11.5px;font-weight:600;color:var(--text);line-height:1.35}
+.m-ph-amt{font-size:12.5px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.m-ph-amt.neg{color:#8b5cf6}
+.m-ph-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0 2px;font-size:12.5px;font-weight:800;color:var(--text)}
+.m-ph-total b{font-size:14px;font-variant-numeric:tabular-nums}
+.m-ph-label{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:2px 0 10px}
+.m-ph-bonus{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);padding:14px}
+.m-ph-bonus div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.m-ph-bonus small{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-ph-bonus b{font-size:12.5px;font-weight:700;color:var(--text);word-break:break-word;font-variant-numeric:tabular-nums}
+/* Blue amounts that drill into a popup */
+.m-pb-amt-link{cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+.m-pb-amt-link:active{opacity:.7}
+.m-ph-total{padding-left:8px;padding-right:8px}
+.m-rate-more{display:inline-block;border:none;background:none;color:var(--accent);font-size:11.5px;font-weight:800;padding:8px 0 0;cursor:pointer}
+
 /* ─── MOBILE MORE SHEET (bottom-nav overflow) ─── */
 .m-more-backdrop{position:absolute;inset:0;z-index:30}
 .m-more-sheet{position:absolute;right:10px;bottom:118px;z-index:31;display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:186px}
@@ -1260,7 +1285,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-title{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-.6px}
 .i-sub{font-size:14px;color:var(--muted);margin-top:5px}
 .i-head-actions{display:flex;align-items:center;gap:12px;position:relative}
-.i-iconbtn{position:relative;width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.i-iconbtn{position:relative;flex:none;width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .i-notif-dropdown{left:auto;right:0;top:52px;width:340px}
 
 /* Grids / splits */

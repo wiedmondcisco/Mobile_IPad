@@ -241,7 +241,7 @@ const recentPaymentPeriods = [
     spiff:{total:"2,125.00", items:[{name:"Q2 Cloud Migration SPIFF", amount:"$1,250.00"},{name:"Partner Acceleration Q2", amount:"$875.00"}]},
     draws:{total:"50.00", items:[{name:"Monthly Incentive Payment (MIPS)", amount:"$35.00"},{name:"Recoverable Draw", amount:"$15.00"}]},
     adj:{total:"73.50", items:[{name:"ICC True-up Adjustment", amount:"$73.50"}]},
-    otb:{total:"100.00", items:[{name:"Security iACV Plan", amount:"$100.00"}]},
+    otb:{total:"100.00", items:[{name:"PIOT PRODUCT RR|PL", amount:"$100.00", pct:65, attChange:25}]},
     past:{total:"200.00", groups:[
       {fy:"FY23", half:"H2", dates:"Jul 1, 2023 – Dec 31, 2023", rate:"CS402", total:"120.00", items:[
         {pe:"PE1", name:"Product & Services Annual", amount:"75.00"},
@@ -391,7 +391,80 @@ function paymentDonutItems(p) {
 /* Little type chips on accordion detail rows (desktop reference) */
 const SECTION_CHIP = {spiff:"SPIFF", otb:"OTB"};
 /* sections whose item amounts render in accent blue on the web */
-const ACCENT_AMT_SECTIONS = {spiff:true, adj:true, otb:true};
+const ACCENT_AMT_SECTIONS = {spiff:true, adj:true, otb:true, draws:true};
+
+/* ── Payment History popups (per line item, keyed by item name) ──
+   Blue amounts in the payment dropdowns open these. `mb` = calendar
+   months back from the demo today (May 26, 2026): Past 6 Months = mb≤5,
+   Past Year = mb≤12. Totals stay consistent with the statement data
+   (e.g. ICC adjustments were $50 in every prior statement; the plan
+   advance nets to the $35 MIPS line after its full reversal pair). */
+const PAYMENT_HISTORY = {
+  "Q2 Cloud Migration SPIFF": {
+    current:{book:"01-May-2026", processed:"10-May-2026", bonus:"1,250.00", payment:"1,250.00", comments:"Q2 Cloud Migration SPIFF – Milestone 1", createdBy:"askg2c", program:"WW_CLOUD_SPIFF"},
+    rows:[
+      {date:"Apr 14, 2026", details:"Q2 Cloud Migration SPIFF", amount:1250.00, mb:1},
+      {date:"Nov 14, 2025", details:"Q1FY26 Cloud Migration SPIFF", amount:1100.00, mb:6},
+      {date:"Apr 14, 2025", details:"Q4FY25 Cloud Migration SPIFF", amount:950.00, mb:13}
+    ]},
+  "Partner Acceleration Q2": {
+    current:{book:"01-May-2026", processed:"10-May-2026", bonus:"875.00", payment:"875.00", comments:"Partner-sourced bookings payout", createdBy:"askg2c", program:"WW_PARTNER_ACCEL"},
+    rows:[
+      {date:"Apr 14, 2026", details:"Partner Acceleration Q2", amount:875.00, mb:1},
+      {date:"Oct 15, 2025", details:"Partner Acceleration Q1", amount:640.00, mb:7},
+      {date:"Apr 14, 2025", details:"Partner Acceleration FY25", amount:590.00, mb:13}
+    ]},
+  "Monthly Incentive Payment (MIPS)": {
+    current:{book:"01-May-2026", processed:"10-May-2026", bonus:"35.00", payment:"35.00", comments:"FY26 Plan Advance", createdBy:"askg2c", program:"WW_PLAN_ADVANCE"},
+    rows:[
+      {date:"May 9, 2026", details:"FY26 Plan Advance", amount:35.00, mb:0},
+      {date:"Oct 15, 2025", details:"FY26H1 Plan advance payment reversal", amount:-8230.77, mb:7},
+      {date:"Sep 16, 2025", details:"FY26P01-P02 Plan advance payment", amount:8230.77, mb:8}
+    ]},
+  "Recoverable Draw": {
+    current:{book:"01-May-2026", processed:"10-May-2026", bonus:"15.00", payment:"15.00", comments:"Recoverable draw – H1 balance", createdBy:"askg2c", program:"WW_RECOV_DRAW"},
+    rows:[
+      {date:"May 9, 2026", details:"Recoverable Draw", amount:15.00, mb:0},
+      {date:"Apr 9, 2026", details:"Recoverable Draw", amount:15.00, mb:1},
+      {date:"Mar 9, 2026", details:"Recoverable Draw", amount:15.00, mb:2},
+      {date:"Nov 7, 2025", details:"Recoverable Draw", amount:15.00, mb:6}
+    ]},
+  "ICC True-up Adjustment": {
+    current:{book:"03-May-2026", processed:"12-May-2026", bonus:"73.50", payment:"73.50", comments:"ICC true-up for April revenue", createdBy:"askg2c", program:"WW_ICC_TRUEUP"},
+    rows:[
+      {date:"May 2, 2026", details:"ICC True-up Adjustment", amount:50.00, mb:0},
+      {date:"Apr 2, 2026", details:"ICC True-up Adjustment", amount:50.00, mb:1},
+      {date:"Mar 2, 2026", details:"ICC True-up Adjustment", amount:50.00, mb:2},
+      {date:"Feb 2, 2026", details:"ICC True-up Adjustment", amount:50.00, mb:3},
+      {date:"Jan 2, 2026", details:"ICC True-up Adjustment", amount:50.00, mb:4},
+      {date:"Dec 2, 2025", details:"ICC True-up Adjustment", amount:50.00, mb:5},
+      {date:"Nov 2, 2025", details:"ICC True-up Adjustment", amount:50.00, mb:6},
+      {date:"Oct 2, 2025", details:"ICC True-up Adjustment", amount:50.00, mb:7},
+      {date:"Sep 2, 2025", details:"ICC True-up Adjustment", amount:50.00, mb:8},
+      {date:"Aug 2, 2025", details:"ICC True-up Adjustment", amount:50.00, mb:9},
+      {date:"Jul 2, 2025", details:"ICC True-up Adjustment", amount:50.00, mb:10}
+    ]},
+  "Q4FY24 Slam Dunk": {
+    rows:[
+      {date:"Apr 14, 2026", details:"Q4FY24 Slam Dunk true-up", amount:2125.00, mb:1},
+      {date:"Aug 15, 2024", details:"Q4FY24 Slam Dunk", amount:1875.00, mb:21}
+    ]}
+};
+PAYMENT_HISTORY["MIPS"] = PAYMENT_HISTORY["Monthly Incentive Payment (MIPS)"];
+PAYMENT_HISTORY["ICC Adj"] = PAYMENT_HISTORY["ICC True-up Adjustment"];
+
+/* ── On-Top Bonus calc popups (keyed by item name) ── Formula follows the
+   desktop OTB reference: TI rate × OTB target incentive × proration ×
+   payout multiplier = payment. 10% × 4,000 × 100% × 25% = 100.00, and
+   prior 40% + incremental 25% = the 65% OTB attainment on the Goals tab. */
+const OTB_CALC = {
+  "PIOT PRODUCT RR|PL": {
+    tiRate:"10%", targetIncentive:"4,000.00", proration:"100%", payoutRate:"25%", result:"100.00", incrementalAtt:"25%", rateName:"CS402",
+    rows:[
+      {range:"0 – 125 %", peRate:"1%", prior:"40%", incr:"25%", mult:"25%", active:true},
+      {range:"125+ %", peRate:"0%", prior:"-", incr:"-", mult:"-"}
+    ]}
+};
 
 function paymentSections(p) {
   return [
@@ -521,10 +594,11 @@ function FullScreenPopup({title, subtitle, tabs, activeTab, onTab, onClose, chil
   </div>;
 }
 
-/* Horizontal formula: Weight × Target Incentive × Proration × Payout Rate = Result */
-function FormulaStrip({weight, targetIncentive, proration, payoutRate, result, totalEarned, prevPaid}) {
+/* Horizontal formula: Weight × Target Incentive × Proration × Payout Rate = Result.
+   weightLabel overrides the first factor's label (OTB uses "On Top Bonus TI Rate"). */
+function FormulaStrip({weight, targetIncentive, proration, payoutRate, result, totalEarned, prevPaid, weightLabel="Weight"}) {
   const factors = [
-    {v:weight, l:"Weight"},
+    {v:weight, l:weightLabel},
     {v:amt(targetIncentive), l:"Target Incentive"},
     {v:proration, l:"Proration"},
     {v:payoutRate, l:"Payout Rate Multiplier"}
@@ -952,13 +1026,42 @@ function PaymentAccordion({p, s}) {
               <b className="m-pb-sub-amt">{amt(it.amount)}</b>
             </div>)}
           </div>)
-        : p[sec.key].items.length>0 ? p[sec.key].items.map((item,j)=><div key={j} className="m-pb-detail-row">
-            <span className="m-pb-detail-name">
-              {SECTION_CHIP[sec.key] && <span className="m-pb-chip">{SECTION_CHIP[sec.key]}</span>}
-              {item.name}
-            </span>
-            <b className={ACCENT_AMT_SECTIONS[sec.key] ? "m-pb-sub-amt" : undefined}>{amt(item.amount)}</b>
-          </div>)
+        : p[sec.key].items.length>0 ? p[sec.key].items.map((item,j)=>{
+            /* Blue amounts drill in: OTB items open their Compensation
+               Calculation; SPIFF/draw/adjustment items open Payment History */
+            const open = OTB_CALC[item.name] ? ()=>s.setOtbCalcItem(item)
+              : PAYMENT_HISTORY[item.name] ? ()=>s.setHistItem({...item, sect:sec.key}) : null;
+            /* OTB items render like goal-sheet rows (desktop reference):
+               chip + name, attainment bar, % + change, blue amount */
+            if (sec.key==="otb" && item.pct != null) return <div key={j} className="m-pb-pe-row">
+              <div className="m-pb-pe-top">
+                <span className="m-pb-chip">OTB</span>
+                <span className="m-pb-pe-name">{item.name}</span>
+              </div>
+              <PbAttBar item={item}/>
+              <div className="m-pb-pe-stats">
+                <span className="m-pb-pe-att"><b>{item.pct}%</b> attainment</span>
+                {item.attChange > 0 && <span className="m-pb-pe-change"><ArrowUp size={10}/> +{item.attChange}%</span>}
+              </div>
+              <div className="m-pb-pe-actions">
+                <span className="m-pb-pe-payout-link" role="button" tabIndex={0} onClick={open}
+                  onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); open(); } }}>
+                  {amt(item.amount)}
+                </span>
+              </div>
+            </div>;
+            return <div key={j} className="m-pb-detail-row">
+              <span className="m-pb-detail-name">
+                {SECTION_CHIP[sec.key] && <span className="m-pb-chip">{SECTION_CHIP[sec.key]}</span>}
+                {item.name}
+              </span>
+              <b className={`${ACCENT_AMT_SECTIONS[sec.key] ? "m-pb-sub-amt" : ""} ${open ? "m-pb-amt-link" : ""}`}
+                {...(open ? {role:"button", tabIndex:0, onClick:open,
+                  onKeyDown:e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); open(); } }} : {})}>
+                {amt(item.amount)}
+              </b>
+            </div>;
+          })
         : <div className="m-pb-empty">No items this period.</div>}
     </div>}
   </div>)}</>;
@@ -1051,6 +1154,83 @@ function CompCalcPopup({item, month, onClose}) {
         </div>
       </div>
     </>}
+  </FullScreenPopup>;
+}
+
+/* On-Top Bonus Compensation Calculation — the OTB blue-amount trigger.
+   Same shell as CompCalcPopup but with the OTB formula (TI rate × OTB
+   target incentive × proration × payout multiplier) and single rate table. */
+function OtbCalcPopup({item, month, onClose}) {
+  const c = OTB_CALC[item.name];
+  return <FullScreenPopup title="Compensation Calculation" subtitle={`Calculations for ${month} payment`}
+    tabs={["Payment Calculation"]} activeTab="Payment Calculation" onTab={()=>{}} onClose={onClose}>
+    <div className="m-calc-badge-row"><PePill pe="OTB" label={item.name} color={PE_COLOR.OTB}/></div>
+    <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {item.name} is <b>{amt(c.result)}</b>.</p>
+    <FormulaStrip weight={c.tiRate} weightLabel="On Top Bonus TI Rate" targetIncentive={c.targetIncentive}
+      proration={c.proration} payoutRate={c.payoutRate} result={c.result}/>
+    <Expandable title="How is the Payout Rate Multiplier determined?" defaultOpen>
+      <p className="m-exp-text">The payout rate multiplier is based on your incremental goal attainment for the month and the payout multiplier associated with your overall goal attainment for the goal period.</p>
+      <p className="m-rate-name">Rate Table: {c.rateName}</p>
+      <div className="m-rate-scroll">
+        <table className="m-rate-table m-rate-wide">
+          <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Prior Att.</th><th>Incr. Att.</th><th>Multiplier</th></tr></thead>
+          <tbody>{c.rows.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
+            <td>{r.range}</td><td>{r.peRate}</td><td>{r.prior}</td><td>{r.incr}</td><td>{r.mult}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>
+      <button className="m-rate-more">More rows →</button>
+      <div className="m-rate-total-row">Total: <b>{c.payoutRate}</b></div>
+    </Expandable>
+    <Expandable title="Why is my proration not 100%?">
+      <p className="m-exp-text">Proration reflects mid-period plan changes, transfers, or start dates. Your plan was active for the full period, so your proration is 100%.</p>
+    </Expandable>
+  </FullScreenPopup>;
+}
+
+/* Payment History — SPIFF / draw / adjustment blue-amount trigger.
+   Two desktop-reference styles: SPIFF items use underline tabs with the
+   three past ranges; draws/adjustments use range pills including Current
+   Month, which switches to the Bonus Details card (the desktop's wide
+   table, stacked for mobile). */
+const HIST_RANGES = ["Current Month","Past 6 Months","Past Year","All Time"];
+function PaymentHistoryPopup({item, onClose}) {
+  const h = PAYMENT_HISTORY[item.name];
+  const tabsStyle = item.sect === "spiff";                 // underline tabs, no Current Month
+  const ranges = tabsStyle || !h.current ? HIST_RANGES.slice(1) : HIST_RANGES;
+  const [range, setRange] = useState(ranges[0]);
+  const lim = range==="Past 6 Months" ? 5 : range==="Past Year" ? 12 : Infinity;
+  const rows = h.rows.filter(r=>r.mb<=lim);
+  const total = rows.reduce((a,r)=>a+r.amount,0);
+  return <FullScreenPopup title="Payment History" subtitle={item.name} onClose={onClose}
+    {...(tabsStyle ? {tabs:ranges, activeTab:range, onTab:setRange} : {})}>
+    {!tabsStyle && <div className="m-ph-ranges">
+      {ranges.map(r=><button key={r} className={r===range?"on":""} onClick={()=>setRange(r)}>{r}</button>)}
+    </div>}
+    {range==="Current Month"
+      ? <>
+        <p className="m-ph-label">Bonus Details</p>
+        <div className="m-ph-bonus">
+          <div><small>Book Date</small><b>{h.current.book}</b></div>
+          <div><small>Processed Date</small><b>{h.current.processed}</b></div>
+          <div><small>Bonus Amount</small><b>{amt(h.current.bonus)}</b></div>
+          <div><small>Payment Amount (USD)</small><b>{amt(h.current.payment)}</b></div>
+          <div><small>User Comments</small><b>{h.current.comments}</b></div>
+          <div><small>Created By</small><b>{h.current.createdBy}</b></div>
+          <div><small>Program Name</small><b>{h.current.program}</b></div>
+        </div>
+      </>
+      : <div className="m-ph-table">
+        <div className="m-ph-tr m-ph-th"><span>Pay Date ↓</span><span>Details</span><span className="m-ph-amt">Amount</span><span>Status</span></div>
+        {rows.map((r,i)=><div key={i} className="m-ph-tr">
+          <span className="m-ph-date">{r.date}</span>
+          <span className="m-ph-details">{r.details}</span>
+          <span className={`m-ph-amt ${r.amount<0?"neg":""}`}>{amt(fmtAmt(r.amount))}</span>
+          <span className="m-pay-status m-status-paid">Paid</span>
+        </div>)}
+        {rows.length===0 && <div className="m-pb-empty">No payments in this range.</div>}
+        <div className="m-ph-total"><span>Total</span><b>{amt(fmtAmt(total))}</b></div>
+      </div>}
   </FullScreenPopup>;
 }
 
@@ -2456,6 +2636,8 @@ function useCompXState() {
   const [estPe, setEstPe] = useState(0);                            // Pay Estimator selected plan element
   const [estAdd, setEstAdd] = useState({PE1:0, PE2:0, PE3:0});      // Pay Estimator additional attainment $ per PE
   const [moreOpen, setMoreOpen] = useState(false);                  // mobile bottom-nav More sheet
+  const [histItem, setHistItem] = useState(null);                   // Payment History popup (payment line item)
+  const [otbCalcItem, setOtbCalcItem] = useState(null);             // OTB Compensation Calculation popup
   const [teamPe, setTeamPe] = useState("PE1");
   const [teamExpanded, setTeamExpanded] = useState(false);          // first 2 ↔ all members
   const [teamSort, setTeamSort] = useState("need");                 // "need" = most coaching first | "best"
@@ -2495,6 +2677,7 @@ function useCompXState() {
     orderQuery, setOrderQuery, orderType, setOrderType, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
     aagSpiffExpanded, setAagSpiffExpanded, backlogFilter, setBacklogFilter,
     estPe, setEstPe, estAdd, setEstAdd, moreOpen, setMoreOpen,
+    histItem, setHistItem, otbCalcItem, setOtbCalcItem,
     teamPe, setTeamPe, teamExpanded, setTeamExpanded, teamSort, setTeamSort, dismissedInsights, setDismissedInsights,
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
@@ -2520,6 +2703,8 @@ function FramePopups({s, variant="mobile"}) {
     {s.showAskIQ && shell(<AskIQPopup onClose={()=>s.setShowAskIQ(false)}/>, ()=>s.setShowAskIQ(false), "i-modal-lg")}
     {s.insightCanvasOpen && shell(<InsightCanvasPopup s={s} onClose={()=>s.setInsightCanvasOpen(false)}/>, ()=>s.setInsightCanvasOpen(false), "i-modal-xl")}
     {s.showRecovBal && shell(<RecovBalancePopup onClose={()=>s.setShowRecovBal(false)}/>, ()=>s.setShowRecovBal(false))}
+    {s.histItem && shell(<PaymentHistoryPopup item={s.histItem} onClose={()=>s.setHistItem(null)}/>, ()=>s.setHistItem(null))}
+    {s.otbCalcItem && shell(<OtbCalcPopup item={s.otbCalcItem} month={s.currentMonth} onClose={()=>s.setOtbCalcItem(null)}/>, ()=>s.setOtbCalcItem(null))}
   </>;
 }
 
