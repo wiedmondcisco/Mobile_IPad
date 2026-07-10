@@ -372,19 +372,22 @@ const revenueTxns = {
    DERIVATIONS (pure; shared by the mobile + iPad layouts so the two
    presentations never duplicate business logic)
    ════════════════════════════════════════════════════════════════ */
-/* Payment Breakdown donut slices — colors match the desktop/web palette:
-   indigo goal sheet, gold SPIFF, sky draws, lavender adjustments,
-   orange on-top, near-black past goal sheets */
-function paymentDonutItems(p) {
+/* Payment Breakdown donut slices — validated categorical palette in fixed
+   CVD-safe order (blue, aqua, yellow, green, violet, red), with per-theme
+   steps so each hue clears the card surface it actually renders on. The
+   legend rows carry every slice's label + value, covering the two light-mode
+   hues that sit under 3:1 contrast. */
+const DONUT_LIGHT = ["#2a78d6","#1baf7a","#eda100","#008300","#4a3aa7","#e34948"];
+const DONUT_DARK  = ["#3987e5","#199e70","#c98500","#008300","#9085e9","#e66767"];
+function paymentDonutItems(p, dark) {
+  const pal = dark ? DONUT_DARK : DONUT_LIGHT;
   return [
-    {label:"Goal Sheet", value:parseFloat(p.goalSheet.total.replace(/,/g,'')), color:"#3f3f9c"},
-    {label:"SPIFF & Bonus", value:parseFloat(p.spiff.total.replace(/,/g,'')), color:"#c9a232"},
-    {label:"Draws", value:parseFloat(p.draws.total.replace(/,/g,'')), color:"#7ec8f0"},
-    {label:"Adjustments", value:parseFloat(p.adj.total.replace(/,/g,'')), color:"#b9aede"},
-    {label:"On-Top Bonus", value:parseFloat(p.otb.total.replace(/,/g,'')), color:"#ed7024"},
-    /* near-black on the web; lifted in dark mode so the slice stays visible on the dark card */
-    {label:"Past Goal Sheets", value:parseFloat(p.past.total.replace(/,/g,'')),
-      color:document.documentElement.getAttribute("data-theme")==="dark" ? "#4b5670" : "#1e2430"}
+    {label:"Goal Sheet", value:parseFloat(p.goalSheet.total.replace(/,/g,'')), color:pal[0]},
+    {label:"SPIFF & Bonus", value:parseFloat(p.spiff.total.replace(/,/g,'')), color:pal[1]},
+    {label:"Draws", value:parseFloat(p.draws.total.replace(/,/g,'')), color:pal[2]},
+    {label:"Adjustments", value:parseFloat(p.adj.total.replace(/,/g,'')), color:pal[3]},
+    {label:"On-Top Bonus", value:parseFloat(p.otb.total.replace(/,/g,'')), color:pal[4]},
+    {label:"Past Goal Sheets", value:parseFloat(p.past.total.replace(/,/g,'')), color:pal[5]}
   ].filter(d=>d.value>0);
 }
 
@@ -513,10 +516,13 @@ function SegmentDonut({items, total, size=180, stroke=26, centerTop, centerSub, 
   const [hover, setHover] = useState(null);
   const [pos, setPos] = useState({x:0, y:0});
   const wrapRef = useRef(null);
+  /* 2px of surface between slices — keeps adjacent hues separated (each
+     slice draws slightly short of its arc; offsets still use the full arc) */
+  const GAP = items.length > 1 ? 2 : 0;
   let offset = 0;
   const segs = items.map(d => {
     const dash = (d.value / total) * circ;
-    const seg = {dash, gap: circ - dash, offset, color: d.color};
+    const seg = {dash: Math.max(dash - GAP, 1), gap: circ - Math.max(dash - GAP, 1), offset, color: d.color};
     offset += dash;
     return seg;
   });
@@ -766,7 +772,9 @@ function AagSpiffSection({s}) {
   const visible = s.aagSpiffExpanded ? spiffBonus : spiffBonus.slice(0,2);
   return <div className="m-section">
     <div className="m-section-hdr"><h2>SPIFF & BONUS</h2></div>
-    {visible.map((sp,i)=><div key={i} className="m-spiff-card">
+    {visible.map((sp,i)=><div key={i} className="m-spiff-card m-pe-click" role="button" tabIndex={0}
+      aria-label={`Open ${sp.name} on SPIFF & Bonus`} onClick={()=>s.openSpiff(sp.name)}
+      onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openSpiff(sp.name); } }}>
       <div className="m-spiff-top">
         <span className="m-spiff-status" style={{color:sp.statusColor, borderColor:sp.statusColor}}>{sp.status}</span>
         <b className="m-spiff-amt" style={{color:sp.statusColor}}>{amt(sp.amount)}</b>
@@ -827,7 +835,9 @@ function AtAGlancePage({s}) {
     <div className="m-section">
       <div className="m-section-hdr"><h2>PLAN ELEMENTS</h2><span className="m-badge">H1 2026</span></div>
       <small className="m-pe-sub">All values in USD · Jan 26, 2026 – Jul 26, 2026</small>
-      {planElements.map((pe,i)=><div key={i} className="m-pe-card m-pe-flat">
+      {planElements.map((pe,i)=><div key={i} className="m-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
+        aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
+        onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
         <div className="m-pe-top">
           <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
           <span className="m-pe-goal">{pe.goal}</span>
@@ -856,32 +866,40 @@ function AtAGlancePage({s}) {
    ════════════════════════════════════════════════════════════════ */
 /* Shared payment sub-components (consumed by mobile PaymentsPage + iPad) */
 function PeriodChips({s}) {
-  /* Chronological chips (oldest → newest); last 3 months by default,
-     toggle reveals the last 12. Keeps the selected chip in view. */
+  /* Chronological chips (oldest → newest). Collapsed shows April · May ·
+     June-upcoming so the open statement sits front and center; the compact
+     chevron toggle expands to the last 12 months. */
   const wrapRef = useRef(null);
   const all = fullPaymentPeriods.map((pr,i)=>({pr,i}));
-  const visible = s.showAllPeriods ? all : all.slice(-3);
+  const visible = s.showAllPeriods ? all : all.slice(-2);
   useEffect(()=>{
     if (!wrapRef.current) return;
     if (s.showAllPeriods) wrapRef.current.querySelector(".m-period-active")?.scrollIntoView({inline:"nearest", block:"nearest"});
     else wrapRef.current.scrollLeft = 0;   // keep the toggle visible at the left edge
   }, [s.showAllPeriods]);
   return <div className="m-period-scroll" ref={wrapRef}>
-    <button className="m-period-more" onClick={()=>s.setShowAllPeriods(!s.showAllPeriods)}>
-      {s.showAllPeriods ? "Last 3 months" : "Last 12 months"}
-      <ChevronRight size={13} className={s.showAllPeriods?"back":""}/>
+    <button className="m-period-more m-period-mini" onClick={()=>s.setShowAllPeriods(!s.showAllPeriods)}
+      aria-label={s.showAllPeriods ? "Show last 3 months" : "Show last 12 months"}
+      title={s.showAllPeriods ? "Last 3 months" : "Last 12 months"}>
+      <ChevronRight size={15} className={s.showAllPeriods?"back":""}/>
     </button>
     {visible.map(({pr,i})=><div key={pr.month} className={`m-period-item ${i===s.periodIdx?"m-period-active":""}`} onClick={()=>s.setPeriodIdx(i)}>
       <span className="m-period-month">{pr.month}</span>
       <b className="m-period-amt">{amt("$"+pr.amount)}</b>
       <span className={`m-pay-status m-status-${pr.status.toLowerCase()}`}>{pr.status}</span>
     </div>)}
+    {/* upcoming month (no statement yet) — keeps the open month centered */}
+    <div className="m-period-item m-period-ghost" aria-disabled="true">
+      <span className="m-period-month">June 2026</span>
+      <b className="m-period-amt">{amt("$0.00")}</b>
+      <span className="m-pay-status m-status-upcoming">Upcoming</span>
+    </div>
   </div>;
 }
 
-function PaymentBreakdownCard({p, donutSize=180}) {
+function PaymentBreakdownCard({p, s, donutSize=180}) {
   const total = parseFloat(p.amount.replace(/,/g,''));
-  const donutItems = paymentDonutItems(p);
+  const donutItems = paymentDonutItems(p, s.theme==="dark");
   return <div className="m-section">
     <div className="m-section-hdr"><h2>Payment Breakdown · {p.month}</h2><span className={`m-pay-status m-status-${p.status.toLowerCase()}`}>{p.status}</span></div>
     <div className="m-donut-hero">
@@ -1077,7 +1095,7 @@ function PaymentsPage({s}) {
     </div>
     <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
     <PeriodChips s={s}/>
-    <PaymentBreakdownCard p={p}/>
+    <PaymentBreakdownCard p={p} s={s}/>
     <PaymentScheduleCard p={p}/>
     <PaymentAccordion p={p} s={s}/>
   </div>;
@@ -2669,11 +2687,26 @@ function useCompXState() {
     setTab("payments");
   };
 
+  /* Deep-link: open Goals with a specific plan-element tab selected */
+  const openGoal = peId => {
+    const idx = goalTabs.findIndex(t => t.id === peId);
+    if (idx >= 0) setGoalIdx(idx);
+    setTab("goals");
+  };
+
+  /* Deep-link: open SPIFF & Bonus with the target program visible —
+     clears filters and expands past the first-2 fold when needed */
+  const openSpiff = name => {
+    setSpiffFilters({period:"All", status:"All", type:"All Types"});
+    if (spiffPrograms.findIndex(sp => sp.name === name) >= 2) setSpiffExpanded(true);
+    setTab("spiff");
+  };
+
   return {
     tab, setTab, viewMode, setViewMode, theme, toggleTheme,
     calcItem, setCalcItem, pdfItem, setPdfItem,
     sellerItem, setSellerItem, showAskIQ, setShowAskIQ, notifOpen, setNotifOpen, reminders, setReminders,
-    periodIdx, setPeriodIdx, openPayPeriod, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
+    periodIdx, setPeriodIdx, openPayPeriod, openGoal, openSpiff, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
     orderQuery, setOrderQuery, orderType, setOrderType, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
     aagSpiffExpanded, setAagSpiffExpanded, backlogFilter, setBacklogFilter,
     estPe, setEstPe, estAdd, setEstAdd, moreOpen, setMoreOpen,
@@ -2718,8 +2751,8 @@ const NAV_TABS = [
   {id:"estimator", label:"Pay Estimator", short:"Estimator", Icon:Calculator}
 ];
 /* Mobile bottom bar: the four core tabs; the rest live in the More sheet */
-const MOBILE_TAB_IDS = ["glance","payments","goals","estimator"];
-const MOBILE_MORE_IDS = ["orders","spiff","backlog"];
+const MOBILE_TAB_IDS = ["glance","payments","goals","orders"];
+const MOBILE_MORE_IDS = ["spiff","backlog","estimator"];
 const MOBILE_TABS = NAV_TABS.filter(t=>MOBILE_TAB_IDS.includes(t.id));
 const MOBILE_MORE = NAV_TABS.filter(t=>MOBILE_MORE_IDS.includes(t.id));
 
@@ -2893,7 +2926,9 @@ function IPadGlance({s}) {
     </div>
     <div className="m-section-label"><span className="m-section-icon">⁘</span> PLAN ELEMENTS & INCENTIVES</div>
     <div className="i-grid-3">
-      {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card m-pe-flat">
+      {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
+        aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
+        onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
         <div className="m-pe-top">
           <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
           <span className="m-pe-goal">{pe.goal}</span>
@@ -2924,7 +2959,7 @@ function IPadPayments({s}) {
     <PeriodChips s={s}/>
     <div className="i-split">
       <div className="i-col-a">
-        <PaymentBreakdownCard p={p} donutSize={188}/>
+        <PaymentBreakdownCard p={p} s={s} donutSize={188}/>
         <PaymentScheduleCard p={p}/>
       </div>
       <div className="i-col-b">

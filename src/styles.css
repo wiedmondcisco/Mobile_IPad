@@ -249,6 +249,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-period-more{flex-shrink:0;display:inline-flex;align-items:center;gap:3px;align-self:stretch;border:1px dashed var(--border);background:none;color:var(--accent);font-size:11px;font-weight:700;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap}
 .m-period-more svg{transition:transform .2s}
 .m-period-more svg.back{transform:rotate(180deg)}
+.m-period-mini{padding:8px 6px;justify-content:center}   /* icon-only 12-month toggle */
+.m-period-scroll{gap:6px}
+.m-period-item{min-width:96px}
+.m-period-ghost{cursor:default;border-style:dashed;background:none}
+.m-period-ghost .m-period-amt{color:var(--muted)}
 .m-period-active{border-color:var(--accent);background:var(--accent-light)}
 .m-period-month{font-size:10px;font-weight:600;color:var(--text);display:block}
 .m-period-amt{font-size:15px;color:var(--text);display:block;margin:2px 0}
@@ -812,6 +817,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-ph-bonus div{display:flex;flex-direction:column;gap:2px;min-width:0}
 .m-ph-bonus small{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
 .m-ph-bonus b{font-size:12.5px;font-weight:700;color:var(--text);word-break:break-word;font-variant-numeric:tabular-nums}
+/* Plan-element cards on At A Glance deep-link to their Goals tab */
+.m-pe-click{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+.m-pe-click:hover{box-shadow:0 4px 14px rgba(0,0,0,.10)}
+.m-pe-click:active{transform:scale(.99)}
+
 /* Blue amounts that drill into a popup */
 .m-pb-amt-link{cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
 .m-pb-amt-link:active{opacity:.7}
