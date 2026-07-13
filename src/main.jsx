@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Filter, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Gift, Calculator, MoreHorizontal } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Gift, Calculator, MoreHorizontal } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -308,13 +308,15 @@ const olderPaymentPeriods = [
 const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slice().reverse()];
 
 /* Goals — one entry per plan element tab (PE1, PE2, PE3, KSO, OTB, NDR) */
+/* blColor = the lighter backlog segment tint, matching planElements so the
+   revenue/backlog distinction reads the same on Goals as on At A Glance */
 const goalTabs = [
-  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,585.50"},
-  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.25"},
-  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$755.00"},
+  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, blColor:"#fbbf24", goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,585.50"},
+  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, blColor:"#6ee7b7", goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.25"},
+  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#93c5fd", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$755.00"},
   {id:"KSO", name:"Key Sales Objectives",color:PE_COLOR.KSO, goal:"$2.5k", attPct:100,  bookingsAmt:"—",    bookingsPct:100, revenueAmt:"—",    revenuePct:100, backlogAmt:"—",    backlogPct:0,  incentive:"$2,500.00"},
-  {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
-  {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}
+  {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, blColor:"#c4b5fd", goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
+  {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, blColor:"#67e8f9", goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}
 ];
 
 /* Example goal sheet rendered inside the View Goal Sheet popup */
@@ -331,16 +333,21 @@ const goalSheetExample = {
   ]
 };
 
-/* Order Search — seller's orders (only shown after a search) */
+/* Order Search — seller's orders (only shown after a search). Statuses per
+   the desktop reference: Full Revenue (all recognized), Partial (revenue +
+   backlog mix), Backlog (nothing recognized yet). PE tags stay consistent
+   with the backlog/insight data (Helix + Cortex = PE1, GlobalNet = PE3). */
 const orders = [
-  {id:"SO-105488", status:"Full Revenue", customer:"GlobalNet Inc",      partner:"Direct",           bookings:"$9,600",  backlog:"$0",      revenue:"$9,600"},
-  {id:"SO-105310", status:"Full Revenue", customer:"BlueStar Solutions", partner:"Insight Enterpr.", bookings:"$17,800", backlog:"$0",      revenue:"$17,800"},
-  {id:"SO-105188", status:"Full Revenue", customer:"Vertex Dynamics",    partner:"SHI Internat.",    bookings:"$14,500", backlog:"$0",      revenue:"$14,500"},
-  {id:"SO-105078", status:"Backlog",      customer:"Helix Networks",     partner:"CDW Corp.",        bookings:"$21,000", backlog:"$14,000", revenue:"$7,000"},
-  {id:"SO-104821", status:"Full Revenue", customer:"Acme Corp",          partner:"Direct",           bookings:"$12,500", backlog:"$0",      revenue:"$12,500"},
-  {id:"SO-104650", status:"Backlog",      customer:"Cortex Financial",   partner:"Direct",           bookings:"$23,000", backlog:"$23,000", revenue:"$0"},
-  {id:"SO-104512", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$8,850",  backlog:"$0",      revenue:"$8,850"}
+  {id:"SO-105488", pe:"PE3", status:"Full Revenue", customer:"GlobalNet Inc",      partner:"Direct",           bookings:"$9,600",  backlog:"$0",      revenue:"$9,600"},
+  {id:"SO-105310", pe:"PE2", status:"Full Revenue", customer:"BlueStar Solutions", partner:"Insight Enterpr.", bookings:"$17,800", backlog:"$0",      revenue:"$17,800"},
+  {id:"SO-105188", pe:"PE1", status:"Full Revenue", customer:"Vertex Dynamics",    partner:"SHI Internat.",    bookings:"$14,500", backlog:"$0",      revenue:"$14,500"},
+  {id:"SO-105078", pe:"PE1", status:"Partial",      customer:"Helix Networks",     partner:"CDW Corp.",        bookings:"$21,000", backlog:"$14,000", revenue:"$7,000"},
+  {id:"SO-104821", pe:"PE1", status:"Full Revenue", customer:"Acme Corp",          partner:"Direct",           bookings:"$12,500", backlog:"$0",      revenue:"$12,500"},
+  {id:"SO-104650", pe:"PE1", status:"Backlog",      customer:"Cortex Financial",   partner:"Direct",           bookings:"$23,000", backlog:"$23,000", revenue:"$0"},
+  {id:"SO-104512", pe:"PE3", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$8,850",  backlog:"$0",      revenue:"$8,850"}
 ];
+const ORDER_STATUSES = ["All Statuses", "Backlog", "Full Revenue", "Partial"];
+const ORDER_PES = ["All Plan Elements", "PE1 - Prod+Services", "PE2 - Recurring Software", "PE3 - Services"];
 
 /* Order Search — searchable field types (from the desktop reference).
    Demo data only carries SO number / customer / partner, so each type maps
@@ -358,13 +365,13 @@ const revenueTxns = {
   PE2:{total:"62,000.00", rows:[
     {so:"SO-105144", date:"Apr 22, 2026", customer:"ClearPath Systems",  rev:"$18,500.00"},
     {so:"SO-105044", date:"Apr 7, 2026",  customer:"Quantum Analytics",  rev:"$12,000.00"},
-    {so:"SO-104512", date:"Mar 8, 2026",  customer:"BlueStar Solutions", rev:"$15,500.00"},
+    {so:"SO-104515", date:"Mar 8, 2026",  customer:"BlueStar Solutions", rev:"$15,500.00"},
     {so:"SO-104089", date:"Feb 22, 2026", customer:"Vector Systems",     rev:"$16,000.00"}
   ]},
   PE3:{total:"40,000.00", rows:[
     {so:"SO-105112", date:"Apr 15, 2026", customer:"Summit Digital", rev:"$15,000.00"},
     {so:"SO-104876", date:"Mar 20, 2026", customer:"Orion Networks", rev:"$14,500.00"},
-    {so:"SO-104650", date:"Mar 1, 2026",  customer:"Phoenix Labs",   rev:"$10,500.00"}
+    {so:"SO-104655", date:"Mar 1, 2026",  customer:"Phoenix Labs",   rev:"$10,500.00"}
   ]}
 };
 
@@ -469,6 +476,19 @@ const OTB_CALC = {
     ]}
 };
 
+/* ── KSO Calculation popup (goal-sheet KSO row) ── Fixed bonus: total
+   earned − previously paid = monthly payment. Aligned with the Goals-tab
+   KSO quarters: Q1 2026's reviewed $2,500 is the amount paying out in the
+   May statement (nothing previously paid this FY), Q2 is still in pending
+   review, and prior history is the FY25 bonuses. */
+const KSO_CALC = {
+  earned:"2,500.00", prevPaid:"0.00", result:"2,500.00",
+  history:[
+    {date:"Aug 4, 2025", details:"FY25 H2 KSO Bonus", amount:2200.00, mb:9},
+    {date:"Feb 3, 2025", details:"FY25 H1 KSO Bonus", amount:1800.00, mb:15}
+  ]
+};
+
 function paymentSections(p) {
   return [
     {key:"goalSheet", label:"Current Goal Sheet", amount:"$"+p.goalSheet.total, period:p.goalSheet.period},
@@ -480,10 +500,12 @@ function paymentSections(p) {
   ];
 }
 
-function deriveOrders(query, type) {
+function deriveOrders(query, type, status="All Statuses", pe="All Plan Elements") {
   const q = query.trim().toLowerCase();
   const fields = ORDER_TYPE_FIELDS[type] || ["id", "customer", "partner"];
-  const list = q ? orders.filter(o => fields.some(f => o[f].toLowerCase().includes(q))) : orders;
+  let list = q ? orders.filter(o => fields.some(f => o[f].toLowerCase().includes(q))) : orders;
+  if (status !== "All Statuses") list = list.filter(o => o.status === status);
+  if (pe !== "All Plan Elements") list = list.filter(o => o.pe === pe.slice(0, 3));
   return {q, list};
 }
 
@@ -955,7 +977,7 @@ function PbAttBar({item}) {
 /* One goal-sheet row. A row with `children` becomes a dropdown of component
    rows — its parent total is display-only (not clickable); each child opens
    its own Compensation Calculation popup. */
-function GoalSheetItemRow({item, onOpenCalc, onOpenPdf}) {
+function GoalSheetItemRow({item, onOpenCalc, onOpenPdf, onOpenKso}) {
   const [open, setOpen] = useState(false);
   const kids = item.children;
   return <div className="m-pb-pe-row">
@@ -982,7 +1004,8 @@ function GoalSheetItemRow({item, onOpenCalc, onOpenPdf}) {
             onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }}>
             {amt("$"+item.payout)}
           </span>
-        : <span className={`m-pb-pe-payout-link ${item.calc?"":"m-no-link"}`} onClick={()=>item.calc && onOpenCalc(item)}>
+        : <span className={`m-pb-pe-payout-link ${item.calc || (item.pe==="KSO" && onOpenKso) ? "" : "m-no-link"}`}
+            onClick={()=>item.calc ? onOpenCalc(item) : (item.pe==="KSO" && onOpenKso && onOpenKso())}>
             {amt("$"+item.payout)}
           </span>}
       {item.calc && <button className="m-pb-pe-pdf" aria-label="Payment statement" onClick={()=>onOpenPdf(item)}>
@@ -1023,7 +1046,8 @@ function PaymentAccordion({p, s}) {
     </div>
 
     {expanded[sec.key] && sec.key==="goalSheet" && <div className="m-pb-body">
-      {p.goalSheet.items.map((item,j)=><GoalSheetItemRow key={j} item={item} onOpenCalc={onOpenCalc} onOpenPdf={onOpenPdf}/>)}
+      {p.goalSheet.items.map((item,j)=><GoalSheetItemRow key={j} item={item} onOpenCalc={onOpenCalc} onOpenPdf={onOpenPdf}
+        onOpenKso={()=>s.setShowKsoCalc(true)}/>)}
     </div>}
 
     {expanded[sec.key] && sec.key!=="goalSheet" && <div className="m-pb-body">
@@ -1206,6 +1230,41 @@ function OtbCalcPopup({item, month, onClose}) {
   </FullScreenPopup>;
 }
 
+/* KSO Calculation — the goal-sheet KSO amount trigger. Fixed bonus, so the
+   formula is just earned − previously paid; tabs add the payment history and
+   a jump to the Goals-tab KSO quarters (the in-app "KSO Tool"). */
+function KsoCalcPopup({month, onClose, onKsoTool}) {
+  const [tab, setTab] = useState("Calculation");
+  const rows = KSO_CALC.history;
+  const total = rows.reduce((a,r)=>a+r.amount,0);
+  return <FullScreenPopup title="KSO Calculation" subtitle={`Key Sales Objectives for ${month}`}
+    tabs={["Calculation","Payment History","View in KSO Tool"]} activeTab={tab}
+    onTab={t=> t==="View in KSO Tool" ? onKsoTool() : setTab(t)} onClose={onClose}>
+    {tab==="Calculation" && <>
+      <div className="m-calc-badge-row"><PePill pe="KSO" label="Key Sales Objectives" color={PE_COLOR.KSO}/></div>
+      <p className="m-calc-summary">Your KSO payment for {month}.</p>
+      <div className="m-formula">
+        <div className="m-formula-factor"><b>{amt(KSO_CALC.earned)}</b><small>Total Earned</small></div>
+        <span className="m-formula-op">−</span>
+        <div className="m-formula-factor"><b>{amt(KSO_CALC.prevPaid)}</b><small>Previously Paid</small></div>
+        <span className="m-formula-op m-formula-eq">=</span>
+        <div className="m-formula-factor"><b className="m-formula-result">{amt("$"+KSO_CALC.result)}</b><small>Monthly Payment</small></div>
+      </div>
+      <div className="m-kso-note"><b>Note:</b> KSO payments are not subject to proration or payout rate multipliers. This is a fixed bonus for meeting all qualifying objectives during the measurement period.</div>
+    </>}
+    {tab==="Payment History" && <div className="m-ph-table">
+      <div className="m-ph-tr m-ph-th"><span>Pay Date ↓</span><span>Details</span><span className="m-ph-amt">Amount</span><span>Status</span></div>
+      {rows.map((r,i)=><div key={i} className="m-ph-tr">
+        <span className="m-ph-date">{r.date}</span>
+        <span className="m-ph-details">{r.details}</span>
+        <span className="m-ph-amt">{amt(fmtAmt(r.amount))}</span>
+        <span className="m-pay-status m-status-paid">Paid</span>
+      </div>)}
+      <div className="m-ph-total"><span>Total</span><b>{amt(fmtAmt(total))}</b></div>
+    </div>}
+  </FullScreenPopup>;
+}
+
 /* Payment History — SPIFF / draw / adjustment blue-amount trigger.
    Two desktop-reference styles: SPIFF items use underline tabs with the
    three past ranges; draws/adjustments use range pills including Current
@@ -1252,34 +1311,41 @@ function PaymentHistoryPopup({item, onClose}) {
   </FullScreenPopup>;
 }
 
-/* PDF / breakdown-icon trigger — Revenue Transactions popup (full-screen) */
+/* PDF / breakdown-icon trigger — Revenue Transactions popup (full-screen),
+   per the desktop reference: snapshot banner, "N transactions contributing"
+   line with the period total, SO links, green revenue, and a bottom total.
+   No export (removed app-wide). */
 function PdfPopup({item, onClose}) {
   const t = revenueTxns[item.pe];
   if (!t) return null;
+  const n = t.rows.length;
   return <div className="m-fs">
-    <div className="m-fs-hdr m-txn-hdr">
-      <div className="m-txn-hdr-top">
-        <b className="m-txn-title">{item.pe} - {item.label} - H1 2026 Revenue Transactions</b>
-        <button className="m-fs-close" onClick={onClose} aria-label="Close"><X size={18}/></button>
-      </div>
-      <div className="m-txn-actions">
-        <button className="m-txn-iconbtn" aria-label="Filter"><Filter size={15}/></button>
-        <button className="m-txn-iconbtn" aria-label="Refresh"><RefreshCw size={15}/></button>
-      </div>
+    <div className="m-fs-hdr">
+      <div className="m-fs-hdr-text"><b>{item.pe} - {item.label} - H1 2026 Revenue Transactions</b></div>
+      <button className="m-fs-close" onClick={onClose} aria-label="Close"><X size={18}/></button>
     </div>
     <div className="m-fs-body">
+      <div className="m-txn-note">ⓘ Values shown are <b>payment-date snapshots</b>. Live order values may differ due to subsequent changes.</div>
+      <div className="m-txn-count">
+        <span><b>{n} transaction{n===1?"":"s"}</b> contributing to this payment</span>
+        <span className="m-txn-count-total">Period Total: <b>{amt("$"+t.total)}</b></span>
+      </div>
       <div className="m-txn-list">
         <div className="m-txn-list-hdr"><span>SO Number</span><span className="r">Revenue</span></div>
         {t.rows.map((r,i)=><div key={i} className="m-txn-row2">
           <div className="m-txn-line1">
             <span className="m-txn-so">{r.so}</span>
-            <span className="m-txn-rev">{r.rev}</span>
+            <span className="m-txn-rev">{amt(r.rev)}</span>
           </div>
           <div className="m-txn-line2">{r.date} · {r.customer}</div>
         </div>)}
         <div className="m-txn-total">
-          <span>Total</span>
-          <b>${t.total}</b>
+          <span>Total ({n} order{n===1?"":"s"})</span>
+          <b className="m-txn-total-amt">{amt("$"+t.total)}</b>
+        </div>
+        <div className="m-txn-foot">
+          <span>Showing 1–{n} of {n}</span>
+          <i>Click any SO to view full order details</i>
         </div>
       </div>
     </div>
@@ -1713,45 +1779,55 @@ function CompUpliftSection({s}) {
 }
 
 /* ── KSO TAB (Goals) — quarterly objective cards, per desktop reference ──
-   Statuses and bar tones are hand-matched to the reference. */
+   Statuses, dates, and bar tones match the reference exactly. One deliberate
+   fix: Q3's New Conversions weight is 50% (the reference's 100% would make
+   the quarter's weights sum to 150). */
 const KSO_STATUS = {"Reviewed":"#64748b", "In Pending Review":"#d97706", "On Going":"#16a34a", "Upcoming":"#8b5cf6"};
 const KSO_TONE = {gold:"#b08a1d", green:"#16a34a", blue:"#4f5ff5", grey:null};
 const ksoQuarters = [
   {q:"Q1 2026", status:"Reviewed", cap:"125%", bonusLabel:"Bonus Earned", bonus:"$2,500.00", date:"16 Nov 2025", dateLabel:"Reviewed",
     rows:[
-      {name:"New Conversions", desc:"13 new logo targets for Q1 FY26", bonus:"$1,000.00", weight:"50%", prog:"14 of 13 targets", pct:100, tone:"gold"},
+      {name:"New Conversions", desc:"6 New logo territory for Q1 FY26", bonus:"$1,000.00", weight:"50%", prog:"14 of 13 targets", pct:100, tone:"gold"},
       {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$500.00", weight:"10%", prog:"10% of 20% attainment", pct:50, tone:"blue"},
       {name:"Conversion Rate", desc:"60% rate, conversion rate for Q1 FY26", bonus:"$1,000.00", weight:"40%", prog:"10% of 13% conversion rate", pct:77, tone:"gold"}
     ]},
-  {q:"Q2 2026", status:"Reviewed", cap:"125%", bonusLabel:"Bonus Earned", bonus:"$4,100.00", date:"12 Feb 2026", dateLabel:"Reviewed",
+  {q:"Q2 2026", status:"In Pending Review", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$4,100.00", date:"9 Feb 2026", dateLabel:"Review Period Opens",
     rows:[
-      {name:"New Conversions", desc:"5 new logo targets for Q2 FY26", bonus:"$2,500.00", weight:"60%", prog:"5 of 5 targets", pct:100, tone:"green"},
+      {name:"New Conversions", desc:"6 New logo territory for Q2 FY26", bonus:"$2,500.00", weight:"60%", prog:"5 of 5 targets", pct:100, tone:"green"},
       {name:"Conversion Rate", desc:"60% rate, conversion rate for Q2 FY26", bonus:"$1,600.00", weight:"40%", prog:"5% of 5% conversion rate", pct:100, tone:"green"}
     ]},
-  {q:"Q3 2026", status:"In Pending Review", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$4,900.00", date:"16 May 2026", dateLabel:"Review Period Opened",
+  {q:"Q3 2026", status:"On Going", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$4,900.00", date:"16 May 2026", dateLabel:"Review Period Opens",
     rows:[
       {name:"Conversion Rate", desc:"60% rate, conversion rate for Q3 FY26", bonus:"$1,250.00", weight:"25%", prog:"5% of 5% conversion rate", pct:100, tone:"green"},
       {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$1,250.00", weight:"25%", prog:"0% of 25% attainment", pct:0, tone:"grey"},
-      {name:"New Conversions", desc:"5 new logo targets for Q3 FY26", bonus:"$2,400.00", weight:"50%", prog:"5 of 5 targets", pct:100, tone:"green"}
+      {name:"New Conversions", desc:"6 New logo territory for Q3 FY26", bonus:"$2,400.00", weight:"50%", prog:"5 of 5 targets", pct:100, tone:"green"}
     ]},
-  {q:"Q4 2026", status:"On Going", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$3,000.00", date:"11 Aug 2026", dateLabel:"Review Period Opens",
+  {q:"Q4 2026", status:"Upcoming", cap:"125%", bonusLabel:"Bonus Potential", bonus:"$3,000.00", date:"11 Aug 2026", dateLabel:"Review Period Opens",
     rows:[
-      {name:"New Conversions", desc:"10 new logo targets for Q4 FY26", bonus:"$1,500.00", weight:"50%", prog:"5 of 10 targets", pct:50, tone:"blue"},
+      {name:"New Conversions", desc:"6 New logo territory for Q4 FY26", bonus:"$1,500.00", weight:"50%", prog:"5 of 10 targets", pct:50, tone:"blue"},
       {name:"Attainment Rate", desc:"Reach 100% target attainment to be included as part of goal sheet", bonus:"$1,500.00", weight:"50%", prog:"0% of 5% attainment", pct:0, tone:"grey"}
     ]}
 ];
 
 function KsoSection() {
   /* Quarter accordions (reference-style expand arrows) — the current
-     quarter's detail matters most, so only one opens at a time */
+     quarter's detail matters most, so only one opens at a time. The fine
+     print is hidden by default; one "More info" toggle at the top reveals
+     every objective's description at once. */
   const [openQ, setOpenQ] = useState(0);
+  const [showInfo, setShowInfo] = useState(false);
   return <>
     <div className="m-kso-info">
       <div className="m-kso-info-top">
         <h2>Key Sales Objectives (KSOs)</h2>
-        <button className="m-kso-tool">View in KSO Tool <ExternalLink size={13}/></button>
+        <div className="m-kso-info-btns">
+          <button className={`m-kso-more ${showInfo?"on":""}`} onClick={()=>setShowInfo(v=>!v)} aria-pressed={showInfo}>
+            {showInfo ? "Hide info" : "More info"} <ChevronDown size={12} className={`m-insight-chev ${showInfo?"open":""}`}/>
+          </button>
+          <button className="m-kso-tool">View in KSO Tool <ExternalLink size={13}/></button>
+        </div>
       </div>
-      <p className="m-kso-info-note">Your plan elements represents 20% of your target Incentive (Compensation for the CS402 FY26 goal sheet)</p>
+      {showInfo && <p className="m-kso-info-note">Your plan elements represents 20% of your target Incentive (Compensation for the CS402 FY26 goal sheet)</p>}
     </div>
     {ksoQuarters.map((qt,qi)=>{
       const sc = KSO_STATUS[qt.status];
@@ -1774,7 +1850,7 @@ function KsoSection() {
         {open && qt.rows.map((r,i)=>{
           const tone = KSO_TONE[r.tone];
           return <div key={i} className="m-kso-row">
-            <div className="m-kso-cell-name"><b>{r.name}</b><span className="m-kso-row-desc">{r.desc}</span></div>
+            <div className="m-kso-cell-name"><b>{r.name}</b>{showInfo && <span className="m-kso-row-desc">{r.desc}</span>}</div>
             <div className="m-kso-fig"><small>{qt.bonusLabel}</small><b>{amt(r.bonus)}</b></div>
             <div className="m-kso-fig"><small>KSO Weight</small><b>{r.weight}</b></div>
             <div className="m-kso-prog">
@@ -1917,6 +1993,37 @@ function NdrSection() {
   </>;
 }
 
+/* Goal-sheet selector (Goals page) — UI mockup only: the menu lists the
+   seller's goal sheets with the current one checked; picking another sheet
+   doesn't swap the page data. Halves match the Team trend periods. */
+const goalSheetOptions = [
+  {code:"CS402", dates:"Jan 26, 2026 – Jul 26, 2026", half:"H1 2026", current:true},
+  {code:"CS402", dates:"Jul 25, 2025 – Jan 25, 2026", half:"H2 2025"},
+  {code:"CS402", dates:"Jan 26, 2025 – Jul 26, 2025", half:"H1 2025"},
+  {code:"CS380", dates:"Jul 27, 2024 – Jan 25, 2025", half:"H2 2024"}
+];
+function GoalSheetSelect() {
+  const [open, setOpen] = useState(false);
+  const cur = goalSheetOptions.find(o=>o.current);
+  return <div className="m-gsel-wrap">
+    <button className="m-gsel" onClick={()=>setOpen(o=>!o)} aria-expanded={open} aria-haspopup="listbox">
+      <small>Goal Sheet</small>
+      <b>{cur.code} · {cur.dates} <span>({cur.half})</span></b>
+      <ChevronDown size={14} className={`m-insight-chev ${open?"open":""}`}/>
+    </button>
+    {open && <>
+      <div className="m-gsel-backdrop" onClick={()=>setOpen(false)}/>
+      <div className="m-gsel-menu" role="listbox" aria-label="Goal sheets">
+        {goalSheetOptions.map((o,i)=><button key={i} role="option" aria-selected={!!o.current}
+          className={o.current?"on":""} onClick={()=>setOpen(false)}>
+          <span className="m-gsel-check">{o.current ? "✓" : ""}</span>
+          <span className="m-gsel-opt"><b>{o.code}</b> {o.dates} <small>({o.half})</small></span>
+        </button>)}
+      </div>
+    </>}
+  </div>;
+}
+
 function GoalsPage({s}) {
   const tabIdx = s.goalIdx, setTabIdx = s.setGoalIdx;
   const g = goalTabs[tabIdx];
@@ -1924,6 +2031,7 @@ function GoalsPage({s}) {
   return <div className="m-page">
     <MobileHeader s={s}/>
     <h1 className="m-page-title">Goals</h1>
+    <GoalSheetSelect/>
 
     {/* PE tab row */}
     <div className="m-goaltab-scroll">
@@ -1959,11 +2067,13 @@ function GoalsPage({s}) {
    ORDER SEARCH
    ════════════════════════════════════════════════════════════════ */
 /* Single order result card (shared by search results + recent-order list) */
+const ORDER_STATUS_CHIP = {"Backlog":"m-status-upcoming", "Partial":"m-status-open", "Full Revenue":"m-status-paid"};
 function OrderCard({o}) {
   return <div className="m-order-card">
     <div className="m-order-top">
+      <span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>
       <span className="m-order-id">{o.id}</span>
-      <span className={`m-pay-status ${o.status==="Backlog"?"m-status-upcoming":"m-status-paid"}`}>{o.status}</span>
+      <span className={`m-pay-status ${ORDER_STATUS_CHIP[o.status]||"m-status-paid"}`}>{o.status}</span>
     </div>
     <div className="m-order-mid"><b>{o.customer}</b><span>{o.partner}</span></div>
     <div className="m-order-figs">
@@ -1974,32 +2084,57 @@ function OrderCard({o}) {
   </div>;
 }
 
-function OrderSearchPage({s}) {
-  const {q, list} = deriveOrders(s.orderQuery, s.orderType);
-  return <div className="m-page">
-    <MobileHeader s={s}/>
-    <h1 className="m-page-title">Order Search</h1>
-
-    {/* Search-by-field bar (desktop reference): [type ▾] [query] [go] */}
-    <div className="m-os-bar">
+/* Search controls (desktop reference): [type ▾][query][go] plus Status /
+   Plan Element filters with Submit + Clear. Shared by mobile + iPad. */
+function OrderSearchControls({s, ipad=false}) {
+  const submit = () => s.setOrderSubmitted(true);
+  const clear = () => {
+    s.setOrderQuery(""); s.setOrderStatus("All Statuses");
+    s.setOrderPe("All Plan Elements"); s.setOrderSubmitted(false);
+  };
+  return <>
+    <div className={`m-os-bar ${ipad?"i-os-bar":""}`}>
       <select className="m-os-type" value={s.orderType} onChange={e=>s.setOrderType(e.target.value)} aria-label="Search by">
         {ORDER_SEARCH_TYPES.map(t=><option key={t}>{t}</option>)}
       </select>
-      <input className="m-os-input" placeholder={`Enter ${s.orderType}...`} value={s.orderQuery} onChange={e=>s.setOrderQuery(e.target.value)}/>
-      <button className="m-os-go" aria-label="Search"><Search size={15}/></button>
+      <input className="m-os-input" placeholder={`Enter ${s.orderType}...`} value={s.orderQuery}
+        onChange={e=>s.setOrderQuery(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()}/>
+      <button className="m-os-go" aria-label="Search" onClick={submit}><Search size={15}/></button>
     </div>
+    <div className="m-os-filters">
+      <label className="m-os-flt"><small>Status</small>
+        <select value={s.orderStatus} onChange={e=>s.setOrderStatus(e.target.value)} aria-label="Status filter">
+          {ORDER_STATUSES.map(o=><option key={o}>{o}</option>)}
+        </select>
+      </label>
+      <label className="m-os-flt"><small>PE</small>
+        <select value={s.orderPe} onChange={e=>s.setOrderPe(e.target.value)} aria-label="Plan element filter">
+          {ORDER_PES.map(o=><option key={o}>{o}</option>)}
+        </select>
+      </label>
+      <button className="m-os-submit" onClick={submit}>Submit</button>
+      <button className="m-os-clear2" onClick={clear}>Clear</button>
+    </div>
+  </>;
+}
 
-    {q ? <>
+function OrderSearchPage({s}) {
+  const {q, list} = deriveOrders(s.orderQuery, s.orderType, s.orderStatus, s.orderPe);
+  const show = q || s.orderSubmitted;
+  return <div className="m-page">
+    <MobileHeader s={s}/>
+    <h1 className="m-page-title">Order Search</h1>
+    <OrderSearchControls s={s}/>
+    {show ? <>
       <div className="m-os-results-hdr">
         <p className="m-search-count">{list.length} order{list.length===1?"":"s"} found</p>
-        <button className="m-os-clear" onClick={()=>s.setOrderQuery("")}>Clear</button>
       </div>
       {list.map(o=><OrderCard key={o.id} o={o}/>)}
-      {list.length===0 && <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or search type.</span></div>}
+      {list.length===0 && <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or loosen the filters.</span></div>}
     </> : <div className="m-search-empty">
       <Search size={30}/>
       <b>Search a seller's orders</b>
-      <span>Pick a field and enter a value above to look up orders.</span>
+      <span>Pick a field, choose filters, and hit Submit to look up orders.</span>
     </div>}
   </div>;
 }
@@ -2109,7 +2244,7 @@ function tierColor(v) {
 function AttainmentChart({title, subtitle, rows, control}) {
   const SCALE = 120;                       // bar axis maxes at 120%
   const markerPos = (100/SCALE)*100;
-  const [sort, setSort] = useState("need");        // "need" = most coaching first | "best"
+  const [sort, setSort] = useState("best");        // highest-first default (reference); "need" flips to coaching-first
   const [expanded, setExpanded] = useState(false);
   const sorted = [...rows].sort((a,b)=> sort==="best" ? b.val-a.val : a.val-b.val);
   const visible = expanded ? sorted : sorted.slice(0,5);
@@ -2118,10 +2253,11 @@ function AttainmentChart({title, subtitle, rows, control}) {
     <div className="m-team-chart-controls">
       <small className="m-team-chart-sub">{subtitle}</small>
       <select className="m-seller-sort" value={sort} onChange={e=>setSort(e.target.value)} aria-label="Sort sellers">
-        <option value="need">Most coaching needed</option>
         <option value="best">Top performers first</option>
+        <option value="need">Most coaching needed</option>
       </select>
     </div>
+    {rows.length===0 && <div className="m-pb-empty">No sellers match this view.</div>}
     <div className="m-abars">
       {visible.map(r=>{
         const c = tierColor(r.val);
@@ -2208,25 +2344,81 @@ function TeamControls({s}) {
   </div>;
 }
 
-function TeamMembersSection({s, gridClass=""}) {
-  /* Default surfaces the two sellers who most need coaching (lowest overall
-     attainment); the sort control flips to top performers first. */
-  const sorted = [...teamMembers].sort((a,b)=> s.teamSort==="best" ? b.att-a.att : a.att-b.att);
+/* ── Team views — preset filters plus user-saved views (name + delete).
+   "My Watch List" is the coaching-focus roster from the team insight;
+   Top Performers = ≥100% on the metric; At Risk Focus = under 60% on
+   charts / under 72% attainment for seller cards. */
+const TEAM_WATCH_LIST = ["John Smith","Daniel Kim","Rachel Lee","Marcus Green"];
+const TEAM_VIEW_PRESETS = [
+  {id:"watch", label:"My Watch List"},
+  {id:"top", label:"Top Performers"},
+  {id:"risk", label:"At Risk Focus"}
+];
+function teamViewFilters(s) {
+  const saved = s.savedViews.find(v=>v.id===s.teamView);
+  const view = saved ? saved.view : s.teamView;
+  return {
+    row: r => view==="watch" ? TEAM_WATCH_LIST.includes(r.name) : view==="top" ? r.val>=100 : view==="risk" ? r.val<60 : true,
+    member: m => view==="watch" ? TEAM_WATCH_LIST.includes(m.name) : view==="top" ? m.att>=100 : view==="risk" ? m.att<72 : true
+  };
+}
+
+function TeamViewsBar({s}) {
+  const [naming, setNaming] = useState(false);
+  const [name, setName] = useState("");
+  const active = s.teamView;
+  const save = () => {
+    const nm = name.trim();
+    if (!nm) return;
+    /* snapshot resolves a saved view back to its underlying preset */
+    const view = s.savedViews.find(x=>x.id===active)?.view || active;
+    s.setSavedViews(v=>[...v, {id:"sv-"+Date.now(), name:nm, view, pe:s.teamPe}]);
+    setNaming(false); setName("");
+  };
+  const remove = id => {
+    s.setSavedViews(v=>v.filter(x=>x.id!==id));
+    if (active===id) s.setTeamView("all");
+  };
+  return <div className="m-tviews">
+    <span className="m-tviews-lbl">Views:</span>
+    {TEAM_VIEW_PRESETS.map(p=><button key={p.id} className={`m-tview-chip ${active===p.id?"on":""}`}
+      onClick={()=>s.setTeamView(active===p.id ? "all" : p.id)} aria-pressed={active===p.id}>
+      {active===p.id && <i className="m-tview-dot"/>}{p.label}
+    </button>)}
+    {s.savedViews.map(v=><span key={v.id} className={`m-tview-chip m-tview-saved ${active===v.id?"on":""}`}>
+      <button className="m-tview-name" onClick={()=>{s.setTeamView(v.id); s.setTeamPe(v.pe);}}>
+        {active===v.id && <i className="m-tview-dot"/>}{v.name}
+      </button>
+      <button className="m-tview-x" aria-label={`Delete view ${v.name}`} onClick={()=>remove(v.id)}><X size={11}/></button>
+    </span>)}
+    <button className="m-tview-chip m-tview-reset" disabled={active==="all"} onClick={()=>s.setTeamView("all")}>Reset</button>
+    {naming
+      ? <span className="m-tview-savebar">
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="View name..." autoFocus
+            onKeyDown={e=>{ if (e.key==="Enter") save(); if (e.key==="Escape") { setNaming(false); setName(""); } }}/>
+          <button className="m-tview-save" onClick={save}>Save</button>
+          <button className="m-tview-cancel" onClick={()=>{setNaming(false); setName("");}}>Cancel</button>
+        </span>
+      : <button className="m-tview-add" onClick={()=>setNaming(true)}>+ Save Current View</button>}
+  </div>;
+}
+
+function TeamMembersSection({s, gridClass="", members=teamMembers}) {
+  /* Highest attainment first (reference order); the views bar handles who
+     to focus on, so there's no separate sort control here */
+  const sorted = [...members].sort((a,b)=> b.att-a.att);
   const list = s.teamExpanded ? sorted : sorted.slice(0,2);
   return <>
     <div className="m-section-label"><span className="m-section-icon">⁘</span> SELLER PERFORMANCE
-      <span className="m-label-right">{list.length} of {teamMembers.length}</span>
-      <select className="m-seller-sort" value={s.teamSort} onChange={e=>s.setTeamSort(e.target.value)} aria-label="Sort sellers">
-        <option value="need">Most coaching needed</option>
-        <option value="best">Top performers first</option>
-      </select></div>
+      <span className="m-label-right">{list.length} of {members.length}</span></div>
     <div className={gridClass}>
       {list.map(m=><MemberCard key={m.name} m={m} onOpen={()=>s.setSellerItem(m)}/>)}
     </div>
-    <button className="m-showall" onClick={()=>s.setTeamExpanded(!s.teamExpanded)}>
-      {s.teamExpanded ? "Show Fewer" : `Show All ${teamMembers.length} Sellers`}
+    {members.length===0 && <div className="m-pb-empty">No sellers match this view.</div>}
+    {members.length>2 && <button className="m-showall" onClick={()=>s.setTeamExpanded(!s.teamExpanded)}>
+      {s.teamExpanded ? "Show Fewer" : `Show All ${members.length} Sellers`}
       <ChevronDown size={14} className={s.teamExpanded?"up":""}/>
-    </button>
+    </button>}
   </>;
 }
 
@@ -2277,9 +2469,9 @@ function TeamInsightsSection({s, gridClass=""}) {
 /* TEAM DASHBOARD page (mobile) */
 function TeamPage({s}) {
   const pe = s.teamPe, setPe = s.setTeamPe;
-  const onOpenSeller = s.setSellerItem;
-  const earnedRows = teamEarnedRows();
-  const bookingRows = teamBookingRows(pe);
+  const vf = teamViewFilters(s);
+  const earnedRows = teamEarnedRows().filter(vf.row);
+  const bookingRows = teamBookingRows(pe).filter(vf.row);
 
   if (s.histView) return <div className="m-page"><HistPage s={s}/></div>;
 
@@ -2292,14 +2484,17 @@ function TeamPage({s}) {
     {/* Period / trend / export controls */}
     <TeamControls s={s}/>
 
+    {/* Preset + saved views filter everything below */}
+    <TeamViewsBar s={s}/>
+
     {/* Earned vs Target Incentive */}
-    <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period" rows={earnedRows}/>
+    <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period, sorted highest to lowest earned." rows={earnedRows}/>
 
     {/* Bookings Attainment (per plan element) */}
-    <AttainmentChart title="Bookings Attainment" subtitle="Bar shows progress toward goal" rows={bookingRows}
+    <AttainmentChart title="Bookings Attainment" subtitle="Sorted by bookings. Bar shows progress toward individual goal." rows={bookingRows}
       control={<div className="m-pe-select">{["PE1","PE2","PE3"].map(p=><button key={p} className={p===pe?"on":""} onClick={()=>setPe(p)}>{p}</button>)}</div>}/>
 
-    <TeamMembersSection s={s}/>
+    <TeamMembersSection s={s} members={teamMembers.filter(vf.member)}/>
     <TeamInsightsSection s={s}/>
   </div>;
 }
@@ -2647,6 +2842,9 @@ function useCompXState() {
   const [goalIdx, setGoalIdx] = useState(0);
   const [orderQuery, setOrderQuery] = useState("");
   const [orderType, setOrderType] = useState(ORDER_SEARCH_TYPES[0]);   // search-by field
+  const [orderStatus, setOrderStatus] = useState("All Statuses");      // order status filter
+  const [orderPe, setOrderPe] = useState("All Plan Elements");         // order PE filter
+  const [orderSubmitted, setOrderSubmitted] = useState(false);         // filters-only searches show results
   const [spiffFilters, setSpiffFilters] = useState({period:"All", status:"All", type:"All Types"});
   const [spiffExpanded, setSpiffExpanded] = useState(false);        // SPIFF page: first 2 ↔ all incentives
   const [aagSpiffExpanded, setAagSpiffExpanded] = useState(false);  // At A Glance SPIFF section: first 2 ↔ all
@@ -2656,9 +2854,11 @@ function useCompXState() {
   const [moreOpen, setMoreOpen] = useState(false);                  // mobile bottom-nav More sheet
   const [histItem, setHistItem] = useState(null);                   // Payment History popup (payment line item)
   const [otbCalcItem, setOtbCalcItem] = useState(null);             // OTB Compensation Calculation popup
+  const [showKsoCalc, setShowKsoCalc] = useState(false);            // KSO Calculation popup
   const [teamPe, setTeamPe] = useState("PE1");
   const [teamExpanded, setTeamExpanded] = useState(false);          // first 2 ↔ all members
-  const [teamSort, setTeamSort] = useState("need");                 // "need" = most coaching first | "best"
+  const [teamView, setTeamView] = useState("all");                  // team views: all | watch | top | risk | saved id
+  const [savedViews, setSavedViews] = useState([]);                 // user-saved team views {id, name, view, pe}
   const [dismissedInsights, setDismissedInsights] = useState([]);   // canvas card indices
   const [upliftOpen, setUpliftOpen] = useState(false);              // Goals · PE1 comp uplift plans
   const [histView, setHistView] = useState(false);                  // Team → Historical Performance Trend
@@ -2707,11 +2907,13 @@ function useCompXState() {
     calcItem, setCalcItem, pdfItem, setPdfItem,
     sellerItem, setSellerItem, showAskIQ, setShowAskIQ, notifOpen, setNotifOpen, reminders, setReminders,
     periodIdx, setPeriodIdx, openPayPeriod, openGoal, openSpiff, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
-    orderQuery, setOrderQuery, orderType, setOrderType, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
+    orderQuery, setOrderQuery, orderType, setOrderType, orderStatus, setOrderStatus, orderPe, setOrderPe,
+    orderSubmitted, setOrderSubmitted, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
     aagSpiffExpanded, setAagSpiffExpanded, backlogFilter, setBacklogFilter,
     estPe, setEstPe, estAdd, setEstAdd, moreOpen, setMoreOpen,
-    histItem, setHistItem, otbCalcItem, setOtbCalcItem,
-    teamPe, setTeamPe, teamExpanded, setTeamExpanded, teamSort, setTeamSort, dismissedInsights, setDismissedInsights,
+    histItem, setHistItem, otbCalcItem, setOtbCalcItem, showKsoCalc, setShowKsoCalc,
+    teamPe, setTeamPe, teamExpanded, setTeamExpanded, teamView, setTeamView, savedViews, setSavedViews,
+    dismissedInsights, setDismissedInsights,
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
     histCmpMember, setHistCmpMember, histPeriods, setHistPeriods, histPe, setHistPe,
@@ -2738,6 +2940,8 @@ function FramePopups({s, variant="mobile"}) {
     {s.showRecovBal && shell(<RecovBalancePopup onClose={()=>s.setShowRecovBal(false)}/>, ()=>s.setShowRecovBal(false))}
     {s.histItem && shell(<PaymentHistoryPopup item={s.histItem} onClose={()=>s.setHistItem(null)}/>, ()=>s.setHistItem(null))}
     {s.otbCalcItem && shell(<OtbCalcPopup item={s.otbCalcItem} month={s.currentMonth} onClose={()=>s.setOtbCalcItem(null)}/>, ()=>s.setOtbCalcItem(null))}
+    {s.showKsoCalc && shell(<KsoCalcPopup month={s.currentMonth} onClose={()=>s.setShowKsoCalc(false)}
+      onKsoTool={()=>{s.setShowKsoCalc(false); s.openGoal("KSO");}}/>, ()=>s.setShowKsoCalc(false))}
   </>;
 }
 
@@ -2973,6 +3177,7 @@ function IPadGoals({s}) {
   const g = goalTabs[s.goalIdx];
   return <div className="i-page">
     <IPadHeader title="Goals" sub="Plan-element attainment · H1 2026" s={s}/>
+    <div className="i-gsel-row"><GoalSheetSelect/></div>
     <div className="i-goaltab-row">
       {goalTabs.map((t,i)=><button key={t.id} className={`m-goaltab ${i===s.goalIdx?"on":""}`} onClick={()=>s.setGoalIdx(i)}
         style={i===s.goalIdx?{background:t.color, color:"#fff", borderColor:t.color}:{}}>{t.id}</button>)}
@@ -3007,27 +3212,21 @@ function IPadGoals({s}) {
 }
 
 function IPadOrders({s}) {
-  const {q, list} = deriveOrders(s.orderQuery, s.orderType);
+  const {q, list} = deriveOrders(s.orderQuery, s.orderType, s.orderStatus, s.orderPe);
+  const show = q || s.orderSubmitted;
   return <div className="i-page">
     <IPadHeader title="Order Search" sub="Look up a seller's orders" s={s}/>
-    <div className="m-os-bar i-os-bar">
-      <select className="m-os-type" value={s.orderType} onChange={e=>s.setOrderType(e.target.value)} aria-label="Search by">
-        {ORDER_SEARCH_TYPES.map(t=><option key={t}>{t}</option>)}
-      </select>
-      <input className="m-os-input" placeholder={`Enter ${s.orderType}...`} value={s.orderQuery} onChange={e=>s.setOrderQuery(e.target.value)}/>
-      <button className="m-os-go" aria-label="Search"><Search size={16}/></button>
-    </div>
-    {q ? <>
+    <OrderSearchControls s={s} ipad/>
+    {show ? <>
       <div className="m-os-results-hdr">
         <p className="m-search-count">{list.length} order{list.length===1?"":"s"} found</p>
-        <button className="m-os-clear" onClick={()=>s.setOrderQuery("")}>Clear</button>
       </div>
       {list.length>0 ? <div className="i-grid-3">{list.map(o=><OrderCard key={o.id} o={o}/>)}</div>
-        : <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or search type.</span></div>}
+        : <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or loosen the filters.</span></div>}
     </> : <div className="m-search-empty">
       <Search size={30}/>
       <b>Search a seller's orders</b>
-      <span>Pick a field and enter a value above to look up orders.</span>
+      <span>Pick a field, choose filters, and hit Submit to look up orders.</span>
     </div>}
   </div>;
 }
@@ -3048,18 +3247,20 @@ function IPadSpiff({s}) {
 }
 
 function IPadTeam({s}) {
-  const earnedRows = teamEarnedRows();
-  const bookingRows = teamBookingRows(s.teamPe);
+  const vf = teamViewFilters(s);
+  const earnedRows = teamEarnedRows().filter(vf.row);
+  const bookingRows = teamBookingRows(s.teamPe).filter(vf.row);
   if (s.histView) return <div className="i-page"><HistPage s={s}/></div>;
   return <div className="i-page">
     <IPadHeader title="Team Dashboard" sub={`${TEAM_AS_OF} · ${REFRESH_NOTE}`} s={s}/>
     <TeamControls s={s}/>
+    <TeamViewsBar s={s}/>
     <div className="i-split">
-      <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period" rows={earnedRows}/>
-      <AttainmentChart title="Bookings Attainment" subtitle="Bar shows progress toward goal" rows={bookingRows}
+      <AttainmentChart title="Earned vs Target Incentive" subtitle="Current period, sorted highest to lowest earned." rows={earnedRows}/>
+      <AttainmentChart title="Bookings Attainment" subtitle="Sorted by bookings. Bar shows progress toward individual goal." rows={bookingRows}
         control={<div className="m-pe-select">{["PE1","PE2","PE3"].map(pp=><button key={pp} className={pp===s.teamPe?"on":""} onClick={()=>s.setTeamPe(pp)}>{pp}</button>)}</div>}/>
     </div>
-    <TeamMembersSection s={s} gridClass="i-grid-3"/>
+    <TeamMembersSection s={s} gridClass="i-grid-3" members={teamMembers.filter(vf.member)}/>
     <TeamInsightsSection s={s} gridClass="i-grid-3"/>
   </div>;
 }
