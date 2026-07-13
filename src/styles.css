@@ -805,10 +805,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-main .m-est-card,.i-main .m-est-sum{min-width:0}
 
 /* ─── ORDER SEARCH FILTERS (status / PE + submit / clear) ─── */
-.m-os-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
-.m-os-flt{display:flex;align-items:center;gap:6px;flex:1;min-width:130px}
-.m-os-flt small{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);flex-shrink:0}
-.m-os-flt select{flex:1;min-width:0;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:11.5px;font-weight:700;padding:8px;border-radius:10px;cursor:pointer}
+.m-os-filters{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:10px 0 14px}
+.m-os-flt{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-width:0}
+.m-os-flt small{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);padding-left:2px}
+.m-os-flt select{width:100%;min-width:0;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:11.5px;font-weight:700;padding:8px;border-radius:10px;cursor:pointer}
 .m-os-submit{border:none;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;padding:9px 18px;border-radius:16px;cursor:pointer}
 .m-os-submit:active{transform:scale(.97)}
 .m-os-clear2{border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:16px;cursor:pointer}
@@ -921,8 +921,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* ─── ORDER SEARCH ─── */
 /* Order search bar (desktop reference): [search-by field ▾] [query] [go] */
-.m-os-bar{display:flex;gap:8px;align-items:center;margin-bottom:14px}
-.m-os-type{flex-shrink:0;max-width:42%;height:44px;border:1.5px solid var(--accent);background:var(--card);color:var(--text);font-size:12px;font-weight:700;padding:0 8px;border-radius:10px;cursor:pointer}
+.m-os-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.m-os-type{flex:1 1 100%;min-width:0;height:44px;border:1.5px solid var(--accent);background:var(--card);color:var(--text);font-size:12px;font-weight:700;padding:0 8px;border-radius:10px;cursor:pointer}
 .m-os-input{flex:1;min-width:0;height:44px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13.5px;padding:0 12px;border-radius:10px;outline:none}
 .m-os-input::placeholder{color:var(--muted)}
 .m-os-input:focus{border-color:var(--accent)}
@@ -934,8 +934,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-search-empty b{font-size:15px;color:var(--text);font-weight:700}
 .m-search-empty span{font-size:12px;line-height:1.5;max-width:230px}
 .m-order-card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid var(--divider)}
-.m-order-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}   /* badge · id · status (status pushes right) */
-.m-order-id{font-size:13px;font-weight:700;color:var(--accent);text-decoration:underline}
+.m-order-top{display:flex;align-items:center;gap:6px 8px;margin-bottom:6px;flex-wrap:wrap}   /* badge · id · status (status pushes right; wraps whole in narrow cells) */
+.m-order-id{font-size:13px;font-weight:700;color:var(--accent);text-decoration:underline;white-space:nowrap}
+.m-order-top .m-pay-status{white-space:nowrap}
 .m-order-mid{margin-bottom:12px}
 .m-order-mid b{display:block;font-size:16px;font-weight:700;color:var(--text)}
 .m-order-mid span{font-size:12px;color:var(--muted)}
@@ -1368,9 +1369,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-timeline-date{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
 .i-goaltab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .i-os-bar{max-width:680px;margin-bottom:20px}
-.i-os-bar .m-os-type{max-width:230px;font-size:13px;padding:0 10px}
+.i-os-bar{flex-wrap:nowrap}
+.i-os-bar .m-os-type{flex:0 0 auto;max-width:230px;font-size:13px;padding:0 10px}
 .i-os-bar .m-os-input{font-size:14.5px;height:48px}
 .i-os-bar .m-os-go{width:48px;height:48px}
+.i-os-filters{display:flex;align-items:flex-end;flex-wrap:wrap}
+.i-os-filters .m-os-flt{flex:0 1 auto}
+.i-os-filters .m-os-flt select{width:auto;font-size:12.5px;padding:9px 10px}
+.i-os-filters .m-os-submit,.i-os-filters .m-os-clear2{flex:0 0 auto;padding-block:9px}
 
 /* Roomier, larger-type feel on iPad (phone components run small) */
 .i-main .m-section{margin-bottom:0;padding:18px 20px;border-radius:18px}

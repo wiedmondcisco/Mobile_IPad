@@ -2101,13 +2101,13 @@ function OrderSearchControls({s, ipad=false}) {
         onChange={e=>s.setOrderQuery(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()}/>
       <button className="m-os-go" aria-label="Search" onClick={submit}><Search size={15}/></button>
     </div>
-    <div className="m-os-filters">
+    <div className={`m-os-filters ${ipad?"i-os-filters":""}`}>
       <label className="m-os-flt"><small>Status</small>
         <select value={s.orderStatus} onChange={e=>s.setOrderStatus(e.target.value)} aria-label="Status filter">
           {ORDER_STATUSES.map(o=><option key={o}>{o}</option>)}
         </select>
       </label>
-      <label className="m-os-flt"><small>PE</small>
+      <label className="m-os-flt"><small>Plan Element</small>
         <select value={s.orderPe} onChange={e=>s.setOrderPe(e.target.value)} aria-label="Plan element filter">
           {ORDER_PES.map(o=><option key={o}>{o}</option>)}
         </select>
