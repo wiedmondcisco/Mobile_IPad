@@ -334,7 +334,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* attainment-change chip: blue, so it reads apart from the green attainment */
 .m-pb-pe-change{font-size:10px;color:#3b82f6;display:inline-flex;align-items:center;gap:2px;font-weight:700}
 .m-pb-pe-rev{font-size:10px;color:var(--muted);margin-left:auto}
-.m-pb-pe-actions{display:flex;align-items:center;gap:12px}
+.m-pb-pe-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 /* PE component breakdown (children of a goal-sheet row) */
 .m-pb-pe-expandable{cursor:pointer}
 .m-pb-kids{margin-top:10px;border-left:2px solid var(--divider);padding-left:10px}
@@ -415,6 +415,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-sched-row b{font-size:12.5px;color:var(--text)}
 .m-sched-cal{display:flex;align-items:center;gap:6px;border:none;background:none;color:var(--accent);font-size:13px;font-weight:700;padding:11px 0 3px;cursor:pointer}
 .m-sched-cal:active{opacity:.7}
+.m-sched-est{font-size:11.5px;font-weight:600;color:var(--muted);padding-top:4px}
+.m-sched-est svg{opacity:.7}
 
 /* ─── PAYMENT CALENDAR POPUP ─── */
 .m-paycal-monthhdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
@@ -663,7 +665,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* Full-width table that flows vertically (no horizontal scroll) */
 .m-rate-scroll{overflow-x:visible}
 .m-rate-wide{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse}
-.m-rate-wide th,.m-rate-wide td{white-space:normal;word-break:normal;overflow-wrap:normal;font-size:10px;padding:7px 4px;text-align:center;vertical-align:middle}
+.m-rate-wide th,.m-rate-wide td{white-space:normal;word-break:normal;overflow-wrap:normal;font-size:10px;padding:7px 6px;text-align:center;vertical-align:middle}
 .m-rate-wide th{font-size:8.5px;line-height:1.25;vertical-align:bottom;letter-spacing:.2px}
 .m-rate-wide th:first-child,.m-rate-wide td:first-child{text-align:left;width:24%}
 .m-rate-wide td:first-child{font-weight:600;white-space:nowrap}
@@ -738,7 +740,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* ─── GOALS ─── */
 .m-page-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .m-page-title-row .m-page-title{margin-bottom:0}
-.m-goalsheet-btn{display:flex;align-items:center;gap:5px;background:var(--accent-light);border:1px solid rgba(4,159,217,.2);color:var(--accent-dark);font-size:12px;font-weight:700;padding:8px 12px;border-radius:20px;cursor:pointer}
+.m-goalsheet-btn{display:flex;align-items:center;gap:5px;background:var(--accent-light);border:1px solid rgba(4,159,217,.2);color:var(--accent-dark);font-size:12px;font-weight:700;padding:8px 12px;border-radius:20px;cursor:pointer;white-space:nowrap}
 .m-goalsheet-btn:active{transform:scale(.96)}
 .m-goaltab-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;-webkit-overflow-scrolling:touch}
 .m-goaltab-scroll::-webkit-scrollbar{display:none}
@@ -847,6 +849,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-blg-details small{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
 .m-blg-details b{font-size:12.5px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
 .i-main .m-blg-card{margin-bottom:0;min-width:0}   /* grid item: allow shrink below content min-width */
+.i-main .m-blg-who b{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25}   /* iPad: wrap names, never truncate */
 .i-page .m-blg-chips{flex-wrap:wrap;overflow-x:visible}   /* iPad: all buckets visible, no scroll */
 
 /* ─── PAY ESTIMATOR ─── */
@@ -918,8 +921,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-gsel-wrap{position:relative;margin-bottom:12px}
 .m-gsel{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .m-gsel small{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);flex-shrink:0}
-.m-gsel b{flex:1;min-width:0;font-size:11.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m-gsel b span{color:var(--muted);font-weight:600}
+.m-gsel-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.m-gsel-txt b{font-size:12px;font-weight:800;color:var(--text);line-height:1.2}
+.m-gsel-dates{font-size:10.5px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .m-gsel .m-insight-chev{flex-shrink:0;color:var(--muted)}
 .m-gsel-backdrop{position:fixed;inset:0;z-index:30}
 .m-gsel-menu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:31;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.22);padding:6px;display:flex;flex-direction:column;gap:2px}
@@ -996,8 +1000,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pb-pe-payout-link.m-no-link{color:var(--text);cursor:default;text-decoration:none}
 /* parent-with-children total: accent blue like the links; tapping it (or the
    button beside it) expands the component breakdown instead of a popup */
-.m-pb-pe-payout-static{font-size:17px;font-weight:700;color:var(--accent);cursor:pointer}
-.m-pb-breakdown-btn{display:inline-flex;align-items:center;gap:5px;border:none;background:var(--accent-light);color:var(--accent);font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:9px;cursor:pointer}
+.m-pb-pe-payout-static{font-size:17px;font-weight:700;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px}
+.m-pb-breakdown-btn{display:inline-flex;align-items:center;gap:5px;border:none;background:var(--accent-light);color:var(--accent);font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:9px;cursor:pointer;white-space:nowrap}
 .m-pb-breakdown-btn:hover{filter:brightness(1.05)}
 
 /* ─── ORDER SEARCH ─── */
@@ -1450,7 +1454,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* Grids / splits */
 .i-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:start}
+.i-grid-2 > *{min-width:0}
 .i-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(208px,1fr));gap:14px;margin-bottom:18px;align-items:start}
+.i-grid-3 > *{min-width:0}
 .i-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px;margin-bottom:18px;align-items:start}
 .i-col-a,.i-col-b{display:flex;flex-direction:column;gap:16px}
 /* Payment timeline: Apr | May (hero) | Jun — chronological left→right */
@@ -1460,6 +1466,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-timeline-card .m-context-amt{font-size:22px}
 .i-timeline-date{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
 .i-goaltab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.i-goals-uplift .m-uplift{margin-top:0}
+/* iPad At A Glance: open Insights spread as a 3-up row */
+.i-insights{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.i-insights .m-insights-hdr{grid-column:1/-1}
+.i-insights .m-insight-card{margin-bottom:0;min-width:0}
 .i-os-bar{max-width:680px;margin-bottom:20px}
 .i-os-bar{flex-wrap:nowrap}
 .i-os-bar .m-os-type{flex:0 0 auto;max-width:230px;font-size:13px;padding:0 10px}
@@ -1519,6 +1530,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-device:not(.land) .i-navitem{font-size:13px;padding:11px 11px;gap:10px}
 .i-device:not(.land) .i-page{padding:26px 26px 52px}
 .i-device:not(.land) .i-head{margin-bottom:24px}
+/* Portrait: compact pill buttons so header actions never push icons off-frame */
+.i-device:not(.land) .i-head-actions .m-goalsheet-btn{font-size:11px;padding:6px 10px}
+.i-device:not(.land) .i-head-actions{flex-wrap:wrap;justify-content:flex-end;row-gap:8px}
 /* At A Glance: hero gets the full width; context + progress pair up under it */
 .i-device:not(.land) .i-glance-top{grid-template-columns:1fr 1.7fr 1fr;gap:12px}
 .i-device:not(.land) .i-hero{padding:16px 16px 14px}

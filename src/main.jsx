@@ -777,11 +777,11 @@ function InsightCanvasBtn({s}) {
 
 /* At A Glance Insights — collapsed to a single header row by default;
    tapping expands to the Insight Canvas button + cards (mobile + iPad) */
-function AagInsightsSection({s}) {
-  const [open, setOpen] = useState(false);
+function AagInsightsSection({s, defaultOpen=false, className=""}) {
+  const [open, setOpen] = useState(defaultOpen);
   const count = s.pinnedInsights.length || insightCards.length;
   const toggle = () => setOpen(o=>!o);
-  return <div className="m-section">
+  return <div className={`m-section ${className}`}>
     <div className={`m-section-hdr m-insights-hdr ${open?"":"closed"}`} role="button" tabIndex={0}
       aria-expanded={open} onClick={toggle}
       onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); toggle(); } }}>
@@ -1087,6 +1087,7 @@ function PaymentScheduleCard({p, s}) {
     <div className="m-sched-row"><Calendar size={13}/><span>Lock Date</span><b>{p.lockDate}</b></div>
     <div className="m-sched-row"><Calendar size={13}/><span>Revenue Dates</span><b>{p.revDates}</b></div>
     <button className="m-sched-cal" onClick={()=>s.setShowPayCal(true)}>View Full Payment Calendar <ExternalLink size={13}/></button>
+    <button className="m-sched-cal m-sched-est" onClick={()=>s.setTab("estimator")}>Estimate a future paycheck <Calculator size={12}/></button>
   </div>;
 }
 
@@ -1420,7 +1421,7 @@ function OtbCalcPopup({item, month, onClose}) {
       <p className="m-rate-name">Rate Table: {c.rateName}</p>
       <div className="m-rate-scroll">
         <table className="m-rate-table m-rate-wide">
-          <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Prior Att.</th><th>Incr. Att.</th><th>Multiplier</th></tr></thead>
+          <thead><tr><th>Attainment</th><th>PE Pay Rate</th><th>Prior Attainment</th><th>Incremental Attainment</th><th>Payout Multiplier</th></tr></thead>
           <tbody>{c.rows.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
             <td>{r.range}</td><td>{r.peRate}</td><td>{r.prior}</td><td>{r.incr}</td><td>{r.mult}</td>
           </tr>)}</tbody>
@@ -2234,7 +2235,10 @@ function GoalSheetSelect() {
   return <div className="m-gsel-wrap">
     <button className="m-gsel" onClick={()=>setOpen(o=>!o)} aria-expanded={open} aria-haspopup="listbox">
       <small>Goal Sheet</small>
-      <b>{cur.code} · {cur.dates} <span>({cur.half})</span></b>
+      <span className="m-gsel-txt">
+        <b>{cur.half} · {cur.code}</b>
+        <span className="m-gsel-dates">{cur.dates}</span>
+      </span>
       <ChevronDown size={14} className={`m-insight-chev ${open?"open":""}`}/>
     </button>
     {open && <>
@@ -2243,7 +2247,7 @@ function GoalSheetSelect() {
         {goalSheetOptions.map((o,i)=><button key={i} role="option" aria-selected={!!o.current}
           className={o.current?"on":""} onClick={()=>setOpen(false)}>
           <span className="m-gsel-check">{o.current ? "✓" : ""}</span>
-          <span className="m-gsel-opt"><b>{o.code}</b> {o.dates} <small>({o.half})</small></span>
+          <span className="m-gsel-opt"><b>{o.half}</b> · {o.code} <small>{o.dates}</small></span>
         </button>)}
       </div>
     </>}
@@ -3366,7 +3370,7 @@ function IPadGlance({s}) {
           </div>)}
     </div>
     <div className="m-section-label"><Menu size={13} className="m-section-icon"/> PLAN ELEMENTS & INCENTIVES</div>
-    <div className="i-grid-3">
+    <div className="i-grid-2">
       {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
         aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
         onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
@@ -3380,14 +3384,10 @@ function IPadGlance({s}) {
         </div>
         <BookingsBar pe={pe}/>
       </div>)}
+      <AagSpiffSection s={s}/>
     </div>
 
-    <div className="i-grid-2">
-      <AagSpiffSection s={s}/>
-      <div>
-        <AagInsightsSection s={s}/>
-      </div>
-    </div>
+    <AagInsightsSection s={s} defaultOpen className="i-insights"/>
   </div>;
 }
 
@@ -3409,16 +3409,48 @@ function IPadPayments({s}) {
   </div>;
 }
 
+/* iPad Goals — plan elements shown together as a grid (no one-at-a-time
+   chips); KSO / OTB / NDR keep their own views behind chips. */
+const IPAD_GOAL_CHIPS = [
+  {id:"PE",  label:"Plan Elements", color:"var(--accent)", match:i=>i<=2, idx:0},
+  {id:"KSO", label:"KSO",           color:PE_COLOR.KSO,    match:i=>i===3, idx:3},
+  {id:"OTB", label:"OTB",           color:PE_COLOR.OTB,    match:i=>i===4, idx:4},
+  {id:"NDR", label:"NDR",           color:PE_COLOR.NDR,    match:i=>i===5, idx:5}
+];
 function IPadGoals({s}) {
   const g = goalTabs[s.goalIdx];
+  const peView = s.goalIdx <= 2;
   return <div className="i-page">
     <IPadHeader title="Goals" sub="Plan-element attainment · H1 2026" s={s}/>
     <div className="i-gsel-row"><GoalSheetSelect/></div>
     <div className="i-goaltab-row">
-      {goalTabs.map((t,i)=><button key={t.id} className={`m-goaltab ${i===s.goalIdx?"on":""}`} onClick={()=>s.setGoalIdx(i)}
-        style={i===s.goalIdx?{background:t.color, color:"#fff", borderColor:t.color}:{}}>{t.id}</button>)}
+      {IPAD_GOAL_CHIPS.map(c=>{
+        const on = c.match(s.goalIdx);
+        return <button key={c.id} className={`m-goaltab ${on?"on":""}`} onClick={()=>s.setGoalIdx(c.idx)}
+          style={on?{background:c.color, color:"#fff", borderColor:c.color}:{}}>{c.label}</button>;
+      })}
     </div>
-    {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <div className="i-split i-goals-split">
+    {peView ? <>
+      <div className="i-grid-2">
+        {goalTabs.slice(0,3).map(t=><div key={t.id} className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:t.color}}>
+          <div className="m-section-hdr">
+            <div className="m-pe-left"><span className="m-pe-badge" style={{background:t.color}}>{t.id}</span><b>{t.name}</b></div>
+            <span className="m-pe-goal">{t.goal} Goal</span>
+          </div>
+          <div className="m-pe-att-row">
+            <b className="m-pe-att-big" style={{color:t.color}}>{t.attPct}%</b>
+            <span className="m-pe-att-lbl">REVENUE ATT.</span>
+          </div>
+          <BookingsBar pe={t}/>
+          <div className="m-goal-stats">
+            <div><small>Goal</small><span>{t.goal}</span></div>
+            <div><small>Attainment</small><span style={{color:t.color}}>{t.attPct}%</span></div>
+            <div><small>Incentive</small><span className="m-goal-earn">{amt(t.incentive)}</span></div>
+          </div>
+        </div>)}
+        <div className="m-section i-goals-uplift"><CompUpliftSection s={s}/></div>
+      </div>
+    </> : g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <div className="i-split i-goals-split">
       <div className="i-col-a">
         <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
           <div className="m-section-hdr">
@@ -3440,7 +3472,6 @@ function IPadGoals({s}) {
         <div className="m-section m-pe-flat m-pe-solo">
           <div className="m-section-hdr"><h2>Bookings vs Revenue</h2></div>
           <BookingsBar pe={g}/>
-          {g.id==="PE1" && <CompUpliftSection s={s}/>}
         </div>
       </div>
     </div>}
