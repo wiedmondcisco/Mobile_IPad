@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Gift, Calculator, MoreHorizontal, HelpCircle, LayoutGrid } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -158,9 +158,9 @@ const INSIGHT_CATS = [
 const INSIGHT_INDEX = INSIGHT_CATS.flatMap(c=>c.items.map(it=>({...it, cat:c.name, catColor:c.color})));
 
 const notifications = [
-  {type:"amber", title:"Goal Sheet acceptance due", desc:"Review and accept H2 FY26 Goal Sheet by Jun 15."},
-  {type:"green", title:"Q2 Bonus Eligible", desc:"On track to earn quarterly bonus."},
-  {type:"blue", title:"New Comp Plan Released", desc:"H2 FY26 Plan is now available."}
+  {type:"amber", title:"Goal Sheet acceptance due", desc:"Please review and accept your H2 FY26 Goal Sheet by Jun 15, 2026.", action:"Accept Goal Sheet", nav:"goals"},
+  {type:"green", title:"Q2 Bonus Eligible", desc:"You are on track to earn a quarterly bonus.", action:"View Details", nav:"spiff"},
+  {type:"blue", title:"New Compensation Plan Released", desc:"H2 FY26 Compensation Plan is now available.", action:"View Plan", nav:"goals"}
 ];
 
 /* My Reminders (second tab of the bell dropdown) — user-managed notes */
@@ -239,8 +239,8 @@ const recentPaymentPeriods = [
       {pe:"KSO", name:"Key Sales Objectives", label:"KSO", weight:"—", pct:100, payout:"2,500.00", color:PE_COLOR.KSO}
     ]},
     spiff:{total:"2,125.00", items:[{name:"Q2 Cloud Migration SPIFF", amount:"$1,250.00"},{name:"Partner Acceleration Q2", amount:"$875.00"}]},
-    draws:{total:"50.00", items:[{name:"Monthly Incentive Payment (MIPS)", amount:"$35.00"},{name:"Recoverable Draw", amount:"$15.00"}]},
-    adj:{total:"73.50", items:[{name:"ICC True-up Adjustment", amount:"$73.50"}]},
+    draws:{total:"50.00", items:[{chip:"MIPS", name:"Monthly Incentive Payment", amount:"$35.00"},{chip:"Draw", name:"Recoverable Draw", amount:"$15.00"}]},
+    adj:{total:"73.50", items:[{chip:"ICC", name:"Payment Adjustment", amount:"$73.50"}]},
     otb:{total:"100.00", items:[{name:"PIOT PRODUCT RR|PL", amount:"$100.00", pct:65, attChange:25}]},
     past:{total:"200.00", groups:[
       {fy:"FY23", half:"H2", dates:"Jul 1, 2023 – Dec 31, 2023", rate:"CS402", total:"120.00", items:[
@@ -256,12 +256,69 @@ const recentPaymentPeriods = [
   },
   {month:"April 2026", amount:"6,830.00", status:"Paid", payDate:"May 2, 2026", lockDate:"Apr 28, 2026", revDates:"Apr 1 – Apr 30, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"4,605.00", items:[
-      {pe:"PE1", label:"Prod+Services", weight:"50%", pct:22, attChange:3, payout:"1,320.00", color:PE_COLOR.PE1},
-      {pe:"PE2", label:"Recurring Software", weight:"30%", pct:65, attChange:5, payout:"1,985.00", color:PE_COLOR.PE2},
-      {pe:"PE3", label:"Services", weight:"20%", pct:39, attChange:4, payout:"1,300.00", color:PE_COLOR.PE3}
+      {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:22, attChange:3, payout:"1,320.00", color:PE_COLOR.PE1,
+        calc:{incrementalAtt:"3%", totalAtt:"22%", weight:"50%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4%",
+          totalEarned:"1,510.00", prevPaid:"$190.00", result:"1,320.00", rateName:"CS402",
+          rateIncremental:[
+            {range:"0 – 50 %", peRate:".75%", prior:"19%", incr:"3%", mult:"4%", active:true},
+            {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
+            {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
+            {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
+          rateTotal:[
+            {range:"0 – 50 %", peRate:".75%", rev:"22%", mult:"4%", active:true},
+            {range:"50 – 75 %", peRate:"1.5%", rev:"-", mult:"-"},
+            {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
+            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
+      {pe:"PE2", name:"RRA-SW WO SEC_ACV|AG|WM|NPR", label:"Recurring Software", weight:"30%", pct:65, attChange:5, payout:"1,985.00", color:PE_COLOR.PE2,
+        calc:{incrementalAtt:"5%", totalAtt:"65%", weight:"30%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"9%",
+          totalEarned:"2,038.50", prevPaid:"$53.50", result:"1,985.00", rateName:"CS402",
+          rateIncremental:[
+            {range:"0 – 50 %", peRate:".75%", prior:"-", incr:"-", mult:"-"},
+            {range:"50 – 75 %", peRate:".75%", prior:"60%", incr:"5%", mult:"9%", active:true},
+            {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
+            {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
+          rateTotal:[
+            {range:"0 – 50 %", peRate:".75%", rev:"-", mult:"-"},
+            {range:"50 – 75 %", peRate:".75%", rev:"65%", mult:"9%", active:true},
+            {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
+            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
+      {pe:"PE3", name:"SEC PRD ACV|WM|NPR", label:"Services", weight:"20%", pct:39, attChange:4, payout:"1,300.00", color:PE_COLOR.PE3,
+        calc:{incrementalAtt:"4%", totalAtt:"39%", weight:"20%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"9%",
+          totalEarned:"1,359.00", prevPaid:"$59.00", result:"1,300.00", rateName:"CS402",
+          rateIncremental:[
+            {range:"0 – 50 %", peRate:"2.25%", prior:"35%", incr:"4%", mult:"9%", active:true},
+            {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
+            {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
+            {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
+          rateTotal:[
+            {range:"0 – 50 %", peRate:"2.25%", rev:"39%", mult:"9%", active:true},
+            {range:"50 – 75 %", peRate:"1.5%", rev:"-", mult:"-"},
+            {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
+            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}}
     ]},
+    /* Goal sheet swapped mid-period: amounts already paid on the prior
+       sheet are reconciled into the current one (desktop reference) */
+    replaced:{period:"Jan 26, 2026 - Jul 26, 2026", total:"$-850.00",
+      note:"Reconciled from previous goal sheet. Not a negative payment — these amounts were already paid and are netted into your Current Goal Sheet above.",
+      items:[
+        {pe:"PE1", label:"Prod+Services", paidNote:"Paid up to Mar", paid:"$650.00", amount:"$-650.00"},
+        {pe:"PE2", label:"Recurring Software", paidNote:"Paid up to Mar", paid:"$100.00", amount:"$-100.00"},
+        {pe:"PE3", label:"Services", paidNote:"Paid up to Mar", paid:"$100.00", amount:"$-100.00"}
+      ]},
     spiff:{total:"2,125.00", items:[{name:"Q4FY24 Slam Dunk", amount:"$2,125.00"}]},
-    draws:{total:"50.00", items:[{name:"MIPS", amount:"$50.00"}]}, adj:{total:"50.00", items:[{name:"ICC Adj", amount:"$50.00"}]}, otb:{total:"0.00", items:[]}, past:{total:"0.00", items:[]}
+    draws:{total:"50.00", items:[{chip:"MIPS", name:"Monthly Incentive Payment", amount:"$50.00"}]}, adj:{total:"50.00", items:[{chip:"ICC", name:"Payment Adjustment", amount:"$50.00"}]}, otb:{total:"0.00", items:[]}, past:{total:"0.00", items:[]}
   },
   {month:"March 2026", amount:"6,189.00", status:"Paid", payDate:"Apr 2, 2026", lockDate:"Mar 28, 2026", revDates:"Mar 1 – Mar 31, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"3,964.00", items:[
@@ -286,8 +343,8 @@ function pastStatement([month, gsTotal, spiffTotal, pcts, payDate, lockDate, rev
       {pe:"PE3", label:"Services", weight:"20%", pct:pcts[2], attChange:2, payout:fmtAmt(g*0.2), color:PE_COLOR.PE3}
     ]},
     spiff:{total:spiffTotal, items:[{name:"Quarterly SPIFF", amount:"$"+spiffTotal}]},
-    draws:{total:"50.00", items:[{name:"MIPS", amount:"$50.00"}]},
-    adj:{total:"50.00", items:[{name:"ICC Adj", amount:"$50.00"}]},
+    draws:{total:"50.00", items:[{chip:"MIPS", name:"Monthly Incentive Payment", amount:"$50.00"}]},
+    adj:{total:"50.00", items:[{chip:"ICC", name:"Payment Adjustment", amount:"$50.00"}]},
     otb:{total:"0.00", items:[]}, past:{total:"0.00", items:[]}
   };
 }
@@ -461,7 +518,9 @@ const PAYMENT_HISTORY = {
     ]}
 };
 PAYMENT_HISTORY["MIPS"] = PAYMENT_HISTORY["Monthly Incentive Payment (MIPS)"];
+PAYMENT_HISTORY["Monthly Incentive Payment"] = PAYMENT_HISTORY["Monthly Incentive Payment (MIPS)"];
 PAYMENT_HISTORY["ICC Adj"] = PAYMENT_HISTORY["ICC True-up Adjustment"];
+PAYMENT_HISTORY["Payment Adjustment"] = PAYMENT_HISTORY["ICC True-up Adjustment"];
 
 /* ── On-Top Bonus calc popups (keyed by item name) ── Formula follows the
    desktop OTB reference: TI rate × OTB target incentive × proration ×
@@ -641,7 +700,7 @@ function FormulaStrip({weight, targetIncentive, proration, payoutRate, result, t
       ? <>
         <div className="m-formula-factor"><b>{amt(totalEarned)}</b><small>Total Earned</small></div>
         <span className="m-formula-op">−</span>
-        <div className="m-formula-factor"><b>{prevPaid}</b><small>Previously Paid</small></div>
+        <div className="m-formula-factor"><b>{amt(prevPaid)}</b><small>Previously Paid</small></div>
         <span className="m-formula-op m-formula-eq">=</span>
         <div className="m-formula-factor"><b className="m-formula-result">{amt(result)}</b><small>Monthly Payment</small></div>
       </>
@@ -735,10 +794,20 @@ function NotifDropdown({s, onClose, ipad=false}) {
       <button className={tab==="reminders"?"on":""} onClick={()=>setTab("reminders")}>My Reminders</button>
       <button className="m-ntabs-close" onClick={onClose} aria-label="Close"><X size={15}/></button>
     </div>
-    {tab==="notifications" && notifications.map((n,i)=><div key={i} className={`m-notif m-notif-${n.type}`}>
-      <div className="m-notif-dot"></div>
-      <div><b>{n.title}</b><span>{n.desc}</span></div>
-    </div>)}
+    {tab==="notifications" && (s.notifs.length === 0
+      ? <div className="m-rem-empty">You're all caught up — no new notifications.</div>
+      : s.notifs.map(n=>{
+        const Ic = {amber:AlertTriangle, green:Check, blue:Info}[n.type] || Info;
+        return <div key={n.title} className={`m-notif m-notif-${n.type}`}>
+          <Ic size={16} className="m-notif-ic"/>
+          <div className="m-notif-body">
+            <b>{n.title}</b>
+            <span>{n.desc}</span>
+            <button className="m-notif-action" onClick={()=>{ s.setTab(n.nav); onClose(); }}>{n.action}</button>
+          </div>
+          <button className="m-notif-x" onClick={()=>s.setNotifs(list=>list.filter(x=>x!==n))} aria-label={`Dismiss ${n.title}`}><X size={13}/></button>
+        </div>;
+      }))}
     {tab==="reminders" && <>
       <div className="m-rem-add">
         <input className="m-rem-note" placeholder="Add a reminder note..." value={note}
@@ -802,7 +871,7 @@ function MobileHeader({s}) {
       <div className="m-header-actions">
         <UtilityIcons/>
         <div className="m-bell" onClick={()=>s.setNotifOpen(!s.notifOpen)}>
-          <Bell size={18}/><span className="m-bell-count">{notifications.length}</span>
+          <Bell size={18}/>{s.notifs.length>0 && <span className="m-bell-count">{s.notifs.length}</span>}
         </div>
       </div>
     </div>
@@ -842,9 +911,17 @@ function AagSpiffSection({s}) {
   </div>;
 }
 
+/* Goal-sheet period selector (concept only — numbers stay on the demo
+   month; the chip + date range swap to sell the interaction) */
+const GOAL_SHEET_PERIODS = {
+  "H1 2026": "Jan 26, 2026 – Jul 26, 2026",
+  "H2 2025": "Jul 27, 2025 – Jan 25, 2026",
+};
+
 function AtAGlancePage({s}) {
   const hero = monthlyPayCards.find(c=>c.current);
   const context = monthlyPayCards.filter(c=>!c.current);
+  const [sheet, setSheet] = useState("H1 2026");
 
   return <div className="m-page">
     <MobileHeader s={s}/>
@@ -879,10 +956,17 @@ function AtAGlancePage({s}) {
     </div>
 
     {/* Plan Elements — donut is the dominant visual per card */}
-    <div className="m-section-label"><span className="m-section-icon">⁘</span> PLAN ELEMENTS & INCENTIVES</div>
+    <div className="m-section-label"><Menu size={13} className="m-section-icon"/> PLAN ELEMENTS & INCENTIVES</div>
     <div className="m-section">
-      <div className="m-section-hdr"><h2>PLAN ELEMENTS</h2><span className="m-badge">H1 2026</span></div>
-      <small className="m-pe-sub">All values in USD · Jan 26, 2026 – Jul 26, 2026</small>
+      <div className="m-section-hdr"><h2>PLAN ELEMENTS</h2>
+        <span className="m-badge-selwrap">
+          <select className="m-badge-select" value={sheet} onChange={e=>setSheet(e.target.value)} aria-label="Goal sheet period">
+            {Object.keys(GOAL_SHEET_PERIODS).map(k=><option key={k}>{k}</option>)}
+          </select>
+          <ChevronDown size={11}/>
+        </span>
+      </div>
+      <small className="m-pe-sub">All values in USD · {GOAL_SHEET_PERIODS[sheet]}</small>
       {planElements.map((pe,i)=><div key={i} className="m-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
         aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
         onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
@@ -945,34 +1029,87 @@ function PeriodChips({s}) {
   </div>;
 }
 
-function PaymentBreakdownCard({p, s, donutSize=180}) {
+/* compact: legend rows under 5% of the total fold into a "N more items"
+   toggle so small line items don't eat the page (mobile). iPad has room,
+   so it renders fully expanded. The donut always shows every slice. */
+function PaymentBreakdownCard({p, s, donutSize=180, compact=false}) {
   const total = parseFloat(p.amount.replace(/,/g,''));
   const donutItems = paymentDonutItems(p, s.theme==="dark");
+  const [showAll, setShowAll] = useState(false);
+  const minor = compact ? donutItems.filter(d=>d.value/total < .05) : [];
+  const fold = minor.length >= 2;
+  const rows = fold && !showAll ? donutItems.filter(d=>d.value/total >= .05) : donutItems;
+  const minorSum = minor.reduce((a,d)=>a+d.value,0);
+  const legRow = (d,i) => {
+    const pct = ((d.value/total)*100).toFixed(0);
+    return <div key={i} className="m-leg2" style={{borderLeftColor:d.color}}>
+      <span className="m-leg2-badge" style={{background:d.color}}>{pct}%</span>
+      <span className="m-leg2-label">{d.label}</span>
+      <b className="m-leg2-val">{amt("$"+d.value.toLocaleString(undefined,{minimumFractionDigits:2}))}</b>
+    </div>;
+  };
   return <div className="m-section">
     <div className="m-section-hdr"><h2>Payment Breakdown · {p.month}</h2><span className={`m-pay-status m-status-${p.status.toLowerCase()}`}>{p.status}</span></div>
     <div className="m-donut-hero">
       <SegmentDonut items={donutItems} total={total} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={amt(`$${p.amount}`)} centerSub="Total" interactive/>
     </div>
     <div className="m-leg2-list">
-      {donutItems.map((d,i)=>{
-        const pct = ((d.value/total)*100).toFixed(0);
-        return <div key={i} className="m-leg2" style={{borderLeftColor:d.color}}>
-          <span className="m-leg2-badge" style={{background:d.color}}>{pct}%</span>
-          <span className="m-leg2-label">{d.label}</span>
-          <b className="m-leg2-val">{amt("$"+d.value.toLocaleString(undefined,{minimumFractionDigits:2}))}</b>
-        </div>;
-      })}
+      {rows.map(legRow)}
+      {fold && <button className="m-leg2 m-leg2-more" onClick={()=>setShowAll(v=>!v)} aria-expanded={showAll}>
+        <span className="m-leg2-badge m-leg2-more-badge">{((minorSum/total)*100).toFixed(0)}%</span>
+        <span className="m-leg2-label">{showAll ? "Show less" : `${minor.length} more items`}</span>
+        {!showAll && <b className="m-leg2-val">{amt("$"+minorSum.toLocaleString(undefined,{minimumFractionDigits:2}))}</b>}
+        <ChevronDown size={15} className={`m-insight-chev ${showAll?"open":""}`}/>
+      </button>}
     </div>
   </div>;
 }
 
-function PaymentScheduleCard({p}) {
+function PaymentScheduleCard({p, s}) {
   return <div className="m-section">
     <div className="m-section-hdr"><h2>Payment Schedule</h2></div>
     <div className="m-sched-row"><Calendar size={13}/><span>Next Payment</span><b>{p.payDate}</b></div>
     <div className="m-sched-row"><Calendar size={13}/><span>Lock Date</span><b>{p.lockDate}</b></div>
     <div className="m-sched-row"><Calendar size={13}/><span>Revenue Dates</span><b>{p.revDates}</b></div>
+    <button className="m-sched-cal" onClick={()=>s.setShowPayCal(true)}>View Full Payment Calendar <ExternalLink size={13}/></button>
   </div>;
+}
+
+/* Full Payment Calendar popup — the current statement month as a seller
+   would see it: revenue capture window, data refresh, lock, statement,
+   and payday, on a month grid with a key-dates list. Demo data (May 2026). */
+const PAYCAL_KEY_DATES = [
+  {cls:"rev",     label:"Revenue Capture Window", date:"May 1 – 18", desc:"Bookings & revenue credited to this statement"},
+  {cls:"refresh", label:"Data Refresh",           date:"May 26",     desc:"Attainment data refreshed at 6:00 AM"},
+  {cls:"lock",    label:"Lock Date",              date:"May 28",     desc:"Statement locks for payroll processing"},
+  {cls:"stmt",    label:"Statement Available",    date:"May 30",     desc:"Final statement posted in CompX"},
+  {cls:"pay",     label:"Payday",                 date:"Jun 2",      desc:"Incentive payment via direct deposit"},
+];
+function PaymentCalendarPopup({onClose}) {
+  /* 6 Sunday-start weeks around May 2026: Apr 26 – Jun 6 (May 1 = Friday) */
+  const cells = Array.from({length:42}, (_,i)=>
+    i<5 ? {d:26+i, mo:"Apr", out:true} : i<36 ? {d:i-4, mo:"May", out:false} : {d:i-35, mo:"Jun", out:true});
+  const mark = c =>
+    c.mo==="May" ? (c.d<=18 ? "rev" : c.d===26 ? "refresh" : c.d===28 ? "lock" : c.d===30 ? "stmt" : "")
+    : c.mo==="Jun" && c.d===2 ? "pay" : "";
+  return <FullScreenPopup title="Payment Calendar" subtitle="May 2026 Statement Period" onClose={onClose}>
+    <div className="m-section">
+      <div className="m-paycal-monthhdr"><b>May 2026</b><span>H1 2026 Goal Sheet</span></div>
+      <div className="m-paycal-grid">
+        {["S","M","T","W","T","F","S"].map((d,i)=><span key={"d"+i} className="m-paycal-dow">{d}</span>)}
+        {cells.map((c,i)=><span key={i} className={`m-paycal-day ${c.out?"out":""} ${mark(c)}`}>{c.d}</span>)}
+      </div>
+    </div>
+    <div className="m-section">
+      <div className="m-section-hdr"><h2>Key Dates</h2></div>
+      {PAYCAL_KEY_DATES.map(k=><div key={k.label} className="m-paycal-key">
+        <span className={`m-paycal-key-dot ${k.cls}`}/>
+        <div className="m-paycal-key-txt"><b>{k.label}</b><span>{k.desc}</span></div>
+        <span className="m-paycal-key-date">{k.date}</span>
+      </div>)}
+    </div>
+    <p className="m-paycal-note">ⓘ Dates are estimates and may shift with payroll processing. Payday deposits typically post by 9:00 AM local time.</p>
+  </FullScreenPopup>;
 }
 
 /* Goal-sheet attainment bar with hover tooltips (desktop-reference style):
@@ -1059,6 +1196,32 @@ function GoalSheetItemRow({item, onOpenCalc, onOpenPdf, onOpenKso}) {
   </div>;
 }
 
+/* Replaced Goal Sheet — shown under the Current Goal Sheet rows when a
+   statement month carries reconciliation from a swapped-out sheet. The
+   amber frame + indent + dashed connector make "replaced, but still
+   feeding your current sheet" impossible to miss. */
+function ReplacedGoalSheet({r}) {
+  return <div className="m-replaced">
+    <div className="m-replaced-hdr">
+      <div className="m-replaced-hdr-l1">
+        <span className="m-replaced-tag">Replaced</span>
+        <b className="m-replaced-title">Replaced Goal Sheet</b>
+      </div>
+      <div className="m-replaced-hdr-l2">
+        <small className="m-replaced-period">{r.period}</small>
+        <b className="m-replaced-total">{amt(r.total)}</b>
+      </div>
+    </div>
+    {r.items.map((it,i)=><div key={i} className="m-replaced-row">
+      <span className="m-pb-pe-badge" style={{background:PE_COLOR[it.pe]+"22", color:PE_COLOR[it.pe]}}>{it.pe}</span>
+      <span className="m-replaced-name">{it.label}</span>
+      <b className="m-replaced-amt">{amt(it.amount)}</b>
+      <span className="m-replaced-paid">{it.paidNote}: <b>{amt(it.paid)}</b></span>
+    </div>)}
+    <p className="m-replaced-note">ⓘ {r.note}</p>
+  </div>;
+}
+
 function PaymentAccordion({p, s}) {
   const expanded = s.expanded;
   const toggle = key => s.setExpanded(prev=>({...prev,[key]:!prev[key]}));
@@ -1074,6 +1237,7 @@ function PaymentAccordion({p, s}) {
     {expanded[sec.key] && sec.key==="goalSheet" && <div className="m-pb-body">
       {p.goalSheet.items.map((item,j)=><GoalSheetItemRow key={j} item={item} onOpenCalc={onOpenCalc} onOpenPdf={onOpenPdf}
         onOpenKso={()=>s.setShowKsoCalc(true)}/>)}
+      {p.replaced && <ReplacedGoalSheet r={p.replaced}/>}
     </div>}
 
     {expanded[sec.key] && sec.key!=="goalSheet" && <div className="m-pb-body">
@@ -1120,7 +1284,7 @@ function PaymentAccordion({p, s}) {
             </div>;
             return <div key={j} className="m-pb-detail-row">
               <span className="m-pb-detail-name">
-                {SECTION_CHIP[sec.key] && <span className="m-pb-chip">{SECTION_CHIP[sec.key]}</span>}
+                {(item.chip || SECTION_CHIP[sec.key]) && <span className="m-pb-chip">{item.chip || SECTION_CHIP[sec.key]}</span>}
                 {item.name}
               </span>
               <b className={`${ACCENT_AMT_SECTIONS[sec.key] ? "m-pb-sub-amt" : ""} ${open ? "m-pb-amt-link" : ""}`}
@@ -1145,8 +1309,8 @@ function PaymentsPage({s}) {
     </div>
     <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
     <PeriodChips s={s}/>
-    <PaymentBreakdownCard p={p} s={s}/>
-    <PaymentScheduleCard p={p}/>
+    <PaymentBreakdownCard p={p} s={s} compact/>
+    <PaymentScheduleCard p={p} s={s}/>
     <PaymentAccordion p={p} s={s}/>
   </div>;
 }
@@ -1505,7 +1669,7 @@ function SpiffBonusPage({s}) {
       {s.spiffExpanded ? "Show Fewer" : `See All ${list.length} Incentives`}
       <ChevronDown size={14} className={s.spiffExpanded?"up":""}/>
     </button>}
-    {list.length===0 && <div className="m-search-empty"><Gift size={30}/><b>No incentives match</b><span>Loosen the filters to see more programs.</span></div>}
+    {list.length===0 && <div className="m-search-empty"><Trophy size={30}/><b>No incentives match</b><span>Loosen the filters to see more programs.</span></div>}
   </div>;
 }
 
@@ -2435,7 +2599,7 @@ function TeamMembersSection({s, gridClass="", members=teamMembers}) {
   const sorted = [...members].sort((a,b)=> b.att-a.att);
   const list = s.teamExpanded ? sorted : sorted.slice(0,2);
   return <>
-    <div className="m-section-label"><span className="m-section-icon">⁘</span> SELLER PERFORMANCE
+    <div className="m-section-label"><Menu size={13} className="m-section-icon"/> SELLER PERFORMANCE
       <span className="m-label-right">{list.length} of {members.length}</span></div>
     <div className={gridClass}>
       {list.map(m=><MemberCard key={m.name} m={m} onOpen={()=>s.setSellerItem(m)}/>)}
@@ -2899,6 +3063,8 @@ function useCompXState() {
   const [insightCanvasOpen, setInsightCanvasOpen] = useState(false);
   const [pinnedInsights, setPinnedInsights] = useState([]);         // insight ids, max MAX_PINS
   const [showRecovBal, setShowRecovBal] = useState(false);          // Recoverable Balance History popup
+  const [showPayCal, setShowPayCal] = useState(false);              // Full Payment Calendar popup
+  const [notifs, setNotifs] = useState(notifications);              // dismissible notification list
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -2945,7 +3111,7 @@ function useCompXState() {
     histCmpMember, setHistCmpMember, histPeriods, setHistPeriods, histPe, setHistPe,
     sideCollapsed, setSideCollapsed, hideAmts, setHideAmts,
     insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
-    showRecovBal, setShowRecovBal,
+    showRecovBal, setShowRecovBal, showPayCal, setShowPayCal, notifs, setNotifs,
     currentMonth: fullPaymentPeriods[fullPaymentPeriods.length-1].month
   };
 }
@@ -2957,15 +3123,18 @@ function FramePopups({s, variant="mobile"}) {
   const shell = (node, onClose, cls="") => ipad
     ? <div className="i-modal-scrim" onClick={onClose}><div className={`i-modal-shell ${cls}`} onClick={e=>e.stopPropagation()}>{node}</div></div>
     : node;
+  /* Calc popups describe the statement period being viewed, not always the newest month */
+  const selMonth = fullPaymentPeriods[s.periodIdx].month;
   return <>
-    {s.calcItem && shell(<CompCalcPopup item={s.calcItem} month={s.currentMonth} onClose={()=>s.setCalcItem(null)}/>, ()=>s.setCalcItem(null))}
+    {s.calcItem && shell(<CompCalcPopup item={s.calcItem} month={selMonth} onClose={()=>s.setCalcItem(null)}/>, ()=>s.setCalcItem(null))}
     {s.pdfItem && shell(<PdfPopup item={s.pdfItem} onClose={()=>s.setPdfItem(null)}/>, ()=>s.setPdfItem(null))}
     {s.sellerItem && shell(<SellerBreakdownPopup s={s.sellerItem} onClose={()=>s.setSellerItem(null)}/>, ()=>s.setSellerItem(null))}
     {s.showAskIQ && shell(<AskIQPopup onClose={()=>s.setShowAskIQ(false)}/>, ()=>s.setShowAskIQ(false), "i-modal-lg")}
     {s.insightCanvasOpen && shell(<InsightCanvasPopup s={s} onClose={()=>s.setInsightCanvasOpen(false)}/>, ()=>s.setInsightCanvasOpen(false), "i-modal-xl")}
     {s.showRecovBal && shell(<RecovBalancePopup onClose={()=>s.setShowRecovBal(false)}/>, ()=>s.setShowRecovBal(false))}
+    {s.showPayCal && shell(<PaymentCalendarPopup onClose={()=>s.setShowPayCal(false)}/>, ()=>s.setShowPayCal(false))}
     {s.histItem && shell(<PaymentHistoryPopup item={s.histItem} onClose={()=>s.setHistItem(null)}/>, ()=>s.setHistItem(null))}
-    {s.otbCalcItem && shell(<OtbCalcPopup item={s.otbCalcItem} month={s.currentMonth} onClose={()=>s.setOtbCalcItem(null)}/>, ()=>s.setOtbCalcItem(null))}
+    {s.otbCalcItem && shell(<OtbCalcPopup item={s.otbCalcItem} month={selMonth} onClose={()=>s.setOtbCalcItem(null)}/>, ()=>s.setOtbCalcItem(null))}
     {s.showKsoCalc && shell(<KsoCalcPopup month={s.currentMonth} onClose={()=>s.setShowKsoCalc(false)}
       onKsoTool={()=>{s.setShowKsoCalc(false); s.openGoal("KSO");}}/>, ()=>s.setShowKsoCalc(false))}
   </>;
@@ -2976,7 +3145,7 @@ const NAV_TABS = [
   {id:"payments", label:"Payments", Icon:DollarSign},
   {id:"goals", label:"Goals", Icon:Target},
   {id:"orders", label:"Order Search", Icon:Search},
-  {id:"spiff", label:"SPIFF & Bonus", Icon:Gift},
+  {id:"spiff", label:"SPIFF & Bonus", Icon:Trophy},
   {id:"backlog", label:"Backlog", Icon:Layers},
   {id:"estimator", label:"Pay Estimator", short:"Estimator", Icon:Calculator}
 ];
@@ -3052,22 +3221,24 @@ function MobileFrame({s}) {
         <div className="m-island"/>
 
         <div className="m-brandbar">
-          <CiscoLogo className="m-cisco"/>
-          <span className="m-compx">Comp<em>X</em></span>
+          <div className="m-brand-lockup">
+            <CiscoLogo className="m-cisco"/>
+            <span className="m-compx">Comp<em>X</em></span>
+          </div>
+          <div className="m-brand-actions">
+            <button className="m-askiq-open" onClick={()=>s.setShowAskIQ(true)} aria-label="Ask StratComp IQ"><Sparkles size={16}/></button>
+            <button className="m-theme-toggle" onClick={s.toggleTheme} aria-label={s.theme==="dark"?"Switch to light mode":"Switch to dark mode"}>
+              {s.theme==="dark" ? <Sun size={17}/> : <Moon size={17}/>}
+            </button>
+          </div>
         </div>
-        <div className="m-viewbar">
-          {/* Me/Team toggle lives on At A Glance only (team view keeps it so you can switch back) */}
-          {(s.tab==="glance" || s.viewMode==="team")
-            ? <div className="m-viewtoggle">
-                <button className={s.viewMode==="me"?"on":""} onClick={()=>s.setViewMode("me")}><User size={14}/> My Compensation</button>
-                <button className={s.viewMode==="team"?"on":""} onClick={()=>s.setViewMode("team")}><Users size={14}/> Team View</button>
-              </div>
-            : <div className="m-viewbar-spacer"/>}
-          <button className="m-askiq-open" onClick={()=>s.setShowAskIQ(true)} aria-label="Ask StratComp IQ"><Sparkles size={16}/></button>
-          <button className="m-theme-toggle" onClick={s.toggleTheme} aria-label={s.theme==="dark"?"Switch to light mode":"Switch to dark mode"}>
-            {s.theme==="dark" ? <Sun size={17}/> : <Moon size={17}/>}
-          </button>
-        </div>
+        {/* Me/Team toggle lives on At A Glance only (team view keeps it so you can switch back) */}
+        {(s.tab==="glance" || s.viewMode==="team") && <div className="m-viewbar">
+          <div className="m-viewtoggle">
+            <button className={s.viewMode==="me"?"on":""} onClick={()=>s.setViewMode("me")}><User size={14}/> My Compensation</button>
+            <button className={s.viewMode==="team"?"on":""} onClick={()=>s.setViewMode("team")}><Users size={14}/> Team View</button>
+          </div>
+        </div>}
 
         <div className="m-content" onScroll={onScroll}>
           {s.viewMode==="team"
@@ -3122,7 +3293,7 @@ function IPadHeader({title, sub, s, right}) {
     <div className="i-head-actions">
       {right}
       <UtilityIcons ipad/>
-      <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/><span className="m-bell-count">{notifications.length}</span></button>
+      <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/>{s.notifs.length>0 && <span className="m-bell-count">{s.notifs.length}</span>}</button>
       {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
         <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)} ipad/></>}
     </div>
@@ -3158,7 +3329,7 @@ function IPadGlance({s}) {
             <small className="i-timeline-date">{c.payDate}</small>
           </div>)}
     </div>
-    <div className="m-section-label"><span className="m-section-icon">⁘</span> PLAN ELEMENTS & INCENTIVES</div>
+    <div className="m-section-label"><Menu size={13} className="m-section-icon"/> PLAN ELEMENTS & INCENTIVES</div>
     <div className="i-grid-3">
       {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
         aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
@@ -3194,7 +3365,7 @@ function IPadPayments({s}) {
     <div className="i-split">
       <div className="i-col-a">
         <PaymentBreakdownCard p={p} s={s} donutSize={188}/>
-        <PaymentScheduleCard p={p}/>
+        <PaymentScheduleCard p={p} s={s}/>
       </div>
       <div className="i-col-b">
         <PaymentAccordion p={p} s={s}/>
@@ -3268,7 +3439,7 @@ function IPadSpiff({s}) {
     <IPadHeader title="SPIFF & Bonus" sub="SPIFFs, uplifts, bonuses, and other strategic incentive programs." s={s} right={<SpiffStatPills/>}/>
     <SpiffFilterRow s={s}/>
     {list.length>0 ? <div className="i-grid-3">{visible.map(p=><SpiffProgramCard key={p.name} p={p}/>)}</div>
-      : <div className="m-search-empty"><Gift size={30}/><b>No incentives match</b><span>Loosen the filters to see more programs.</span></div>}
+      : <div className="m-search-empty"><Trophy size={30}/><b>No incentives match</b><span>Loosen the filters to see more programs.</span></div>}
     {list.length>2 && <button className="m-showall" onClick={()=>s.setSpiffExpanded(!s.spiffExpanded)}>
       {s.spiffExpanded ? "Show Fewer" : `See All ${list.length} Incentives`}
       <ChevronDown size={14} className={s.spiffExpanded?"up":""}/>
