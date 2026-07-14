@@ -92,14 +92,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* ─── HEADER ─── */
 .m-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .m-header-left{display:flex;align-items:center;gap:12px}
-.m-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--accent)}
-.m-header h1{font-size:20px;font-weight:700;color:var(--text);white-space:nowrap}
+.m-avatar{width:48px;height:48px;border-radius:50%;border:2px solid var(--accent)}
+.m-header h1{font-size:22px;font-weight:700;color:var(--text);white-space:nowrap}
 .m-bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer}
 .m-bell-count{position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
 
 /* ─── UTILITY ICONS (help · Open Case · Dashboards · color picker) ─── */
 .m-utils{position:relative;display:flex;align-items:center;gap:6px}
-.m-util-btn{width:32px;height:32px;border:none;border-radius:50%;background:var(--card);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.m-util-btn{width:34px;height:34px;border:none;border-radius:50%;background:var(--card);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .m-util-btn.on{background:var(--accent);color:#fff}
 .m-util-overlay{background:transparent}
 .m-util-pop{position:absolute;top:38px;right:0;z-index:50;min-width:214px;background:var(--card);border-radius:14px;border:1px solid var(--divider);box-shadow:0 8px 32px rgba(0,0,0,.18);padding:10px 0;animation:m-slideDown .2s ease}
@@ -142,14 +142,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-rem-x{width:32px;height:32px;border:1px solid var(--border);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
 .m-rem-x:hover{border-color:var(--red);color:var(--red)}
 .m-rem-empty{font-size:12px;color:var(--muted);text-align:center;padding:14px 0}
-.m-notif{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--bg);margin-bottom:6px}
-.m-notif:last-child{margin-bottom:0}
-.m-notif b{display:block;font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
-.m-notif span{display:block;font-size:11px;color:var(--muted);line-height:1.3;margin-top:2px}
-.m-notif-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.m-notif-amber .m-notif-dot{background:var(--amber)}
-.m-notif-green .m-notif-dot{background:var(--green)}
-.m-notif-blue .m-notif-dot{background:var(--accent)}
+.m-notif{display:flex;align-items:flex-start;gap:10px;padding:13px 2px 13px 12px;border-left:3px solid transparent;border-bottom:1px solid var(--divider)}
+.m-notif:last-child{border-bottom:none}
+.m-notif-amber{border-left-color:var(--amber)}
+.m-notif-green{border-left-color:var(--green)}
+.m-notif-blue{border-left-color:var(--accent)}
+.m-notif-ic{flex-shrink:0;margin-top:2px;color:var(--text)}
+.m-notif-body{flex:1;min-width:0}
+.m-notif b{display:block;font-size:13.5px;font-weight:800;color:var(--text);line-height:1.3}
+.m-notif span{display:block;font-size:12px;color:var(--muted);line-height:1.45;margin-top:3px}
+.m-notif-action{margin-top:10px;border:1px solid var(--border);background:var(--card);color:var(--accent);font-size:12.5px;font-weight:700;padding:9px 15px;border-radius:13px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.m-notif-action:active{transform:scale(.97)}
+.m-notif-x{flex-shrink:0;width:27px;height:27px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
 
 /* ─── PAYMENT CARDS ─── */
 .m-section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:flex;align-items:center;gap:6px;white-space:nowrap}
@@ -175,6 +179,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-section h2{font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.3px}
 .m-section-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .m-badge{font-size:10px;font-weight:600;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:10px}
+/* Collapsible Insights header — one tappable row when closed */
+.m-insights-hdr{cursor:pointer;user-select:none}
+.m-insights-hdr.closed{margin-bottom:0}
+.m-insights-hdr .m-insight-chev{margin-left:auto;flex-shrink:0;color:var(--muted)}
+.m-insights-canvas{margin-left:auto}
+.m-insights-canvas + .m-insight-chev{margin-left:0}
+.m-badge-selwrap{position:relative;display:inline-flex;align-items:center;margin-left:auto}
+.m-badge-select{appearance:none;-webkit-appearance:none;border:1px solid rgba(4,159,217,.25);background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;padding:4px 24px 4px 10px;border-radius:12px;cursor:pointer}
+.m-badge-selwrap svg{position:absolute;right:8px;pointer-events:none;color:var(--accent)}
 
 /* ─── PLAN ELEMENT CARDS ─── */
 .m-pe-sub{font-size:9px;color:var(--muted);display:block;margin:-6px 0 10px;font-style:italic}
@@ -211,14 +224,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-spiff-card:first-child{padding-top:0}
 .m-spiff-card:last-child{border-bottom:none;padding-bottom:0}
 .m-spiff-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.m-spiff-status{font-size:10px;font-weight:600;border:1px solid;padding:2px 8px;border-radius:4px}
-.m-spiff-amt{font-size:18px;font-weight:700}
-.m-spiff-name{font-size:12px;color:var(--text);display:block;margin-bottom:2px}
-.m-spiff-sub{font-size:10px;color:var(--muted);display:block;margin-bottom:6px}
+.m-spiff-status{font-size:11px;font-weight:700;border:1px solid;padding:3px 9px;border-radius:5px}
+.m-spiff-amt{font-size:22px;font-weight:800}
+.m-spiff-name{font-size:15px;font-weight:700;color:var(--text);display:block;margin-bottom:8px}
 .m-spiff-bar-wrap{height:5px;background:var(--track);border-radius:3px;position:relative;margin-bottom:4px}
 .m-spiff-bar{height:100%;border-radius:3px;transition:width .4s}
 .m-spiff-prog{position:absolute;right:0;top:-14px;font-size:9px;color:var(--muted);font-weight:600}
-.m-spiff-date{font-size:9px;color:var(--muted)}
+.m-spiff-date{font-size:11px;color:var(--muted)}
 
 /* ─── INSIGHT CARDS ─── */
 .m-insight-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px}
@@ -368,6 +380,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pb-detail-name{display:flex;align-items:center;gap:8px;flex:1;min-width:0;padding-right:10px;color:var(--text)}
 .m-pb-chip{display:inline-flex;align-items:center;border:1px solid var(--border);background:var(--card-2);color:var(--text-2);font-size:9px;font-weight:800;letter-spacing:.4px;padding:3px 8px;border-radius:7px;flex-shrink:0}
 .m-pb-sub-amt{color:var(--accent) !important}
+/* Replaced goal sheet — amber frame + indent + dashed elbow connector
+   so it reads as "swapped out, but still reconciled into the current sheet" */
+.m-replaced{position:relative;margin:14px 0 4px 18px;padding:12px 12px 4px;border:1.5px solid var(--amber);border-left-width:4px;border-radius:12px;background:rgba(245,158,11,.07)}
+.m-replaced::before{content:"";position:absolute;left:-15px;top:-12px;width:12px;height:calc(50% + 12px);border-left:2px dashed var(--amber);border-bottom:2px dashed var(--amber);border-bottom-left-radius:10px;opacity:.6}
+.m-replaced-hdr{padding-bottom:9px;border-bottom:1px solid rgba(245,158,11,.3)}
+.m-replaced-hdr-l1{display:flex;align-items:center;gap:8px}
+.m-replaced-hdr-l2{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:5px}
+.m-replaced-tag{flex-shrink:0;font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:var(--amber);color:#fff;padding:3px 6px;border-radius:7px}
+.m-replaced-title{font-size:13px;font-weight:800;color:var(--text);white-space:nowrap}
+.m-replaced-period{font-size:10px;color:var(--muted)}
+.m-replaced-total{font-size:14px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
+.m-replaced-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px 8px;padding:10px 0;border-bottom:1px solid rgba(245,158,11,.25)}
+.m-replaced-row:last-of-type{border-bottom:none}
+.m-replaced-name{flex:1;font-size:12.5px;font-weight:700;color:var(--text)}
+.m-replaced-amt{font-size:13.5px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
+.m-replaced-paid{flex-basis:100%;width:max-content;font-size:11px;font-weight:600;color:var(--text-2);background:rgba(16,185,129,.12);border-radius:8px;padding:4px 9px}
+.m-replaced-paid b{color:var(--green);font-weight:800}
+.m-replaced-note{font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.45;padding:9px 0 8px;border-top:1px solid rgba(245,158,11,.25)}
+
 .m-pb-past-group{margin-bottom:12px}
 .m-pb-past-group:last-child{margin-bottom:0}
 .m-pb-past-hdr{display:flex;align-items:center;gap:6px;padding:9px 0 8px;border-bottom:1px solid var(--divider)}
@@ -382,6 +413,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-sched-row svg{color:var(--accent)}
 .m-sched-row span{flex:1;font-size:11px;color:var(--muted)}
 .m-sched-row b{font-size:12.5px;color:var(--text)}
+.m-sched-cal{display:flex;align-items:center;gap:6px;border:none;background:none;color:var(--accent);font-size:13px;font-weight:700;padding:11px 0 3px;cursor:pointer}
+.m-sched-cal:active{opacity:.7}
+
+/* ─── PAYMENT CALENDAR POPUP ─── */
+.m-paycal-monthhdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.m-paycal-monthhdr b{font-size:16px;font-weight:800;color:var(--text)}
+.m-paycal-monthhdr span{font-size:11px;color:var(--muted);font-weight:600}
+.m-paycal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.m-paycal-dow{text-align:center;font-size:9.5px;font-weight:800;letter-spacing:.4px;color:var(--muted);padding:2px 0}
+.m-paycal-day{position:relative;height:36px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--text);border-radius:10px}
+.m-paycal-day.out{color:var(--muted);opacity:.4}
+.m-paycal-day.rev{background:var(--accent-light);color:var(--accent);font-weight:800}
+.m-paycal-day.refresh{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent);font-weight:800}
+.m-paycal-day.lock{background:rgba(245,158,11,.14);box-shadow:inset 0 0 0 1.5px #f59e0b;color:#f59e0b;font-weight:800}
+.m-paycal-day.stmt{background:rgba(16,185,129,.14);box-shadow:inset 0 0 0 1.5px #10b981;color:#10b981;font-weight:800}
+.m-paycal-day.pay{background:var(--accent-grad);color:#fff;font-weight:800;opacity:1;box-shadow:0 2px 10px var(--hero-glow)}
+.m-paycal-key{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--divider)}
+.m-paycal-key:last-child{border-bottom:none}
+.m-paycal-key-dot{flex-shrink:0;width:13px;height:13px;border-radius:4px;margin-top:2px}
+.m-paycal-key-dot.rev{background:var(--accent-light);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.m-paycal-key-dot.refresh{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.m-paycal-key-dot.lock{background:rgba(245,158,11,.14);box-shadow:inset 0 0 0 1.5px #f59e0b}
+.m-paycal-key-dot.stmt{background:rgba(16,185,129,.14);box-shadow:inset 0 0 0 1.5px #10b981}
+.m-paycal-key-dot.pay{background:var(--accent-grad)}
+.m-paycal-key-txt{flex:1;min-width:0}
+.m-paycal-key-txt b{display:block;font-size:12.5px;font-weight:700;color:var(--text)}
+.m-paycal-key-txt span{font-size:11px;color:var(--muted);line-height:1.35}
+.m-paycal-key-date{font-size:12px;font-weight:800;color:var(--text);white-space:nowrap}
+.m-paycal-note{font-size:11px;color:var(--muted);line-height:1.5;padding:0 4px 12px}
 
 /* ─── GOALS - RING ─── */
 .m-goal-hero{display:flex;align-items:center;gap:20px;background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
@@ -754,6 +814,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-page .m-kso-prog{grid-column:auto}
 
 /* ─── BACKLOG INSIGHTS ─── */
+/* Mobile backlog hero — selected bucket at a glance, dropdown filter */
+.m-blg-hero-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.m-blg-hero-lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-blg-hero-figs{display:flex;align-items:baseline;gap:10px;min-width:0}
+.m-blg-hero-amt{font-size:26px;font-weight:800;line-height:1}
+.m-blg-hero-orders{font-size:12px;font-weight:600;color:var(--muted)}
+.m-blg-hero-est{margin-left:auto;font-size:13px;font-weight:800;color:var(--accent);white-space:nowrap}
+
 .m-blg-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch}
 .m-blg-chips::-webkit-scrollbar{display:none}
 .m-blg-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:96px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;text-align:left;transition:all .15s}
@@ -968,6 +1036,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-leg2-badge{flex-shrink:0;min-width:38px;text-align:center;font-size:11px;font-weight:800;color:#fff;padding:3px 6px;border-radius:6px;font-variant-numeric:tabular-nums;letter-spacing:.2px}
 .m-leg2-label{flex:1;font-size:12.5px;font-weight:700;color:var(--text)}
 .m-leg2-val{font-size:14px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.m-leg2-more{width:100%;border-left-color:var(--divider);cursor:pointer;font:inherit}
+.m-leg2-more .m-leg2-label{color:var(--accent)}
+.m-leg2-more-badge{background:var(--muted)}
+.m-leg2-more .m-insight-chev{color:var(--accent)}
 
 /* ─── GOALS: pacing clarity note ─── */
 
@@ -1028,24 +1100,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .cisco-logo{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;color:#049fd9}
 .cisco-logo svg{display:block}
 .cisco-logo span{font-weight:800;line-height:1;color:#049fd9;text-transform:uppercase}
-.cisco-logo.m-cisco svg{width:34px;height:9.4px}
-.cisco-logo.m-cisco span{font-size:8px;letter-spacing:1.8px;margin-right:-1.8px}
+.cisco-logo.m-cisco svg{width:44px;height:12.1px}
+.cisco-logo.m-cisco span{font-size:10px;letter-spacing:2.6px;margin-right:-2.6px}
 .cisco-logo.i-cisco svg{width:44px;height:12.1px}
 .cisco-logo.i-cisco span{font-size:10px;letter-spacing:2.6px;margin-right:-2.6px}
 
-/* Persistent top: centered cisco+CompX brand strip, then view toggle bar */
-.m-brandbar{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 0 3px;background:var(--bg)}
-.m-viewbar{flex-shrink:0;display:flex;align-items:center;gap:9px;padding:2px 11px 10px;background:var(--bg)}
-.m-compx{font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1;color:var(--text)}
+/* Persistent top: brand row (centered cisco+CompX, actions right), then
+   the view toggle bar — rendered only on pages that show the toggle */
+.m-brandbar{flex-shrink:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px 11px 6px;background:var(--bg)}
+.m-brand-lockup{grid-column:2;display:flex;align-items:center;gap:9px}
+.m-brand-actions{grid-column:3;justify-self:end;display:flex;align-items:center;gap:8px}
+.m-viewbar{flex-shrink:0;display:flex;align-items:center;padding:2px 11px 10px;background:var(--bg)}
+.m-compx{font-size:19px;font-weight:800;letter-spacing:-.4px;line-height:1;color:var(--text)}
 .m-compx em{font-style:normal;color:var(--accent)}
 .i-brand-txt b em{font-style:normal;color:var(--accent)}
-.m-viewtoggle{flex:1;display:flex;gap:3px;background:var(--track);border-radius:12px;padding:3px}
-.m-viewbar-spacer{flex:1}
-.m-viewtoggle button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;background:none;border-radius:9px;padding:8px 6px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
+.m-viewtoggle{flex:1;display:flex;gap:3px;background:var(--track);border-radius:13px;padding:3px}
+.m-viewtoggle button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:none;background:none;border-radius:10px;padding:10px 6px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
 .m-viewtoggle button svg{flex-shrink:0}
 .m-viewtoggle button.on{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.12)}
 :root[data-theme="dark"] .m-viewtoggle button.on{background:var(--accent);color:#fff}
-.m-viewbar .m-theme-toggle{flex-shrink:0}
 
 /* Team header */
 .m-team-sub{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.4}
@@ -1407,7 +1480,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-main .m-hero-label{font-size:12px}
 .i-main .m-context-amt{font-size:20px}
 .i-main .m-pe-left b{font-size:14px}
-.i-main .m-insight-title,.i-main .m-spiff-name{font-size:13.5px}
+.i-main .m-insight-title{font-size:13.5px}
 .i-main .m-abar-name{width:94px;font-size:12px}
 .i-main .m-abar-val{font-size:12.5px}
 .i-main .m-order-mid b{font-size:17px}

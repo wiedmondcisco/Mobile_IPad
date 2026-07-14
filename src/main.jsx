@@ -775,6 +775,25 @@ function InsightCanvasBtn({s}) {
   </button>;
 }
 
+/* At A Glance Insights — collapsed to a single header row by default;
+   tapping expands to the Insight Canvas button + cards (mobile + iPad) */
+function AagInsightsSection({s}) {
+  const [open, setOpen] = useState(false);
+  const count = s.pinnedInsights.length || insightCards.length;
+  const toggle = () => setOpen(o=>!o);
+  return <div className="m-section">
+    <div className={`m-section-hdr m-insights-hdr ${open?"":"closed"}`} role="button" tabIndex={0}
+      aria-expanded={open} onClick={toggle}
+      onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); toggle(); } }}>
+      <h2>Insights</h2>
+      <span className="m-badge">{count}</span>
+      {open && <span className="m-insights-canvas" onClick={e=>e.stopPropagation()}><InsightCanvasBtn s={s}/></span>}
+      <ChevronDown size={16} className={`m-insight-chev ${open?"open":""}`}/>
+    </div>
+    {open && <InsightCardsList s={s}/>}
+  </div>;
+}
+
 /* Bell dropdown — Notifications | My Reminders tabs (desktop reference).
    Reminders live in app state so they persist across pages and devices. */
 function NotifDropdown({s, onClose, ipad=false}) {
@@ -897,7 +916,6 @@ function AagSpiffSection({s}) {
         <b className="m-spiff-amt" style={{color:sp.statusColor}}>{amt(sp.amount)}</b>
       </div>
       <b className="m-spiff-name">{sp.name}</b>
-      <span className="m-spiff-sub">{sp.sub}</span>
       {sp.pct < 100 && <div className="m-spiff-bar-wrap">
         <div className="m-spiff-bar" style={{width:sp.pct+"%", background:sp.statusColor}}></div>
         {sp.prog && <span className="m-spiff-prog">{sp.prog}</span>}
@@ -985,11 +1003,8 @@ function AtAGlancePage({s}) {
     {/* SPIFF & Bonus — first 2 programs, expandable */}
     <AagSpiffSection s={s}/>
 
-    {/* Insights — single column, image/chart-forward; pinned via Insight Canvas */}
-    <div className="m-section">
-      <div className="m-section-hdr"><h2>Insights</h2><InsightCanvasBtn s={s}/></div>
-      <InsightCardsList s={s}/>
-    </div>
+    {/* Insights — one collapsed row; expands to pinned/AI cards */}
+    <AagInsightsSection s={s}/>
   </div>;
 }
 
@@ -1712,6 +1727,28 @@ function BacklogBucketChips({s}) {
   </div>;
 }
 
+/* Mobile: one summary card with a period dropdown instead of the
+   desktop's horizontal bucket cards — kills the sideways scroll */
+function BacklogHero({s}) {
+  const b = backlogBuckets.find(x=>x.id===s.backlogFilter);
+  return <div className="m-section m-blg-hero">
+    <div className="m-blg-hero-top">
+      <small className="m-blg-hero-lbl">{b.id==="All" ? "Total Backlog" : b.label}{b.note ? ` · ${b.note}` : ""}</small>
+      <span className="m-badge-selwrap">
+        <select className="m-badge-select" value={s.backlogFilter} onChange={e=>s.setBacklogFilter(e.target.value)} aria-label="Backlog period">
+          {backlogBuckets.map(x=><option key={x.id} value={x.id}>{x.id==="All" ? "All Periods" : x.label}</option>)}
+        </select>
+        <ChevronDown size={11}/>
+      </span>
+    </div>
+    <div className="m-blg-hero-figs">
+      <b className="m-blg-hero-amt" style={{color:b.color}}>{amt(b.amt)}</b>
+      <span className="m-blg-hero-orders">{b.orders} order{b.orders===1?"":"s"}</span>
+      <b className="m-blg-hero-est">{maskText(b.est)}</b>
+    </div>
+  </div>;
+}
+
 /* Selected bucket's est. paycheck impact, in the data-banner style */
 function BacklogSummaryStrip({s}) {
   const b = backlogBuckets.find(x=>x.id===s.backlogFilter);
@@ -1753,8 +1790,7 @@ function BacklogPage({s}) {
     <MobileHeader s={s}/>
     <h1 className="m-page-title" style={{marginBottom:4}}>Backlog Insights</h1>
     <p className="m-team-sub">Orders awaiting revenue recognition. Payment dates and amounts are estimates.</p>
-    <BacklogBucketChips s={s}/>
-    <BacklogSummaryStrip s={s}/>
+    <BacklogHero s={s}/>
     {list.map(o=><BacklogOrderCard key={o.id} o={o}/>)}
   </div>;
 }
@@ -3348,9 +3384,8 @@ function IPadGlance({s}) {
 
     <div className="i-grid-2">
       <AagSpiffSection s={s}/>
-      <div className="m-section">
-        <div className="m-section-hdr"><h2>Insights</h2><InsightCanvasBtn s={s}/></div>
-        <InsightCardsList s={s}/>
+      <div>
+        <AagInsightsSection s={s}/>
       </div>
     </div>
   </div>;
