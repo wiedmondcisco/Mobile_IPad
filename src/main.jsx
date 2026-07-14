@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Gift, Calculator, MoreHorizontal } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Gift, Calculator, MoreHorizontal, HelpCircle, LayoutGrid } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -762,6 +762,34 @@ function NotifDropdown({s, onClose, ipad=false}) {
   </div>;
 }
 
+/* Utility icons (desktop reference), folded into two buttons to keep the
+   header uncluttered. Popovers are informational only — no live links yet. */
+const UTIL_ITEMS = [
+  {id:"support", Icon:HelpCircle, label:"Support", items:["Help","Open Case"]},
+  {id:"dash", Icon:LayoutGrid, label:"Dashboards",
+    items:["Next Gen Claiming","Sales Incentive Calendar","MBR","Sales Comp Portal"]},
+];
+function UtilityIcons({ipad=false}) {
+  const [open, setOpen] = useState(null);
+  const cur = UTIL_ITEMS.find(u=>u.id===open);
+  return <div className={`m-utils ${ipad?"i-utils":""}`}>
+    {UTIL_ITEMS.map(u=>
+      <button key={u.id} className={`m-util-btn ${open===u.id?"on":""}`} aria-label={u.label}
+        aria-expanded={open===u.id} onClick={()=>setOpen(open===u.id?null:u.id)}>
+        <u.Icon size={ipad?17:15}/>
+      </button>)}
+    {cur && <>
+      <div className="m-notif-overlay m-util-overlay" onClick={()=>setOpen(null)}/>
+      <div className="m-util-pop">
+        {cur.items
+          ? <><b className="m-util-pop-title">{cur.label}</b>
+              {cur.items.map(d=><span key={d} className="m-util-pop-item">{d}</span>)}</>
+          : <span className="m-util-pop-label">{cur.label}</span>}
+      </div>
+    </>}
+  </div>;
+}
+
 /* Universal mobile header — avatar, name/role, bell with unread count.
    Shown on every mobile page so the top of the app reads consistently. */
 function MobileHeader({s}) {
@@ -769,12 +797,10 @@ function MobileHeader({s}) {
     <div className="m-header">
       <div className="m-header-left">
         <img src="https://randomuser.me/api/portraits/men/32.jpg" className="m-avatar" alt=""/>
-        <div>
-          <h1>Alex Johnson</h1>
-          <span className="m-role">Enterprise Account Executive</span>
-        </div>
+        <h1>Alex Johnson</h1>
       </div>
       <div className="m-header-actions">
+        <UtilityIcons/>
         <div className="m-bell" onClick={()=>s.setNotifOpen(!s.notifOpen)}>
           <Bell size={18}/><span className="m-bell-count">{notifications.length}</span>
         </div>
@@ -3025,8 +3051,11 @@ function MobileFrame({s}) {
         <StatusBar/>
         <div className="m-island"/>
 
-        <div className="m-viewbar">
+        <div className="m-brandbar">
           <CiscoLogo className="m-cisco"/>
+          <span className="m-compx">Comp<em>X</em></span>
+        </div>
+        <div className="m-viewbar">
           {/* Me/Team toggle lives on At A Glance only (team view keeps it so you can switch back) */}
           {(s.tab==="glance" || s.viewMode==="team")
             ? <div className="m-viewtoggle">
@@ -3092,6 +3121,7 @@ function IPadHeader({title, sub, s, right}) {
     </div>
     <div className="i-head-actions">
       {right}
+      <UtilityIcons ipad/>
       <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/><span className="m-bell-count">{notifications.length}</span></button>
       {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
         <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)} ipad/></>}
@@ -3303,7 +3333,7 @@ function IPadFrame({s, landscape=false}) {
         <aside className={`i-sidebar ${s.sideCollapsed?"closed":""}`}>
           <div className="i-brand">
             <CiscoLogo className="i-cisco"/>
-            <div className="i-brand-txt"><b>CompX</b><small>Compensation IQ</small></div>
+            <div className="i-brand-txt"><b>Comp<em>X</em></b><small>Compensation IQ</small></div>
             <button className="i-side-collapse" onClick={()=>s.setSideCollapsed(!s.sideCollapsed)}
               aria-label={s.sideCollapsed?"Expand sidebar":"Collapse sidebar"} title={s.sideCollapsed?"Expand":"Collapse"}>
               {s.sideCollapsed ? <ChevronRight size={16}/> : <ChevronLeft size={16}/>}

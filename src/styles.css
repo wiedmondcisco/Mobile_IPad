@@ -93,10 +93,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .m-header-left{display:flex;align-items:center;gap:12px}
 .m-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--accent)}
-.m-header h1{font-size:20px;font-weight:700;color:var(--text)}
-.m-role{font-size:11px;color:var(--muted);font-weight:500}
+.m-header h1{font-size:20px;font-weight:700;color:var(--text);white-space:nowrap}
 .m-bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer}
 .m-bell-count{position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+
+/* ─── UTILITY ICONS (help · Open Case · Dashboards · color picker) ─── */
+.m-utils{position:relative;display:flex;align-items:center;gap:6px}
+.m-util-btn{width:32px;height:32px;border:none;border-radius:50%;background:var(--card);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.m-util-btn.on{background:var(--accent);color:#fff}
+.m-util-overlay{background:transparent}
+.m-util-pop{position:absolute;top:38px;right:0;z-index:50;min-width:214px;background:var(--card);border-radius:14px;border:1px solid var(--divider);box-shadow:0 8px 32px rgba(0,0,0,.18);padding:10px 0;animation:m-slideDown .2s ease}
+.m-util-pop-label{display:block;padding:4px 18px;font-size:13.5px;font-weight:600;color:var(--text-2);text-align:center;white-space:nowrap}
+.m-util-pop-title{display:block;padding:4px 18px 10px;font-size:15px;font-weight:800;color:var(--text);text-align:center;border-bottom:1px solid var(--divider);margin-bottom:4px}
+.m-util-pop-item{display:block;padding:9px 18px;font-size:13px;font-weight:600;color:var(--text-2);white-space:nowrap}
+.i-utils{gap:8px}
+.i-utils .m-util-btn{width:38px;height:38px;border:1px solid var(--border);color:var(--text)}
+.i-utils .m-util-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.i-utils .m-util-pop{top:48px}
 
 /* ─── NOTIFICATIONS DROPDOWN ─── */
 .m-notif-overlay{position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.2)}
@@ -982,7 +995,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-theme-toggle{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.06);transition:transform .15s,color .2s}
 .m-theme-toggle:active{transform:scale(.92)}
 :root[data-theme="dark"] .m-theme-toggle{color:#ffd27a}
-.m-header-actions{display:flex;align-items:center;gap:10px}
+.m-header-actions{display:flex;align-items:center;gap:8px}
 
 /* ─── DARK-MODE POLISH ─── */
 /* status pills need brighter fills/text on dark surfaces */
@@ -1020,8 +1033,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .cisco-logo.i-cisco svg{width:44px;height:12.1px}
 .cisco-logo.i-cisco span{font-size:10px;letter-spacing:2.6px;margin-right:-2.6px}
 
-/* Persistent top bar: cisco logo + segmented view toggle + theme toggle */
-.m-viewbar{flex-shrink:0;display:flex;align-items:center;gap:9px;padding:6px 11px 10px;background:var(--bg)}
+/* Persistent top: centered cisco+CompX brand strip, then view toggle bar */
+.m-brandbar{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 0 3px;background:var(--bg)}
+.m-viewbar{flex-shrink:0;display:flex;align-items:center;gap:9px;padding:2px 11px 10px;background:var(--bg)}
+.m-compx{font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1;color:var(--text)}
+.m-compx em{font-style:normal;color:var(--accent)}
+.i-brand-txt b em{font-style:normal;color:var(--accent)}
 .m-viewtoggle{flex:1;display:flex;gap:3px;background:var(--track);border-radius:12px;padding:3px}
 .m-viewbar-spacer{flex:1}
 .m-viewtoggle button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;background:none;border-radius:9px;padding:8px 6px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
@@ -1339,8 +1356,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-sidebar.closed{width:68px;padding:16px 10px}
 .i-sidebar.closed .i-brand{flex-direction:column;gap:9px;padding:2px 0 0}
 .i-sidebar.closed .i-side-collapse{margin-left:0}
-.i-sidebar.closed .i-brand-txt,.i-sidebar.closed .i-brand-tag,.i-sidebar.closed .i-profile-txt,.i-sidebar.closed .i-viewtoggle button span,
+.i-sidebar.closed .i-brand-txt small,.i-sidebar.closed .i-brand-tag,.i-sidebar.closed .i-profile-txt,.i-sidebar.closed .i-viewtoggle button span,
 .i-sidebar.closed .i-navitem span,.i-sidebar.closed .i-side-askiq span,.i-sidebar.closed .i-side-theme span{display:none}
+.i-sidebar.closed .i-brand-txt{margin-top:-4px}
+.i-sidebar.closed .i-brand-txt b{font-size:11.5px;letter-spacing:-.2px;text-align:center}
 .i-sidebar.closed .i-profile{padding:4px;justify-content:center;background:none}
 .i-sidebar.closed .i-viewtoggle button{justify-content:center;padding:10px 0}
 .i-sidebar.closed .i-navitem{justify-content:center;padding:11px 0}
