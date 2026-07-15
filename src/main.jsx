@@ -23,10 +23,10 @@ const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, "$" + DOT
 /* StratComp IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
   "attainment":"You're at 24% on PRI (CX-SVC RENEW), 71% on NPR (RRA-SW), and 44% on NPR2 (SEC PRD). Overall weighted: ~42%. You need significant revenue growth on PRI to hit accelerator.",
-  "earnings":"YTD earnings: $25,409 paid (Jan–Apr). Current month (May 2026): $8,408.25 — Goal Sheet $5,859.75, SPIFFs $2,125, Draws $50, Adj $73.50, OTB $100, Past $200.",
+  "earnings":"YTD earnings: $25,409 paid (Jan–Apr). Current month (May 2026): $8,434.23 — Goal Sheet $5,885.73, SPIFFs $2,125, Draws $50, Adj $73.50, OTB $100, Past $200.",
   "accelerator":"Accelerator kicks in at 100% attainment. Rate jumps from 1% to 2% per 1% attainment! Your best positioned PE is NPR at 71%.",
   "close":"Your best positioned PE is NPR (Recurring Software) at 71%. You need about $25K more revenue to reach 100%. PRI is at 24% needing ~$83K.",
-  "payment":"Next payment: $8,408.25 on Jun 2, 2026. Previous: $6,830 (Apr). Lock date: May 28.",
+  "payment":"Next payment: $8,434.23 on Jun 2, 2026. Previous: $6,830 (Apr). Lock date: May 28.",
   "backlog":"$115K in backlog. Estimated additional paycheck impact: +$1,200. Orders pending fulfillment across multiple months.",
   "goal":"Goal Sheet H1: PRI $109K (50% weight), NPR $87K (30%), NPR2 $90K (20%). Total target incentive: $75,500.",
   "spiff":"Active: Q2 Cloud Migration SPIFF ($5,000 potential, 25% progress), Partner Acceleration Q2 ($3,500, 25%). Projected SPIFF earnings this period: $2,125.",
@@ -47,7 +47,7 @@ const PE_COLOR = { PE1:"#f59e0b", PE2:"#10b981", PE3:"#3b82f6", KSO:"#6366f1", O
 
 const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"6,830.00", change:"▲ 10.4%", payDate:"Paid May 2, 2026"},
-  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,408.25", change:"▲ 23.1%", payDate:"Pay: Jun 2, 2026"},
+  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▲ 23.5%", payDate:"Pay: Jun 2, 2026"},
   {month:"JUN 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // no statement period yet — card stays inert
 ];
 
@@ -104,7 +104,7 @@ function filterSpiffs(f) {
 const insightCards = [
   {peBadge:"Prod+Services", peColor:PE_COLOR.PE1, tag:"$18K ★", tagColor:"#dc2626", title:"High Value Booking", desc:"Stargate AI ($18K) is your largest eligible booking this period. Top backlog: Cortex Financial ($23K), Helix Networks ($14K). Clearing both pushes PE1 past the 50% threshold."},
   {peBadge:"Services", peColor:PE_COLOR.PE3, tag:"$38K ★", tagColor:"#dc2626", title:"Services Backlog Opportunity", desc:"Services sits at 44% attainment — $5K from the 50% tier. GlobalNet Inc ($38K backlog, PE3) clearing alone would lift you past the 75% tier."},
-  {peBadge:"CA Review", peColor:"#6b7280", tag:"✓ Clear ★", tagColor:"#10b981", title:"Comp Assurance", desc:"No CA review triggered this period. Your May payment of $8,408 is 91% below the $100K threshold."}
+  {peBadge:"CA Review", peColor:"#6b7280", tag:"✓ Clear ★", tagColor:"#10b981", title:"Comp Assurance", desc:"No CA review triggered this period. Your May payment of $8,434 is 92% below the $100K threshold."}
 ];
 
 /* ── Insight Canvas catalog (from the desktop reference) ──
@@ -174,10 +174,10 @@ const fmtRemDate = iso => iso
 
 /* Payments — periods with full breakdown + per-PE calculation data */
 const recentPaymentPeriods = [
-  {month:"May 2026", amount:"8,408.25", status:"Open", payDate:"Jun 2, 2026", lockDate:"May 28, 2026", revDates:"May 1 – May 18, 2026",
-    goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"5,859.75", items:[
-      {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:24, attChange:4, payout:"1,585.50", color:PE_COLOR.PE1,
-        calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"50%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4.2%", result:"1,585.50", rateName:"CS402",
+  {month:"May 2026", amount:"8,434.23", status:"Open", payDate:"Jun 2, 2026", lockDate:"May 28, 2026", revDates:"May 1 – May 18, 2026",
+    goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"5,885.73", items:[
+      {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:24, attChange:4, payout:"1,386.18", color:PE_COLOR.PE1,
+        calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"50%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4.2%", result:"1,386.18", rateName:"CS402",
           rateIncremental:[
             {range:"0 – 50 %", peRate:".75%", prior:"20%", incr:"4%", mult:"4.2%", active:true},
             {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
@@ -196,46 +196,82 @@ const recentPaymentPeriods = [
            display-only; each child opens its own calc breakdown */
         children:[
           {pe:"PE1", label:"Prod+Services", color:PE_COLOR.PE1, pct:24, attChange:4, payout:"1,359.00",
-            calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"45%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4%", totalEarned:"1,359.00", prevPaid:"0", result:"1,359.00"}},
-          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.60",
-            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"6%", totalEarned:"90.60", prevPaid:"0", result:"90.60"}},
-          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:3, payout:"90.60",
-            calc:{incrementalAtt:"3%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"6%", totalEarned:"90.60", prevPaid:"0", result:"90.60"}},
-          {pe:"MY", label:"Services MY", color:"#3b82f6", pct:5, attChange:1, payout:"45.30",
-            calc:{incrementalAtt:"1%", totalAtt:"5%", weight:"1%", targetIncentive:"75,500.00", proration:"50%", payoutRate:"12%", totalEarned:"45.30", prevPaid:"0", result:"45.30"}}
+            /* Desktop reference: 60% × 75,500 × 100% × 13.0% = 5,889.00 − 4,530.00 = 1,359.00.
+               Multiplier builds from the rate table: 20% prior × 0.50% = 10.0%, +4% incr × 0.75% = 3.0%. */
+            calc:{incrementalAtt:"4%", totalAtt:"24%", weight:"60%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"13.0%", totalEarned:"5,889.00", prevPaid:"4,530.00", result:"1,359.00", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
+              rateIncremental:[
+                {range:"0 – 20%", peRate:"0.50%", prior:"20%", incr:"-", mult:"10.0%"},
+                {range:"20 – 75%", peRate:"0.75%", prior:"-", incr:"4%", mult:"3.0%", active:true},
+                {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
+              ]}},
+          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08",
+            /* Desktop reference: 2% × 75,500 × 100% × 2.3% = 34.73 − 22.65 = 12.08.
+               Multiplier: 3% prior × 0.50% = 1.5%, +1% incr × 0.75% = 0.8%. */
+            calc:{incrementalAtt:"1%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"2.3%", totalEarned:"34.73", prevPaid:"22.65", result:"12.08", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
+              rateIncremental:[
+                {range:"0 – 3%", peRate:"0.50%", prior:"3%", incr:"-", mult:"1.5%"},
+                {range:"3 – 75%", peRate:"0.75%", prior:"-", incr:"1%", mult:"0.8%", active:true},
+                {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
+              ]}},
+          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08",
+            /* Desktop reference: same shape as Security Comp Uplift — 2% × 75,500 × 100% × 2.3% = 34.73 − 22.65 = 12.08 */
+            calc:{incrementalAtt:"1%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"2.3%", totalEarned:"34.73", prevPaid:"22.65", result:"12.08", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
+              rateIncremental:[
+                {range:"0 – 3%", peRate:"0.50%", prior:"3%", incr:"-", mult:"1.5%"},
+                {range:"3 – 75%", peRate:"0.75%", prior:"-", incr:"1%", mult:"0.8%", active:true},
+                {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
+              ]}},
+          {pe:"MY", label:"Services MY", color:"#3b82f6", pct:5, attChange:1, payout:"3.02",
+            /* Desktop reference: 1% × 75,500 × 50% × 2.8% = 10.57 − 7.55 = 3.02.
+               Multiplier: 4% prior × 0.50% = 2.0%, +1% incr × 0.75% = 0.8%. */
+            calc:{incrementalAtt:"1%", totalAtt:"5%", weight:"1%", targetIncentive:"75,500.00", proration:"50%", payoutRate:"2.8%", totalEarned:"10.57", prevPaid:"7.55", result:"3.02", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
+              rateIncremental:[
+                {range:"0 – 4%", peRate:"0.50%", prior:"4%", incr:"-", mult:"2.0%"},
+                {range:"4 – 75%", peRate:"0.75%", prior:"-", incr:"1%", mult:"0.8%", active:true},
+                {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
+              ]}}
         ]},
-      {pe:"PE2", name:"RRA-SW WO SEC_ACV|AG|WM|NPR", label:"Recurring Software", weight:"30%", pct:71, attChange:6, payout:"1,019.25", color:PE_COLOR.PE2,
-        calc:{incrementalAtt:"6%", totalAtt:"71%", weight:"30%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4.5%", result:"1,019.25", rateName:"CS402",
-          rateIncremental:[
-            {range:"0 – 50 %", peRate:".75%", prior:"-", incr:"-", mult:"-"},
-            {range:"50 – 75 %", peRate:".75%", prior:"65%", incr:"6%", mult:"4.5%", active:true},
-            {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
-            {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
-            {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
-            {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
+      {pe:"PE2", name:"RRA-SW WO SEC_ACV|AG|WM|NPR", label:"Recurring Software", weight:"30%", pct:71, attChange:6, payout:"1,019.47", color:PE_COLOR.PE2,
+        /* Desktop reference: non-primary PE. 30% × 31,759.05 × 100% × 10.70% = 1,019.47.
+           Multiplier depends on NPR attainment AND the primary PE's attainment (24% < 100% → standard rates);
+           active rows 7.50% + 3.20% = 10.70%. Total-attainment view: 50% + 21% rev att = 71%. */
+        calc:{incrementalAtt:"6%", totalAtt:"71%", weight:"30%", targetIncentive:"31,759.05", proration:"100%", payoutRate:"10.70%", result:"1,019.47", rateName:"CS402", shortName:"PE2",
+          nonPrimary:{primaryName:"CX-SVC RENEW ANN|PRI", primaryAtt:"24%", note:"Primary PE < 100% — Standard Rates"},
+          rateNP:[
+            {npr:"0 – 50 %", pri:"0 – 100 %", peRate:".15%", prior:"65%", incr:"6%", mult:"7.50%", active:true},
+            {npr:"0 – 50 %", pri:"100+ %", peRate:".15%", prior:"-", incr:"-", mult:"-"},
+            {npr:"50 – 75 %", pri:"0 – 100 %", peRate:".15%", prior:"-", incr:"6%", mult:"3.20%", active:true},
+            {npr:"50 – 75 %", pri:"100+ %", peRate:".25%", prior:"-", incr:"-", mult:"-"},
+            {npr:"75 – 100 %", pri:"0 – 100 %", peRate:".20%", prior:"-", incr:"-", mult:"-"},
+            {npr:"75 – 100 %", pri:"100+ %", peRate:".30%", prior:"-", incr:"-", mult:"-"},
+            {npr:"100 – 130 %", pri:"0 – 100 %", peRate:".20%", prior:"-", incr:"-", mult:"-"},
+            {npr:"100 – 130 %", pri:"100+ %", peRate:".40%", prior:"-", incr:"-", mult:"-"},
+            {npr:"130 – 200 %", pri:"0 – 100 %", peRate:".20%", prior:"-", incr:"-", mult:"-"},
+            {npr:"130 – 200 %", pri:"100+ %", peRate:".30%", prior:"-", incr:"-", mult:"-"}],
           rateTotal:[
-            {range:"0 – 50 %", peRate:".75%", rev:"-", mult:"-"},
-            {range:"50 – 75 %", peRate:".75%", rev:"71%", mult:"4.5%", active:true},
-            {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
-            {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
-            {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
-            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
-      {pe:"PE3", name:"SEC PRD ACV|WM|NPR", label:"Services", weight:"20%", pct:44, attChange:5, payout:"755.00", color:PE_COLOR.PE3,
-        calc:{incrementalAtt:"5%", totalAtt:"44%", weight:"20%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"5%", result:"755.00", rateName:"CS402",
+            {range:"0 – 50 %", peRate:".15%", rev:"50%", mult:"7.50%", active:true},
+            {range:"50 – 75 %", peRate:".15%", rev:"21%", mult:"3.20%", active:true},
+            {range:"75 – 100 %", peRate:".20%", rev:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:".30%", rev:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:".25%", rev:"-", mult:"-"},
+            {range:"200+ %", peRate:".15%", rev:"-", mult:"-"}]}},
+      {pe:"PE3", name:"SEC PRD ACV|WM|NPR", label:"Services", weight:"20%", pct:44, attChange:5, payout:"980.08", color:PE_COLOR.PE3,
+        /* Desktop reference: 20% × 31,759.05 × 100% × 15.43% = 980.08. Total view: 44% rev att → 15.43%. */
+        calc:{incrementalAtt:"5%", totalAtt:"44%", weight:"20%", targetIncentive:"31,759.05", proration:"100%", payoutRate:"15.43%", result:"980.08", rateName:"CS402", shortName:"PE3", moreRows:true,
           rateIncremental:[
-            {range:"0 – 50 %", peRate:"1%", prior:"39%", incr:"5%", mult:"5%", active:true},
-            {range:"50 – 75 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
-            {range:"75 – 100 %", peRate:"1%", prior:"-", incr:"-", mult:"-"},
-            {range:"100 – 130 %", peRate:"2%", prior:"-", incr:"-", mult:"-"},
-            {range:"130 – 200 %", peRate:"1.5%", prior:"-", incr:"-", mult:"-"},
-            {range:"200+ %", peRate:"1%", prior:"-", incr:"-", mult:"-"}],
+            {range:"0 – 50 %", peRate:".35%", prior:"39%", incr:"5%", mult:"15.43%", active:true},
+            {range:"50 – 75 %", peRate:".50%", prior:"-", incr:"-", mult:"-"},
+            {range:"75 – 100 %", peRate:".65%", prior:"-", incr:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"1.00%", prior:"-", incr:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:".75%", prior:"-", incr:"-", mult:"-"},
+            {range:"200+ %", peRate:".50%", prior:"-", incr:"-", mult:"-"}],
           rateTotal:[
-            {range:"0 – 50 %", peRate:"1%", rev:"44%", mult:"5%", active:true},
-            {range:"50 – 75 %", peRate:"1.5%", rev:"-", mult:"-"},
-            {range:"75 – 100 %", peRate:"1%", rev:"-", mult:"-"},
-            {range:"100 – 130 %", peRate:"2%", rev:"-", mult:"-"},
-            {range:"130 – 200 %", peRate:"1.5%", rev:"-", mult:"-"},
-            {range:"200+ %", peRate:"1%", rev:"-", mult:"-"}]}},
+            {range:"0 – 50 %", peRate:".35%", rev:"44%", mult:"15.43%", active:true},
+            {range:"50 – 75 %", peRate:".50%", rev:"-", mult:"-"},
+            {range:"75 – 100 %", peRate:".65%", rev:"-", mult:"-"},
+            {range:"100 – 130 %", peRate:"1.00%", rev:"-", mult:"-"},
+            {range:"130 – 200 %", peRate:".75%", rev:"-", mult:"-"},
+            {range:"200+ %", peRate:".50%", rev:"-", mult:"-"}]}},
       {pe:"KSO", name:"Key Sales Objectives", label:"KSO", weight:"—", pct:100, payout:"2,500.00", color:PE_COLOR.KSO}
     ]},
     spiff:{total:"2,125.00", items:[{name:"Q2 Cloud Migration SPIFF", amount:"$1,250.00"},{name:"Partner Acceleration Q2", amount:"$875.00"}]},
@@ -368,9 +404,9 @@ const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slic
 /* blColor = the lighter backlog segment tint, matching planElements so the
    revenue/backlog distinction reads the same on Goals as on At A Glance */
 const goalTabs = [
-  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, blColor:"#fbbf24", goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,585.50"},
-  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, blColor:"#6ee7b7", goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.25"},
-  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#93c5fd", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$755.00"},
+  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, blColor:"#fbbf24", goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,386.18"},
+  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, blColor:"#6ee7b7", goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.47"},
+  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#93c5fd", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.08"},
   {id:"KSO", name:"Key Sales Objectives",color:PE_COLOR.KSO, goal:"$2.5k", attPct:100,  bookingsAmt:"—",    bookingsPct:100, revenueAmt:"—",    revenuePct:100, backlogAmt:"—",    backlogPct:0,  incentive:"$2,500.00"},
   {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, blColor:"#c4b5fd", goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
   {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, blColor:"#67e8f9", goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}
@@ -543,6 +579,7 @@ const OTB_CALC = {
 const KSO_CALC = {
   earned:"2,500.00", prevPaid:"0.00", result:"2,500.00",
   history:[
+    {date:"Apr 1, 2026", details:"Q2 Bonus", amount:2500.00, mb:1},
     {date:"Aug 4, 2025", details:"FY25 H2 KSO Bonus", amount:2200.00, mb:9},
     {date:"Feb 3, 2025", details:"FY25 H1 KSO Bonus", amount:1800.00, mb:15}
   ]
@@ -1350,44 +1387,65 @@ function CompCalcPopup({item, month, onClose}) {
     <div className="m-calc-badge-row"><PePill pe={item.pe} label={item.label} color={item.color}/></div>
 
     {tab==="Payment Calculation" && <>
-      <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {item.label || item.pe} is <b>{amt(c.result)}</b>.</p>
+      <p className="m-calc-summary">Based on your incremental attainment of <b>{c.incrementalAtt}</b> of your goal, your incentive payment for {c.shortName || item.label || item.pe} is <b>{amt(c.result)}</b>.</p>
 
       <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result} totalEarned={c.totalEarned} prevPaid={c.prevPaid}/>
 
-      <Expandable title="How is the Payout Rate Multiplier determined?" defaultOpen={!!c.rateIncremental}>
-        <p className="m-exp-text">The payout rate multiplier is based on your incremental goal attainment for the month and the payout multiplier associated with your overall goal attainment for the goal period.</p>
-        {c.rateIncremental && <>
-          <p className="m-rate-name">Rate Table: {c.rateName}</p>
+      <Expandable title="How is the Payout Rate Multiplier determined?" defaultOpen={!!(c.rateIncremental || c.rateNP)}>
+        {c.nonPrimary ? <>
+          <p className="m-exp-text">This is a <b>Non-Primary Plan Element</b>. The payout rate multiplier depends on both your NPR attainment AND the attainment of the primary PE ({c.nonPrimary.primaryName}).</p>
+          <div className="m-dep-banner"><b>Dependent on:</b> {c.nonPrimary.primaryName} Attainment: <b>{c.nonPrimary.primaryAtt}</b> <span>({c.nonPrimary.note})</span></div>
+          <p className="m-rate-name">Rate Table: {c.rateName} (Non-Primary)</p>
           <div className="m-rate-scroll">
-            <table className="m-rate-table m-rate-wide">
-              <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Prior Att.</th><th>Incr. Att.</th><th>Multiplier</th></tr></thead>
-              <tbody>{c.rateIncremental.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
-                <td>{r.range}</td><td>{r.peRate}</td><td>{r.prior}</td><td>{r.incr}</td><td>{r.mult}</td>
+            <table className="m-rate-table m-rate-wide m-rate-np">
+              <thead><tr><th>NPR Attainment</th><th>Pri Attainment</th><th>PE Pay Rate</th><th>Prior Attainment</th><th>Incremental Attainment</th><th>Payout Multiplier</th></tr></thead>
+              <tbody>{c.rateNP.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
+                <td>{r.npr} <span className="m-rate-and">and</span></td><td>{r.pri}</td><td>{r.peRate}</td><td>{r.prior}</td>
+                <td className={r.active && r.incr!=="-" ? "m-rate-hot" : ""}>{r.incr}</td><td>{r.mult}</td>
               </tr>)}</tbody>
             </table>
           </div>
+          <button className="m-rate-more">More rows →</button>
           <div className="m-rate-total-row">Total: <b>{c.payoutRate}</b></div>
+        </> : <>
+          <p className="m-exp-text">The payout rate multiplier is based on your incremental goal attainment for the month and the payout multiplier associated with your overall goal attainment for the goal period.</p>
+          {c.rateIncremental && <>
+            <p className="m-rate-name">Rate Table: {c.rateName}</p>
+            <div className="m-rate-scroll">
+              <table className="m-rate-table m-rate-wide">
+                <thead><tr><th>Attainment</th><th>PE Pay Rate</th><th>Prior Attainment</th><th>Incremental Attainment</th><th>Payout Multiplier</th></tr></thead>
+                <tbody>{c.rateIncremental.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
+                  <td>{r.range}</td><td>{r.peRate}</td><td>{r.prior}</td>
+                  <td className={r.active && r.incr!=="-" ? "m-rate-hot" : ""}>{r.incr}</td><td>{r.mult}</td>
+                </tr>)}</tbody>
+              </table>
+            </div>
+            {c.moreRows && <button className="m-rate-more">More rows →</button>}
+            <div className="m-rate-total-row">{c.totalLabel || "Total:"} <b>{c.payoutRate}</b></div>
+          </>}
         </>}
       </Expandable>
 
       <Expandable title="Why is my proration not 100%?">
-        <p className="m-exp-text">Your proration may be less than 100% if you were hired mid-period, transferred roles, or had a change in your compensation plan during the goal period.</p>
+        <p className="m-exp-text">{c.proration==="100%"
+          ? <>Your proration is <b>100%</b> because you were active for the full goaling interval (182/182 days). Proration is reduced when a seller joins mid-period or has a territory change during the interval.</>
+          : <>Your proration is <b>{c.proration}</b> because you were active for only part of the goaling interval. Proration is reduced when a seller joins mid-period or has a territory change during the interval.</>}</p>
       </Expandable>
 
       <Expandable title="What is my Total Payment against this Plan?">
-        <p className="m-exp-text">Based on your total attainment of <b>{c.totalAtt}</b> of your goal, your incentive payment for {item.label || item.pe} is <b>{amt(c.result)}</b>.</p>
-        <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result} totalEarned={c.totalEarned} prevPaid={c.prevPaid}/>
-        {c.rateTotal && <>
+        {c.rateTotal ? <>
+          <p className="m-exp-text">Based on your total attainment of <b>{c.totalAtt}</b> of your goal, your incentive payment for {c.shortName || item.label || item.pe} is <b>{amt(c.result)}</b>.</p>
+          <FormulaStrip weight={c.weight} targetIncentive={c.targetIncentive} proration={c.proration} payoutRate={c.payoutRate} result={c.result} totalEarned={c.totalEarned} prevPaid={c.prevPaid}/>
           <p className="m-rate-name">Payout Rate Table</p>
           <div className="m-rate-scroll">
             <table className="m-rate-table m-rate-wide">
-              <thead><tr><th>Attainment</th><th>Pay Rate</th><th>Rev. Att.</th><th>Multiplier</th></tr></thead>
+              <thead><tr><th>Attainment</th><th>PE Pay Rate</th><th>Revenue Attainment</th><th>Payout Multiplier</th></tr></thead>
               <tbody>{c.rateTotal.map((r,ri)=><tr key={ri} className={r.active?"m-rate-active":""}>
                 <td>{r.range}</td><td>{r.peRate}</td><td>{r.rev}</td><td>{r.mult}</td>
               </tr>)}</tbody>
             </table>
           </div>
-        </>}
+        </> : <p className="m-exp-text">Your total GPTD (Goal Period to Date) incentive for {item.label || item.pe} is <b>{amt("$"+(c.gptd || c.result))}</b>. This reflects all payments earned against this plan element from the start of the goal period through the current payment.</p>}
       </Expandable>
     </>}
 
@@ -1439,34 +1497,52 @@ function OtbCalcPopup({item, month, onClose}) {
 /* KSO Calculation — the goal-sheet KSO amount trigger. Fixed bonus, so the
    formula is just earned − previously paid; tabs add the payment history and
    a jump to the Goals-tab KSO quarters (the in-app "KSO Tool"). */
+/* KSO popup — desktop reference: per-tab titles, earned − paid strip with the
+   monthly payment in a filled chip, ranged Payment History, and a View in
+   KSO Tool panel (the button lands on the Goals KSO view — our stand-in
+   for the external KSO Management Tool). */
+const KSO_RANGES = ["Past 6 Months","Past Year","All Time"];
 function KsoCalcPopup({month, onClose, onKsoTool}) {
   const [tab, setTab] = useState("Calculation");
-  const rows = KSO_CALC.history;
+  const [range, setRange] = useState(KSO_RANGES[0]);
+  const lim = range==="Past 6 Months" ? 6 : range==="Past Year" ? 12 : Infinity;
+  const rows = KSO_CALC.history.filter(r=>r.mb<=lim);
   const total = rows.reduce((a,r)=>a+r.amount,0);
-  return <FullScreenPopup title="KSO Calculation" subtitle={`Key Sales Objectives for ${month}`}
+  return <FullScreenPopup title={tab==="Calculation" ? "KSO Calculation" : "Payment History"}
+    subtitle={tab==="Calculation" ? `Key Sales Objectives for ${month}` : "Key Sales Objectives"}
     tabs={["Calculation","Payment History","View in KSO Tool"]} activeTab={tab}
-    onTab={t=> t==="View in KSO Tool" ? onKsoTool() : setTab(t)} onClose={onClose}>
+    onTab={setTab} onClose={onClose}>
     {tab==="Calculation" && <>
       <div className="m-calc-badge-row"><PePill pe="KSO" label="Key Sales Objectives" color={PE_COLOR.KSO}/></div>
       <p className="m-calc-summary">Your KSO payment for {month}.</p>
       <div className="m-formula">
         <div className="m-formula-factor"><b>{amt(KSO_CALC.earned)}</b><small>Total Earned</small></div>
         <span className="m-formula-op">−</span>
-        <div className="m-formula-factor"><b>{amt(KSO_CALC.prevPaid)}</b><small>Previously Paid</small></div>
+        <div className="m-formula-factor m-formula-dim"><b>{amt(KSO_CALC.prevPaid)}</b><small>Previously Paid</small></div>
         <span className="m-formula-op m-formula-eq">=</span>
-        <div className="m-formula-factor"><b className="m-formula-result">{amt("$"+KSO_CALC.result)}</b><small>Monthly Payment</small></div>
+        <div className="m-formula-chip"><b>{amt("$"+KSO_CALC.result)}</b><small>Monthly Payment</small></div>
       </div>
       <div className="m-kso-note"><b>Note:</b> KSO payments are not subject to proration or payout rate multipliers. This is a fixed bonus for meeting all qualifying objectives during the measurement period.</div>
     </>}
-    {tab==="Payment History" && <div className="m-ph-table">
-      <div className="m-ph-tr m-ph-th"><span>Pay Date ↓</span><span>Details</span><span className="m-ph-amt">Amount</span><span>Status</span></div>
-      {rows.map((r,i)=><div key={i} className="m-ph-tr">
-        <span className="m-ph-date">{r.date}</span>
-        <span className="m-ph-details">{r.details}</span>
-        <span className="m-ph-amt">{amt(fmtAmt(r.amount))}</span>
-        <span className="m-pay-status m-status-paid">Paid</span>
-      </div>)}
-      <div className="m-ph-total"><span>Total</span><b>{amt(fmtAmt(total))}</b></div>
+    {tab==="Payment History" && <>
+      <div className="m-ph-ranges">
+        {KSO_RANGES.map(r=><button key={r} className={r===range?"on":""} onClick={()=>setRange(r)}>{r}</button>)}
+      </div>
+      <div className="m-ph-table">
+        <div className="m-ph-tr m-ph-th"><span>Pay Date ?</span><span>Details</span><span className="m-ph-amt">Amount</span><span>Status</span></div>
+        {rows.map((r,i)=><div key={i} className="m-ph-tr">
+          <span className="m-ph-date">{r.date}</span>
+          <span className="m-ph-details">{r.details}</span>
+          <span className="m-ph-amt">{amt(fmtAmt(r.amount))}</span>
+          <span className="m-pay-status m-status-paid">Paid</span>
+        </div>)}
+        <div className="m-ph-total"><span>Total</span><b>{amt(fmtAmt(total))}</b></div>
+      </div>
+    </>}
+    {tab==="View in KSO Tool" && <div className="m-kso-tool">
+      <ExternalLink size={40}/>
+      <p>You will be redirected to the KSO Management Tool to view detailed objectives, milestones, and approvals.</p>
+      <button className="m-kso-tool-btn" onClick={onKsoTool}>Open KSO Tool <ExternalLink size={15}/></button>
     </div>}
   </FullScreenPopup>;
 }

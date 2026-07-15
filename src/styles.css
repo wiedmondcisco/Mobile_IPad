@@ -663,7 +663,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* wide rate tables (scroll horizontally on phone) */
 .m-rate-name{font-size:12px;font-weight:800;color:var(--text);margin:12px 0 8px}
 /* Full-width table that flows vertically (no horizontal scroll) */
-.m-rate-scroll{overflow-x:visible}
+.m-rate-scroll{overflow-x:auto}
+.m-rate-wide.m-rate-np{min-width:540px}
+.m-rate-and{color:var(--muted);font-weight:700;font-size:8.5px}
+.m-dep-banner{display:flex;flex-wrap:wrap;align-items:center;gap:5px;background:var(--accent-light);border:1px solid rgba(4,159,217,.18);border-radius:10px;padding:9px 12px;margin:10px 0 4px;font-size:11.5px;font-weight:600;color:var(--text)}
+.m-dep-banner b{color:var(--accent-dark)}
+.m-dep-banner span{color:var(--muted)}
 .m-rate-wide{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse}
 .m-rate-wide th,.m-rate-wide td{white-space:normal;word-break:normal;overflow-wrap:normal;font-size:10px;padding:7px 6px;text-align:center;vertical-align:middle}
 .m-rate-wide th{font-size:8.5px;line-height:1.25;vertical-align:bottom;letter-spacing:.2px}
@@ -671,6 +676,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-rate-wide td:first-child{font-weight:600;white-space:nowrap}
 .m-rate-wide tbody tr{border-top:1px solid var(--divider)}
 .m-rate-wide .m-rate-active td{font-weight:700}
+.m-rate-wide td.m-rate-hot{background:var(--accent-light);font-weight:800}
 .m-rate-total-row{text-align:right;font-size:12px;color:var(--muted);font-weight:600;margin-top:10px}
 .m-rate-total-row b{color:var(--text);font-size:14px;font-weight:800;margin-left:4px}
 
@@ -939,6 +945,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* KSO Calculation popup note */
 .m-kso-note{background:var(--accent-light);border:1px solid rgba(4,159,217,.18);border-radius:var(--radius-sm);padding:11px 13px;margin-top:14px;font-size:11.5px;line-height:1.55;color:var(--accent-dark)}
 .m-kso-note b{font-weight:800}
+.m-formula-dim b,.m-formula-dim small{color:var(--muted);opacity:.75}
+.m-formula-chip{display:flex;flex-direction:column;align-items:center;gap:2px;background:linear-gradient(135deg,#2e7fc2,#1d5d92);border-radius:14px;padding:10px 18px;box-shadow:0 4px 12px rgba(30,95,150,.3)}
+.m-formula-chip b{font-size:19px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+.m-formula-chip small{font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.82);white-space:nowrap}
+.m-kso-tool{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:44px 20px}
+.m-kso-tool > svg{color:var(--accent)}
+.m-kso-tool p{font-size:13.5px;color:var(--text-2);line-height:1.6;max-width:420px}
+.m-kso-tool-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px 22px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(4,159,217,.35)}
+.m-kso-tool-btn:active{transform:scale(.97)}
 
 /* ─── PAYMENT HISTORY POPUP ─── */
 .m-ph-ranges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
