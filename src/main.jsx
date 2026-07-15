@@ -23,10 +23,10 @@ const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, "$" + DOT
 /* StratComp IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
   "attainment":"You're at 24% on PRI (CX-SVC RENEW), 71% on NPR (RRA-SW), and 44% on NPR2 (SEC PRD). Overall weighted: ~42%. You need significant revenue growth on PRI to hit accelerator.",
-  "earnings":"YTD earnings: $25,409 paid (Jan–Apr). Current month (May 2026): $8,434.23 — Goal Sheet $5,885.73, SPIFFs $2,125, Draws $50, Adj $73.50, OTB $100, Past $200.",
+  "earnings":"YTD earnings: $27,267 paid (Jan–Apr). Current month (May 2026): $8,434.23 — Goal Sheet $5,885.73, SPIFFs $2,125, Draws $50, Adj $73.50, OTB $100, Past $200.",
   "accelerator":"Accelerator kicks in at 100% attainment. Rate jumps from 1% to 2% per 1% attainment! Your best positioned PE is NPR at 71%.",
   "close":"Your best positioned PE is NPR (Recurring Software) at 71%. You need about $25K more revenue to reach 100%. PRI is at 24% needing ~$83K.",
-  "payment":"Next payment: $8,434.23 on Jun 2, 2026. Previous: $6,830 (Apr). Lock date: May 28.",
+  "payment":"Next payment: $8,434.23 on Jun 2, 2026. Previous: $8,688.08 (Apr). Lock date: May 28.",
   "backlog":"$115K in backlog. Estimated additional paycheck impact: +$1,200. Orders pending fulfillment across multiple months.",
   "goal":"Goal Sheet H1: PRI $109K (50% weight), NPR $87K (30%), NPR2 $90K (20%). Total target incentive: $75,500.",
   "spiff":"Active: Q2 Cloud Migration SPIFF ($5,000 potential, 25% progress), Partner Acceleration Q2 ($3,500, 25%). Projected SPIFF earnings this period: $2,125.",
@@ -46,8 +46,8 @@ function getInitialTheme() {
 const PE_COLOR = { PE1:"#f59e0b", PE2:"#10b981", PE3:"#3b82f6", KSO:"#6366f1", OTB:"#8b5cf6", NDR:"#06b6d4" };
 
 const monthlyPayCards = [
-  {month:"APR 2026", period:"April 2026", status:"Paid", amount:"6,830.00", change:"▲ 10.4%", payDate:"Paid May 2, 2026"},
-  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▲ 23.5%", payDate:"Pay: Jun 2, 2026"},
+  {month:"APR 2026", period:"April 2026", status:"Paid", amount:"8,688.08", change:"▲ 40.4%", payDate:"Paid May 2, 2026"},
+  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▼ 2.9%", payDate:"Pay: Jun 2, 2026"},
   {month:"JUN 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // no statement period yet — card stays inert
 ];
 
@@ -290,7 +290,7 @@ const recentPaymentPeriods = [
         {pe:"PE3", name:"Renewable Software (SRenewed)", amount:"5.00"}]}
     ]}
   },
-  {month:"April 2026", amount:"6,830.00", status:"Paid", payDate:"May 2, 2026", lockDate:"Apr 28, 2026", revDates:"Apr 1 – Apr 30, 2026",
+  {month:"April 2026", amount:"8,688.08", status:"Paid", payDate:"May 2, 2026", lockDate:"Apr 28, 2026", revDates:"Apr 1 – Apr 30, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"4,605.00", items:[
       {pe:"PE1", name:"CX-SVC RENEW ANN|PRI", label:"Prod+Services", weight:"50%", pct:22, attChange:3, payout:"1,320.00", color:PE_COLOR.PE1,
         calc:{incrementalAtt:"3%", totalAtt:"22%", weight:"50%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"4%",
@@ -353,8 +353,31 @@ const recentPaymentPeriods = [
         {pe:"PE2", label:"Recurring Software", paidNote:"Paid up to Mar", paid:"$100.00", amount:"$-100.00"},
         {pe:"PE3", label:"Services", paidNote:"Paid up to Mar", paid:"$100.00", amount:"$-100.00"}
       ]},
-    spiff:{total:"2,125.00", items:[{name:"Q4FY24 Slam Dunk", amount:"$2,125.00"}]},
-    draws:{total:"50.00", items:[{chip:"MIPS", name:"Monthly Incentive Payment", amount:"$50.00"}]}, adj:{total:"50.00", items:[{chip:"ICC", name:"Payment Adjustment", amount:"$50.00"}]}, otb:{total:"0.00", items:[]}, past:{total:"0.00", items:[]}
+    spiff:{total:"2,125.00", items:[{name:"Q2 Cloud Migration SPIFF", amount:"$1,250.00"},{name:"Partner Acceleration Q2", amount:"$875.00"}]},
+    draws:{total:"50.00", items:[{chip:"MIPS", name:"Monthly Incentive Payment", amount:"$35.00"},{chip:"Draw", name:"Recoverable Draw", amount:"$15.00"}]},
+    adj:{total:"50.00", items:[{name:"ICC True-up Adjustment", amount:"$50.00"}]},
+    /* Desktop reference: April OTB pays 1,658.08 (10% × 31,178.57 × 100% × 53.18%),
+       with a replaced-goal-sheet reconciliation line (not a negative payment) */
+    otb:{total:"1,658.08", items:[
+      {name:"PIOT PRODUCT RR|PL", amount:"$1,658.08", pct:53.18, attChange:53.18,
+        calc:{tiRate:"10%", targetIncentive:"31,178.57", proration:"100%", payoutRate:"53.18%", result:"1,658.08", incrementalAtt:"53.18%", rateName:"CS402",
+          rows:[
+            {range:"0 – 125 %", peRate:"1%", prior:"-", incr:"53.18%", mult:"53.18%", active:true},
+            {range:"125+ %", peRate:"0%", prior:"-", incr:"-", mult:"-"}
+          ]}}],
+      replaced:{period:"Jan 26, 2026 - Jul 26, 2026", note:"Reconciled from previous goal sheet. Not a negative payment",
+        items:[{name:"PIOT PRODUCT RR|PL", amount:"$-50.00"}]}},
+    past:{total:"200.00", groups:[
+      {fy:"FY23", half:"H2", dates:"Jul 1, 2023 – Dec 31, 2023", rate:"CS402", total:"120.00", items:[
+        {pe:"PE1", name:"Product & Services Annual", amount:"75.00"},
+        {pe:"PE2", name:"Renewable Software & Customer Success (iACV)", amount:"45.00"}]},
+      {fy:"FY23", half:"H1", dates:"Jan 1, 2023 – Jun 30, 2023", rate:"CS402", total:"50.00", items:[
+        {pe:"PE1", name:"Product & Services Annual", amount:"50.00"}]},
+      {fy:"FY22", half:"H2", dates:"Jul 1, 2022 – Dec 31, 2022", rate:"CS402", total:"30.00", items:[
+        {pe:"PE1", name:"Product & Services Annual", amount:"15.00"},
+        {pe:"PE2", name:"Renewable Software & Customer Success (iACV)", amount:"10.00"},
+        {pe:"PE3", name:"Renewable Software (SRenewed)", amount:"5.00"}]}
+    ]}
   },
   {month:"March 2026", amount:"6,189.00", status:"Paid", payDate:"Apr 2, 2026", lockDate:"Mar 28, 2026", revDates:"Mar 1 – Mar 31, 2026",
     goalSheet:{period:"Jan 26, 2026 - Jul 26, 2026", total:"3,964.00", items:[
@@ -494,7 +517,8 @@ function paymentDonutItems(p, dark) {
 /* Little type chips on accordion detail rows (desktop reference) */
 const SECTION_CHIP = {spiff:"SPIFF", otb:"OTB"};
 /* sections whose item amounts render in accent blue on the web */
-const ACCENT_AMT_SECTIONS = {spiff:true, adj:true, otb:true, draws:true};
+/* Sections whose item amounts render in accent blue; draws stay plain (desktop). */
+const ACCENT_AMT_SECTIONS = {spiff:true, adj:true, otb:true};
 
 /* ── Payment History popups (per line item, keyed by item name) ──
    Blue amounts in the payment dropdowns open these. `mb` = calendar
@@ -1314,7 +1338,7 @@ function PaymentAccordion({p, s}) {
         : p[sec.key].items.length>0 ? p[sec.key].items.map((item,j)=>{
             /* Blue amounts drill in: OTB items open their Compensation
                Calculation; SPIFF/draw/adjustment items open Payment History */
-            const open = OTB_CALC[item.name] ? ()=>s.setOtbCalcItem(item)
+            const open = (sec.key==="otb" && (item.calc || OTB_CALC[item.name])) ? ()=>s.setOtbCalcItem(item)
               : PAYMENT_HISTORY[item.name] ? ()=>s.setHistItem({...item, sect:sec.key}) : null;
             /* OTB items render like goal-sheet rows (desktop reference):
                chip + name, attainment bar, % + change, blue amount */
@@ -1348,6 +1372,17 @@ function PaymentAccordion({p, s}) {
             </div>;
           })
         : <div className="m-pb-empty">No items this period.</div>}
+      {sec.key==="otb" && p.otb.replaced && <div className="m-otb-replaced">
+        <div className="m-otb-replaced-hdr">
+          <b>Replaced Goal Sheet</b>
+          <small>{p.otb.replaced.period}</small>
+        </div>
+        <p className="m-otb-replaced-note">{p.otb.replaced.note}</p>
+        {p.otb.replaced.items.map((it,k)=><div key={k} className="m-pb-detail-row">
+          <span className="m-pb-detail-name"><span className="m-pb-chip">OTB</span>{it.name}</span>
+          <b className="m-otb-replaced-amt">{amt(it.amount)}</b>
+        </div>)}
+      </div>}
     </div>}
   </div>)}</>;
 }
@@ -1467,7 +1502,7 @@ function CompCalcPopup({item, month, onClose}) {
    Same shell as CompCalcPopup but with the OTB formula (TI rate × OTB
    target incentive × proration × payout multiplier) and single rate table. */
 function OtbCalcPopup({item, month, onClose}) {
-  const c = OTB_CALC[item.name];
+  const c = item.calc || OTB_CALC[item.name];
   return <FullScreenPopup title="Compensation Calculation" subtitle={`Calculations for ${month} payment`}
     tabs={["Payment Calculation"]} activeTab="Payment Calculation" onTab={()=>{}} onClose={onClose}>
     <div className="m-calc-badge-row"><PePill pe="OTB" label={item.name} color={PE_COLOR.OTB}/></div>
@@ -3259,9 +3294,9 @@ function FramePopups({s, variant="mobile"}) {
 const NAV_TABS = [
   {id:"glance", label:"At A Glance", Icon:Home},
   {id:"payments", label:"Payments", Icon:DollarSign},
-  {id:"goals", label:"Goals", Icon:Target},
+  {id:"goals", label:"Goals", Icon:CheckCircle2},
   {id:"orders", label:"Order Search", Icon:Search},
-  {id:"spiff", label:"SPIFF & Bonus", Icon:Trophy},
+  {id:"spiff", label:"SPIFF & Bonus", Icon:Target},
   {id:"backlog", label:"Backlog", Icon:Layers},
   {id:"estimator", label:"Pay Estimator", short:"Estimator", Icon:Calculator}
 ];
