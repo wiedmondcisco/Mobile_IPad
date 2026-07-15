@@ -1316,6 +1316,17 @@ function ReplacedGoalSheet({r}) {
   </div>;
 }
 
+/* Expand All / Collapse All for the Payments accordion (desktop reference).
+   Opens every section at once so sellers don't have to tap through six
+   headers; flips to Collapse All when everything is open. */
+function ExpandAllBtn({s, p}) {
+  const keys = paymentSections(p).map(x=>x.key);
+  const allOpen = keys.every(k=>s.expanded[k]);
+  return <button className="m-expandall-btn" onClick={()=>s.setExpanded(allOpen ? {} : Object.fromEntries(keys.map(k=>[k,true])))}>
+    {allOpen ? "Collapse All" : "Expand All"}
+  </button>;
+}
+
 function PaymentAccordion({p, s}) {
   const expanded = s.expanded;
   const toggle = key => s.setExpanded(prev=>({...prev,[key]:!prev[key]}));
@@ -1416,6 +1427,7 @@ function PaymentsPage({s}) {
     <PeriodChips s={s}/>
     <PaymentBreakdownCard p={p} s={s} compact/>
     <PaymentScheduleCard p={p} s={s}/>
+    <div className="m-expandall-row"><ExpandAllBtn s={s} p={p}/></div>
     <PaymentAccordion p={p} s={s}/>
   </div>;
 }
@@ -1990,14 +2002,15 @@ function EstRateTable({p, addRev}) {
       {open?"Hide Rate Table":"Show Rate Table"} <ChevronDown size={12} className={`m-insight-chev ${open?"open":""}`}/>
     </button>
     {open && <div className="m-est-table">
-      <div className="m-est-tr m-est-th"><span>Quota %</span><span>Rate / 1%</span><span>Yours ({att.toFixed(1)}%)</span><span>Value</span></div>
+      <div className="m-est-tr m-est-th"><span>Performance as a % of Annual Quota</span><span>Multiplier for each 1% Attainment Range</span><span>Attainment Breakdown ({att.toFixed(2)}%)</span><span>Calculated Value</span></div>
       {EST_BRACKETS.map((b,i)=>{
         const seg = Math.max(0, Math.min(att,b.to)-b.from);
-        return <div key={i} className={`m-est-tr ${att>b.from && att<=b.to ? "on":""}`}>
-          <span>{b.to===Infinity ? `${b.from}+ %` : `${b.from}–${b.to}%`}</span>
-          <span>{b.rate}%</span>
-          <span>{seg>0 ? seg.toFixed(seg%1 ? 2 : 0) : "—"}</span>
-          <span>{seg>0 ? (seg*b.rate).toFixed(2) : "—"}</span>
+        const active = att>b.from && att<=b.to;
+        return <div key={i} className={`m-est-tr ${active ? "on":""}`}>
+          <span><span className="m-est-range">{b.to===Infinity ? `${b.from} - ${b.from}+ %` : `${b.from} - ${b.to} %`}</span></span>
+          <span className="m-est-mult">{String(b.rate).replace(/^0\./,".")}%</span>
+          <span>{seg>0 ? (Number.isInteger(seg) ? seg : +seg.toFixed(5)) : ""}</span>
+          <span>{seg>0 ? (seg*b.rate).toFixed(2) : ""}</span>
         </div>;
       })}
     </div>}
@@ -3523,7 +3536,7 @@ function IPadPayments({s}) {
   const p = fullPaymentPeriods[s.periodIdx];
   return <div className="i-page">
     <IPadHeader title="Payments" sub={`${DATA_AS_OF} · ${REFRESH_NOTE}`} s={s}
-      right={<><button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button><HideBtn s={s}/></>}/>
+      right={<><button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button><ExpandAllBtn s={s} p={fullPaymentPeriods[s.periodIdx]}/><HideBtn s={s}/></>}/>
     <PeriodChips s={s}/>
     <div className="i-split">
       <div className="i-col-a">

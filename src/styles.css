@@ -382,22 +382,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pb-sub-amt{color:var(--accent) !important}
 /* Replaced goal sheet — amber frame + indent + dashed elbow connector
    so it reads as "swapped out, but still reconciled into the current sheet" */
-.m-replaced{position:relative;margin:14px 0 4px 18px;padding:12px 12px 4px;border:1.5px solid var(--amber);border-left-width:4px;border-radius:12px;background:rgba(245,158,11,.07)}
-.m-replaced::before{content:"";position:absolute;left:-15px;top:-12px;width:12px;height:calc(50% + 12px);border-left:2px dashed var(--amber);border-bottom:2px dashed var(--amber);border-bottom-left-radius:10px;opacity:.6}
-.m-replaced-hdr{padding-bottom:9px;border-bottom:1px solid rgba(245,158,11,.3)}
-.m-replaced-hdr-l1{display:flex;align-items:center;gap:8px}
-.m-replaced-hdr-l2{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:5px}
-.m-replaced-tag{flex-shrink:0;font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:var(--amber);color:#fff;padding:3px 6px;border-radius:7px}
-.m-replaced-title{font-size:13px;font-weight:800;color:var(--text);white-space:nowrap}
-.m-replaced-period{font-size:10px;color:var(--muted)}
-.m-replaced-total{font-size:14px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
-.m-replaced-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px 8px;padding:10px 0;border-bottom:1px solid rgba(245,158,11,.25)}
+.m-replaced{border-top:1px solid var(--divider);margin-top:12px;padding-top:10px}
+.m-replaced-hdr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding-bottom:4px}
+.m-replaced-title{font-size:12.5px;font-weight:800;color:var(--text-2);white-space:nowrap}
+.m-replaced-period{font-size:10.5px;color:var(--muted)}
+.m-replaced-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:6px 8px;padding:10px 0;border-bottom:1px solid var(--divider)}
+.m-replaced-row .m-pb-pe-badge{grid-column:1}
+.m-replaced-row .m-insight-chev{grid-column:3}
+.m-replaced-row .m-replaced-amt{grid-column:4;justify-self:end}
+.m-replaced-row .m-replaced-paid{grid-column:1/-1;justify-self:start}
 .m-replaced-row:last-of-type{border-bottom:none}
-.m-replaced-name{flex:1;font-size:12.5px;font-weight:700;color:var(--text)}
+.m-replaced-expandable{cursor:pointer}
+.m-replaced-name{grid-column:2;font-size:12.5px;font-weight:700;color:var(--text)}
 .m-replaced-amt{font-size:13.5px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
-.m-replaced-paid{flex-basis:100%;width:max-content;font-size:11px;font-weight:600;color:var(--text-2);background:rgba(16,185,129,.12);border-radius:8px;padding:4px 9px}
+.m-replaced-kids{margin:2px 0 8px 8px;padding-left:10px;border-left:2px solid var(--divider)}
+.m-replaced-childrow{background:var(--card-2);border-radius:10px;padding:8px 10px;margin:3px 0;border-bottom:none}
+.m-replaced-childrow:last-of-type{border-bottom:none}
+/* OTB reconciliation footer (April desktop reference) */
+.m-otb-replaced{border-top:1px solid var(--divider);margin-top:10px;padding-top:10px}
+.m-otb-replaced-hdr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.m-otb-replaced-hdr b{font-size:12px;font-weight:800;color:var(--text-2)}
+.m-otb-replaced-hdr small{font-size:10.5px;color:var(--muted);font-weight:600}
+.m-otb-replaced-note{font-size:10.5px;color:var(--muted);font-style:italic;margin:3px 0 4px}
+.m-otb-replaced-amt{font-size:13px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
+.m-replaced-paid{flex-basis:100%;max-width:max-content;font-size:11px;font-weight:600;color:var(--muted);background:var(--track);border-radius:8px;padding:4px 9px}
 .m-replaced-paid b{color:var(--green);font-weight:800}
-.m-replaced-note{font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.45;padding:9px 0 8px;border-top:1px solid rgba(245,158,11,.25)}
+.m-replaced-note{flex-basis:100%;font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.45}
 
 .m-pb-past-group{margin-bottom:12px}
 .m-pb-past-group:last-child{margin-bottom:0}
@@ -748,6 +758,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-page-title-row .m-page-title{margin-bottom:0}
 .m-goalsheet-btn{display:flex;align-items:center;gap:5px;background:var(--accent-light);border:1px solid rgba(4,159,217,.2);color:var(--accent-dark);font-size:12px;font-weight:700;padding:8px 12px;border-radius:20px;cursor:pointer;white-space:nowrap}
 .m-goalsheet-btn:active{transform:scale(.96)}
+.m-expandall-btn{display:inline-flex;align-items:center;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:700;padding:8px 14px;border-radius:20px;cursor:pointer;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.m-expandall-btn:active{transform:scale(.96)}
+.m-expandall-row{display:flex;justify-content:flex-end;margin:2px 0 10px}
 .m-goaltab-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;-webkit-overflow-scrolling:touch}
 .m-goaltab-scroll::-webkit-scrollbar{display:none}
 .m-goaltab{flex-shrink:0;min-width:52px;padding:9px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .15s}
@@ -882,8 +895,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-est-table{margin-top:10px;border-top:1px solid var(--divider);padding-top:6px}
 .m-est-tr{display:grid;grid-template-columns:1.2fr .8fr 1fr .8fr;gap:6px;padding:6px 0;font-size:11px;font-weight:600;color:var(--text-2);border-bottom:1px solid var(--divider);align-items:center;font-variant-numeric:tabular-nums}
 .m-est-tr:last-child{border-bottom:none}
-.m-est-tr.m-est-th{font-size:8.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--muted)}
-.m-est-tr.on{color:var(--accent);font-weight:800}
+.m-est-tr.m-est-th{font-size:8.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);line-height:1.35}
+.m-est-tr.on{color:var(--accent);font-weight:800;background:var(--accent-light)}
+.m-est-range{display:inline-block;background:var(--track);border:1px solid transparent;border-radius:8px;padding:3px 8px;font-size:10.5px;font-weight:700;color:var(--text-2);white-space:nowrap}
+.m-est-tr.on .m-est-range{background:var(--accent-light);border-color:rgba(4,159,217,.35);color:var(--accent)}
+.m-est-mult{color:var(--text);font-weight:700}
+.m-est-tr.on .m-est-mult{color:var(--text)}
 .m-est-sum-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--divider);font-size:12px}
 .m-est-sum-name{flex:1;font-weight:700;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .m-est-sum-add{font-size:11px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -1546,7 +1563,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-device:not(.land) .i-page{padding:26px 26px 52px}
 .i-device:not(.land) .i-head{margin-bottom:24px}
 /* Portrait: compact pill buttons so header actions never push icons off-frame */
-.i-device:not(.land) .i-head-actions .m-goalsheet-btn{font-size:11px;padding:6px 10px}
+.i-device:not(.land) .i-head-actions .m-goalsheet-btn,
+.i-device:not(.land) .i-head-actions .m-expandall-btn{font-size:11px;padding:6px 10px}
 .i-device:not(.land) .i-head-actions{flex-wrap:wrap;justify-content:flex-end;row-gap:8px}
 /* At A Glance: hero gets the full width; context + progress pair up under it */
 .i-device:not(.land) .i-glance-top{grid-template-columns:1fr 1.7fr 1fr;gap:12px}
