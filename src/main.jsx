@@ -2363,12 +2363,13 @@ function NdrSection() {
 
 /* Goal-sheet selector (Goals page) — UI mockup only: the menu lists the
    seller's goal sheets with the current one checked; picking another sheet
-   doesn't swap the page data. Halves match the Team trend periods. */
+   doesn't swap the page data. Labels follow the desktop reference:
+   "<FY> <code> <start> to <end> (Semi-Annual:H1|H2)". */
 const goalSheetOptions = [
-  {code:"CS402", dates:"Jan 26, 2026 – Jul 26, 2026", half:"H1 2026", current:true},
-  {code:"CS402", dates:"Jul 25, 2025 – Jan 25, 2026", half:"H2 2025"},
-  {code:"CS402", dates:"Jan 26, 2025 – Jul 26, 2025", half:"H1 2025"},
-  {code:"CS380", dates:"Jul 27, 2024 – Jan 25, 2025", half:"H2 2024"}
+  {fy:"2026", code:"CS532", dates:"25-Jan-2026 to 25-Jul-2026", half:"Semi-Annual:H2", current:true},
+  {fy:"2026", code:"CS532", dates:"27-Jul-2025 to 24-Jan-2026", half:"Semi-Annual:H1"},
+  {fy:"2025", code:"CS532", dates:"26-Jan-2025 to 26-Jul-2025", half:"Semi-Annual:H2"},
+  {fy:"2025", code:"CS580", dates:"28-Jul-2024 to 25-Jan-2025", half:"Semi-Annual:H1"}
 ];
 function GoalSheetSelect() {
   const [open, setOpen] = useState(false);
@@ -2377,8 +2378,8 @@ function GoalSheetSelect() {
     <button className="m-gsel" onClick={()=>setOpen(o=>!o)} aria-expanded={open} aria-haspopup="listbox">
       <small>Goal Sheet</small>
       <span className="m-gsel-txt">
-        <b>{cur.half} · {cur.code}</b>
-        <span className="m-gsel-dates">{cur.dates}</span>
+        <b>{cur.fy} {cur.code}</b>
+        <span className="m-gsel-dates">{cur.dates} ({cur.half})</span>
       </span>
       <ChevronDown size={14} className={`m-insight-chev ${open?"open":""}`}/>
     </button>
@@ -2388,7 +2389,7 @@ function GoalSheetSelect() {
         {goalSheetOptions.map((o,i)=><button key={i} role="option" aria-selected={!!o.current}
           className={o.current?"on":""} onClick={()=>setOpen(false)}>
           <span className="m-gsel-check">{o.current ? "✓" : ""}</span>
-          <span className="m-gsel-opt"><b>{o.half}</b> · {o.code} <small>{o.dates}</small></span>
+          <span className="m-gsel-opt">{o.fy} {o.code} {o.dates} ({o.half})</span>
         </button>)}
       </div>
     </>}
