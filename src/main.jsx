@@ -347,9 +347,14 @@ const recentPaymentPeriods = [
     /* Goal sheet swapped mid-period: amounts already paid on the prior
        sheet are reconciled into the current one (desktop reference) */
     replaced:{period:"Jan 26, 2026 - Jul 26, 2026", total:"$-850.00",
-      note:"Reconciled from previous goal sheet. Not a negative payment — these amounts were already paid and are netted into your Current Goal Sheet above.",
+      note:"Reconciled from previous goal sheet. Not a negative payment",
       items:[
-        {pe:"PE1", label:"Prod+Services", paidNote:"Paid up to Mar", paid:"$650.00", amount:"$-650.00"},
+        {pe:"PE1", label:"Prod+Services", paidNote:"Paid up to Mar", paid:"$650.00", amount:"$-650.00", children:[
+          {pe:"PE1", label:"Prod+Services", paidNote:"Paid up to Mar", paid:"$500.00", amount:"$-500.00"},
+          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", paidNote:"Paid up to Mar", paid:"$50.00", amount:"$-50.00"},
+          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", paidNote:"Paid up to Mar", paid:"$50.00", amount:"$-50.00"},
+          {pe:"MY", label:"Services MY", color:"#3b82f6", paidNote:"Paid up to Mar", paid:"$50.00", amount:"$-50.00"}
+        ]},
         {pe:"PE2", label:"Recurring Software", paidNote:"Paid up to Mar", paid:"$100.00", amount:"$-100.00"},
         {pe:"PE3", label:"Services", paidNote:"Paid up to Mar", paid:"$100.00", amount:"$-100.00"}
       ]},
@@ -500,8 +505,10 @@ const revenueTxns = {
    steps so each hue clears the card surface it actually renders on. The
    legend rows carry every slice's label + value, covering the two light-mode
    hues that sit under 3:1 contrast. */
-const DONUT_LIGHT = ["#2a78d6","#1baf7a","#eda100","#008300","#4a3aa7","#e34948"];
-const DONUT_DARK  = ["#3987e5","#199e70","#c98500","#008300","#9085e9","#e66767"];
+/* Modern Pie Chart scheme: Majorelle Blue, Disco, Tangy Pink, Outrageous
+   Orange, Yellow Sea — plus a bridging purple for the sixth slice. */
+const DONUT_LIGHT = ["#6050DC","#D52DB7","#FF2E7E","#FF6B45","#FFAB05","#7A28C7"];
+const DONUT_DARK  = ["#7264E3","#DD4AC4","#FF4E92","#FF7E5C","#FFB52A","#9146D6"];
 function paymentDonutItems(p, dark) {
   const pal = dark ? DONUT_DARK : DONUT_LIGHT;
   return [
@@ -1274,28 +1281,38 @@ function GoalSheetItemRow({item, onOpenCalc, onOpenPdf, onOpenKso}) {
 }
 
 /* Replaced Goal Sheet — shown under the Current Goal Sheet rows when a
-   statement month carries reconciliation from a swapped-out sheet. The
-   amber frame + indent + dashed connector make "replaced, but still
-   feeding your current sheet" impossible to miss. */
+   statement month carries reconciliation from a swapped-out sheet.
+   Desktop reference: neutral header with the reconciliation note inline,
+   gray "Paid up to" pills, orange only on the negative amounts, and the
+   PE1 row expanding into its component lines. */
+function ReplacedRow({it, child=false}) {
+  const [open, setOpen] = useState(false);
+  const color = it.color || PE_COLOR[it.pe];
+  const kids = it.children;
+  return <>
+    <div className={`m-replaced-row ${child?"m-replaced-childrow":""} ${kids?"m-replaced-expandable":""}`}
+      onClick={kids ? ()=>setOpen(o=>!o) : undefined}
+      role={kids?"button":undefined} tabIndex={kids?0:undefined} aria-expanded={kids?open:undefined}
+      onKeyDown={kids ? (e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }) : undefined}>
+      <span className="m-pb-pe-badge" style={{background:color+"22", color}}>{it.pe}</span>
+      <span className="m-replaced-name">{it.label}</span>
+      {kids && <ChevronDown size={13} className={`m-insight-chev ${open?"open":""}`}/>}
+      <b className="m-replaced-amt">{amt(it.amount)}</b>
+      <span className="m-replaced-paid">{it.paidNote}: <b>{amt(it.paid)}</b></span>
+    </div>
+    {kids && open && <div className="m-replaced-kids">
+      {kids.map((k,i)=><ReplacedRow key={i} it={k} child/>)}
+    </div>}
+  </>;
+}
 function ReplacedGoalSheet({r}) {
   return <div className="m-replaced">
     <div className="m-replaced-hdr">
-      <div className="m-replaced-hdr-l1">
-        <span className="m-replaced-tag">Replaced</span>
-        <b className="m-replaced-title">Replaced Goal Sheet</b>
-      </div>
-      <div className="m-replaced-hdr-l2">
-        <small className="m-replaced-period">{r.period}</small>
-        <b className="m-replaced-total">{amt(r.total)}</b>
-      </div>
+      <b className="m-replaced-title">Replaced Goal Sheet</b>
+      <small className="m-replaced-period">{r.period}</small>
+      <span className="m-replaced-note">{r.note}</span>
     </div>
-    {r.items.map((it,i)=><div key={i} className="m-replaced-row">
-      <span className="m-pb-pe-badge" style={{background:PE_COLOR[it.pe]+"22", color:PE_COLOR[it.pe]}}>{it.pe}</span>
-      <span className="m-replaced-name">{it.label}</span>
-      <b className="m-replaced-amt">{amt(it.amount)}</b>
-      <span className="m-replaced-paid">{it.paidNote}: <b>{amt(it.paid)}</b></span>
-    </div>)}
-    <p className="m-replaced-note">ⓘ {r.note}</p>
+    {r.items.map((it,i)=><ReplacedRow key={i} it={it}/>)}
   </div>;
 }
 
