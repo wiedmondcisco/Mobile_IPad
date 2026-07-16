@@ -2204,15 +2204,20 @@ const ksoQuarters = [
     calc:{ach:"89.3%", inst:"( 50% * 107% ) + ( 10% * 50% ) + ( 40% * 77% )", total:"$2,500.00"}},
   {q:"Q2 2026", cap:"125%", bonus:"$4,100.00",
     rows:[
-      {name:"FY26 Generate [X] NUMBER of new logo acquisitions", weight:"60%", bonus:"$2,500.00", target:"5", result:"5", ach:100},
-      {name:"FY26 Achieve [X] PERCENTAGE % conversion rate", weight:"40%", bonus:"$1,600.00", target:"5%", result:"5%", ach:100}
+      {name:"FY26 Generate [X] NUMBER of new logo acquisitions", weight:"60%", bonus:"$2,500.00", target:"5", result:"5", ach:100,
+        desc:"FY26 Generate [X] NUMBER of new logo acquisitions in assigned territory for Q2."},
+      {name:"FY26 Achieve [X] PERCENTAGE % conversion rate", weight:"40%", bonus:"$1,600.00", target:"5%", result:"5%", ach:100,
+        desc:"FY26 Achieve [X] PERCENTAGE % conversion rate from qualified pipeline to closed-won."}
     ],
     calc:{ach:"100%", inst:"( 60% * 100% ) + ( 40% * 100% )", total:"$4,100.00"}},
   {q:"Q3 2026", cap:"125%", bonus:"$4,900.00",
     rows:[
-      {name:"FY26 Achieve [X] PERCENTAGE % conversion rate", weight:"25%", bonus:"$1,250.00", target:"5%", result:"5%", ach:100},
-      {name:"FY26 Reach [X] PERCENTAGE % target attainment", weight:"25%", bonus:"$1,250.00", target:"25%", result:"0%", ach:0},
-      {name:"FY26 Progress [X] NUMBER of sales initiatives to completion", weight:"100%", bonus:"$2,400.00", target:"5", result:"5", ach:100}
+      {name:"FY26 Achieve [X] PERCENTAGE % conversion rate", weight:"25%", bonus:"$1,250.00", target:"5%", result:"5%", ach:100,
+        desc:"FY26 Achieve [X] PERCENTAGE % conversion rate from demand waterfall stages to revenue."},
+      {name:"FY26 Reach [X] PERCENTAGE % target attainment", weight:"25%", bonus:"$1,250.00", target:"25%", result:"0%", ach:0,
+        desc:"FY26 Reach [X] PERCENTAGE % target attainment to be included as part of goal sheet measurement."},
+      {name:"FY26 Progress [X] NUMBER of sales initiatives to completion", weight:"100%", bonus:"$2,400.00", target:"5", result:"5", ach:100,
+        desc:"FY26 Progress [X] NUMBER of sales initiatives driving pipeline and territory coverage."}
     ],
     calc:{ach:"125%", inst:"( 25% * 100% ) + ( 25% * 0% ) + ( 100% * 100% )", total:"$4,900.00"}},
   {q:"Q4 2026", cap:"125%", bonus:"-",
@@ -2283,10 +2288,12 @@ function KsoSection() {
           </div>
         </div>
         {open && <>
-          {qt.rows.map((r,i)=><div key={i} className="m-kso-row">
-            <div className="m-kso-cell-name" title={KSO_OBJ_DESC[r.name]}>
+          {qt.rows.map((r,i)=>{
+            const desc = r.desc || KSO_OBJ_DESC[r.name];
+            return <div key={i} className="m-kso-row">
+            <div className="m-kso-cell-name" title={desc}>
               <b>{r.name}</b>
-              <span className="m-kso-row-desc">{showInfo && KSO_OBJ_DESC[r.name] ? KSO_OBJ_DESC[r.name] : "Objective"}</span>
+              <span className="m-kso-row-desc">{showInfo && desc ? desc : "Objective"}</span>
             </div>
             <div className="m-kso-figs">
               <div className="m-kso-fig"><small>KSO Weight</small><b>{r.weight}</b></div>
@@ -2297,7 +2304,7 @@ function KsoSection() {
                 <span className={`m-kso-ach ${r.ach==null ? "" : r.ach>=100 ? "good" : r.ach===0 ? "bad" : ""}`}>{r.ach==null ? "-" : r.ach+"%"}</span>
               </div>
             </div>
-          </div>)}
+          </div>;})}
           {qt.calc && <KsoViewCalc c={qt.calc} objCount={qt.rows.length}/>}
         </>}
       </div>;
