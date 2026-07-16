@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu, Settings } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -960,14 +960,13 @@ function NotifDropdown({s, onClose, ipad=false}) {
 }
 
 /* Utility icons (desktop reference), folded into two buttons to keep the
-   header uncluttered. Settings consolidates the old Support links with the
-   At A Glance widget manager (show/hide + reorder by position number). */
+   header uncluttered. Popovers are informational only — no live links yet. */
 const UTIL_ITEMS = [
-  {id:"settings", Icon:Settings, label:"Settings"},
+  {id:"support", Icon:HelpCircle, label:"Support", items:["Help","Open Case"]},
   {id:"dash", Icon:LayoutGrid, label:"Dashboards",
     items:["Next Gen Claiming","Sales Incentive Calendar","MBR","Sales Comp Portal"]},
 ];
-function UtilityIcons({s, ipad=false}) {
+function UtilityIcons({ipad=false}) {
   const [open, setOpen] = useState(null);
   const cur = UTIL_ITEMS.find(u=>u.id===open);
   return <div className={`m-utils ${ipad?"i-utils":""}`}>
@@ -978,27 +977,11 @@ function UtilityIcons({s, ipad=false}) {
       </button>)}
     {cur && <>
       <div className="m-notif-overlay m-util-overlay" onClick={()=>setOpen(null)}/>
-      <div className={`m-util-pop ${cur.id==="settings" ? "m-util-pop-wide" : ""}`}>
-        {cur.id==="settings"
-          ? <>
-              <b className="m-util-pop-title">Settings</b>
-              <span className="m-util-pop-item">Help</span>
-              <span className="m-util-pop-item">Open Case</span>
-              <b className="m-wgt-title"><Eye size={12}/> Widgets — Show / Hide & Reorder</b>
-              {s.widgets.map((w,i)=><div key={w.id} className={`m-wgt-row ${w.on ? "" : "m-wgt-off"}`}>
-                <button className="m-wgt-eye" aria-pressed={w.on} aria-label={`${w.on ? "Hide" : "Show"} ${w.label}`}
-                  onClick={()=>s.toggleWidget(w.id)}>{w.on ? <Eye size={15}/> : <EyeOff size={15}/>}</button>
-                <span className="m-wgt-name">{w.label}</span>
-                <select className="m-wgt-pos" value={i+1} aria-label={`Position of ${w.label}`}
-                  onChange={e=>s.moveWidget(w.id, Number(e.target.value)-1)}>
-                  {s.widgets.map((_,j)=><option key={j} value={j+1}>{j+1}</option>)}
-                </select>
-              </div>)}
-            </>
-          : cur.items
-            ? <><b className="m-util-pop-title">{cur.label}</b>
-                {cur.items.map(d=><span key={d} className="m-util-pop-item">{d}</span>)}</>
-            : <span className="m-util-pop-label">{cur.label}</span>}
+      <div className="m-util-pop">
+        {cur.items
+          ? <><b className="m-util-pop-title">{cur.label}</b>
+              {cur.items.map(d=><span key={d} className="m-util-pop-item">{d}</span>)}</>
+          : <span className="m-util-pop-label">{cur.label}</span>}
       </div>
     </>}
   </div>;
@@ -1026,7 +1009,7 @@ function MobileHeader({s}) {
         <h1>Alex Johnson</h1>
       </div>
       <div className="m-header-actions">
-        <UtilityIcons s={s}/>
+        <UtilityIcons/>
         <div className="m-bell" onClick={()=>s.setNotifOpen(!s.notifOpen)}>
           <Bell size={18}/>{s.notifs.length>0 && <span className="m-bell-count">{s.notifs.length}</span>}
         </div>
@@ -1114,11 +1097,9 @@ function AtAGlancePage({s}) {
 
   return <div className="m-page">
     <MobileHeader s={s}/>
-    {s.widgets.filter(w=>w.on).map(w=><React.Fragment key={w.id}>
-      {w.id==="payments" && paymentsBlock}
-      {w.id==="plan" && planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOpen)}
-      {w.id==="insights" && <AagInsightsSection s={s}/>}
-    </React.Fragment>)}
+    {paymentsBlock}
+    {planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOpen)}
+    <AagInsightsSection s={s}/>
   </div>;
 }
 
@@ -1249,26 +1230,65 @@ function PaymentScheduleCard({p, s}) {
   </div>;
 }
 
-/* Full Payment Calendar popup — the current statement month as a seller
-   would see it: revenue capture window, data refresh, lock, statement,
-   and payday, on a month grid with a key-dates list. Demo data (May 2026). */
-const PAYCAL_KEY_DATES = [
-  {cls:"rev",     label:"Revenue Capture Window", date:"May 1 – 18", desc:"Bookings & revenue credited to this statement"},
-  {cls:"refresh", label:"Data Refresh",           date:"May 26",     desc:"Attainment data refreshed at 6:00 AM"},
-  {cls:"lock",    label:"Lock Date",              date:"May 28",     desc:"Statement locks for payroll processing"},
-  {cls:"stmt",    label:"Statement Available",    date:"May 30",     desc:"Final statement posted in CompX"},
-  {cls:"pay",     label:"Payday",                 date:"Jun 2",      desc:"Incentive payment via direct deposit"},
-];
+/* Full Payment Calendar popup — a statement month as a seller would see it:
+   revenue capture window, data refresh, lock, statement, and payday, on a
+   month grid with a key-dates list. The ◀ ▶ arrows browse to previous and
+   future months; months with a real statement use that period's dates, the
+   rest follow the standard cadence (demo). */
+const PAYCAL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const PAYCAL_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function paycalInfo(y, m) {
+  const p = fullPaymentPeriods.find(pp => pp.month === `${PAYCAL_MONTHS[m]} ${y}`);
+  const nums = str => (str.match(/\d+/g) || []).map(Number);
+  const rev = p ? nums(p.revDates) : null;               // [startDay, endDay, ...]
+  const daysIn = new Date(y, m+1, 0).getDate();
+  return {
+    revStart: rev ? rev[0] : 1,
+    revEnd: rev ? rev[1] : Math.min(18, daysIn),
+    refresh: 26,
+    lock: p ? nums(p.lockDate)[0] : 28,
+    stmt: Math.min(30, daysIn),
+    pay: p ? nums(p.payDate)[0] : 2,
+    sheet: m===0 ? `H2 ${y-1}` : m<=6 ? `H1 ${y}` : `H2 ${y}`
+  };
+}
 function PaymentCalendarPopup({onClose}) {
-  /* 6 Sunday-start weeks around May 2026: Apr 26 – Jun 6 (May 1 = Friday) */
-  const cells = Array.from({length:42}, (_,i)=>
-    i<5 ? {d:26+i, mo:"Apr", out:true} : i<36 ? {d:i-4, mo:"May", out:false} : {d:i-35, mo:"Jun", out:true});
+  const [view, setView] = useState({y:2026, m:4});       // opens on the current statement month (May 2026)
+  const {y, m} = view;
+  const info = paycalInfo(y, m);
+  const startDow = new Date(y, m, 1).getDay();
+  const daysIn = new Date(y, m+1, 0).getDate();
+  const daysPrev = new Date(y, m, 0).getDate();
+  const cells = Array.from({length:42}, (_,i)=>{
+    const d = i - startDow + 1;
+    return d < 1 ? {d:daysPrev+d, out:true, next:false}
+      : d > daysIn ? {d:d-daysIn, out:true, next:true}
+      : {d, out:false, next:false};
+  });
   const mark = c =>
-    c.mo==="May" ? (c.d<=18 ? "rev" : c.d===26 ? "refresh" : c.d===28 ? "lock" : c.d===30 ? "stmt" : "")
-    : c.mo==="Jun" && c.d===2 ? "pay" : "";
-  return <FullScreenPopup title="Payment Calendar" subtitle="May 2026 Statement Period" onClose={onClose}>
+    !c.out ? (c.d===info.refresh ? "refresh" : c.d===info.lock ? "lock" : c.d===info.stmt ? "stmt" : c.d>=info.revStart && c.d<=info.revEnd ? "rev" : "")
+    : c.next && c.d===info.pay ? "pay" : "";
+  const move = dir => setView(v=>{ const m2 = v.m + dir; return {y: v.y + Math.floor(m2/12), m: ((m2%12)+12)%12}; });
+  /* viewed month vs the open statement month (May 2026): Paid ← Current → Upcoming */
+  const rel = (y*12 + m) - (2026*12 + 4);
+  const status = rel===0 ? {label:"Current", cls:"open"} : rel>0 ? {label:"Upcoming", cls:"upcoming"} : {label:"Paid", cls:"paid"};
+  const keyDates = [
+    {cls:"rev",     label:"Revenue Capture Window", date:`${PAYCAL_SHORT[m]} ${info.revStart} – ${info.revEnd}`, desc:"Bookings & revenue credited to this statement"},
+    {cls:"refresh", label:"Data Refresh",           date:`${PAYCAL_SHORT[m]} ${info.refresh}`,                   desc:"Attainment data refreshed at 6:00 AM"},
+    {cls:"lock",    label:"Lock Date",              date:`${PAYCAL_SHORT[m]} ${info.lock}`,                      desc:"Statement locks for payroll processing"},
+    {cls:"stmt",    label:"Statement Available",    date:`${PAYCAL_SHORT[m]} ${info.stmt}`,                      desc:"Final statement posted in CompX"},
+    {cls:"pay",     label:"Payday",                 date:`${PAYCAL_SHORT[(m+1)%12]} ${info.pay}`,                desc:"Incentive payment via direct deposit"},
+  ];
+  return <FullScreenPopup title="Payment Calendar" subtitle={`${PAYCAL_MONTHS[m]} ${y} Statement Period`} onClose={onClose}>
     <div className="m-section">
-      <div className="m-paycal-monthhdr"><b>May 2026</b><span>H1 2026 Goal Sheet</span></div>
+      <div className="m-paycal-monthhdr">
+        <button className="m-paycal-nav" aria-label="Previous month" onClick={()=>move(-1)}><ChevronLeft size={16}/></button>
+        <div className="m-paycal-month">
+          <div className="m-paycal-month-row"><b>{PAYCAL_MONTHS[m]} {y}</b><span className={`m-pay-status m-status-${status.cls}`}>{status.label}</span></div>
+          <span>{info.sheet} Goal Sheet</span>
+        </div>
+        <button className="m-paycal-nav" aria-label="Next month" onClick={()=>move(1)}><ChevronRight size={16}/></button>
+      </div>
       <div className="m-paycal-grid">
         {["S","M","T","W","T","F","S"].map((d,i)=><span key={"d"+i} className="m-paycal-dow">{d}</span>)}
         {cells.map((c,i)=><span key={i} className={`m-paycal-day ${c.out?"out":""} ${mark(c)}`}>{c.d}</span>)}
@@ -1276,7 +1296,7 @@ function PaymentCalendarPopup({onClose}) {
     </div>
     <div className="m-section">
       <div className="m-section-hdr"><h2>Key Dates</h2></div>
-      {PAYCAL_KEY_DATES.map(k=><div key={k.label} className="m-paycal-key">
+      {keyDates.map(k=><div key={k.label} className="m-paycal-key">
         <span className={`m-paycal-key-dot ${k.cls}`}/>
         <div className="m-paycal-key-txt"><b>{k.label}</b><span>{k.desc}</span></div>
         <span className="m-paycal-key-date">{k.date}</span>
@@ -3396,27 +3416,13 @@ function useCompXState() {
   const [histPeriods, setHistPeriods] = useState([...HIST_PERIODS]);
   const [histPe, setHistPe] = useState("PE1");
   const [sideCollapsed, setSideCollapsed] = useState(false);        // iPad sidebar rail mode
-  const [hideAmts, setHideAmts] = useState(false);                  // dot out payment figures (privacy)
+  const [hideAmts, setHideAmts] = useState(true);                   // privacy default: figures dotted out until the seller taps Show
   AMOUNTS_HIDDEN = hideAmts;
   const [insightCanvasOpen, setInsightCanvasOpen] = useState(false);
   const [pinnedInsights, setPinnedInsights] = useState([]);         // insight ids, max MAX_PINS
   const [showRecovBal, setShowRecovBal] = useState(false);          // Recoverable Balance History popup
   const [showPayCal, setShowPayCal] = useState(false);              // Full Payment Calendar popup
   const [notifs, setNotifs] = useState(notifications);              // dismissible notification list
-  /* At A Glance widgets — settings popover controls visibility + order
-     ("reorder by number": each row's position select moves the widget) */
-  const [widgets, setWidgets] = useState([
-    {id:"payments", label:"Monthly Payments", on:true},
-    {id:"plan", label:"Plan Elements & Incentives", on:true},
-    {id:"insights", label:"Insights", on:true}
-  ]);
-  const toggleWidget = id => setWidgets(ws=>ws.map(w=>w.id===id ? {...w, on:!w.on} : w));
-  const moveWidget = (id, to) => setWidgets(ws=>{
-    const next = [...ws];
-    const [it] = next.splice(next.findIndex(w=>w.id===id), 1);
-    next.splice(to, 0, it);
-    return next;
-  });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -3481,7 +3487,6 @@ function useCompXState() {
     sideCollapsed, setSideCollapsed, hideAmts, setHideAmts,
     insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
     showRecovBal, setShowRecovBal, showPayCal, setShowPayCal, notifs, setNotifs,
-    widgets, toggleWidget, moveWidget,
     currentMonth: fullPaymentPeriods[fullPaymentPeriods.length-1].month
   };
 }
@@ -3592,10 +3597,8 @@ function MobileFrame({s}) {
         <div className="m-island"/>
 
         <div className="m-brandbar">
-          <div className="m-brand-lockup">
-            <CiscoLogo className="m-cisco"/>
-            <span className="m-compx">Comp<em>X</em></span>
-          </div>
+          <CiscoLogo className="m-cisco m-brand-cisco"/>
+          <span className="m-compx">Comp<em>X</em></span>
           <div className="m-brand-actions">
             <button className="m-askiq-open" onClick={()=>s.setShowAskIQ(true)} aria-label="Ask SalesComp IQ"><Sparkles size={16}/></button>
             <button className="m-theme-toggle" onClick={s.toggleTheme} aria-label={s.theme==="dark"?"Switch to light mode":"Switch to dark mode"}>
@@ -3663,7 +3666,7 @@ function IPadHeader({title, sub, s, right}) {
     </div>
     <div className="i-head-actions">
       {right}
-      <UtilityIcons s={s} ipad/>
+      <UtilityIcons ipad/>
       <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/>{s.notifs.length>0 && <span className="m-bell-count">{s.notifs.length}</span>}</button>
       {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
         <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)} ipad/></>}
@@ -3725,11 +3728,9 @@ function IPadGlance({s}) {
 
   return <div className="i-page">
     <IPadHeader title="At A Glance" sub="Your compensation snapshot · H1 2026" s={s}/>
-    {s.widgets.filter(w=>w.on).map(w=><React.Fragment key={w.id}>
-      {w.id==="payments" && paymentsBlock}
-      {w.id==="plan" && planIpadBlock}
-      {w.id==="insights" && <AagInsightsSection s={s} defaultOpen className="i-insights"/>}
-    </React.Fragment>)}
+    {paymentsBlock}
+    {planIpadBlock}
+    <AagInsightsSection s={s} defaultOpen className="i-insights"/>
   </div>;
 }
 
