@@ -2222,8 +2222,10 @@ const ksoQuarters = [
     calc:{ach:"125%", inst:"( 25% * 100% ) + ( 25% * 0% ) + ( 100% * 100% )", total:"$4,900.00"}},
   {q:"Q4 2026", cap:"125%", bonus:"-",
     rows:[
-      {name:"FY26 Generate [X] NUMBER of new logo territories", weight:"50%", bonus:"-", target:"10", result:"-", ach:null},
-      {name:"FY26 Reach [X] PERCENTAGE % target attainment", weight:"50%", bonus:"-", target:"5%", result:"-", ach:null}
+      {name:"FY26 Generate [X] NUMBER of new logo territories", weight:"50%", bonus:"-", target:"10", result:"-", ach:null,
+        desc:"FY26 Generate [X] NUMBER of new logo territory acquisitions for Q4 FY26 period."},
+      {name:"FY26 Reach [X] PERCENTAGE % target attainment", weight:"50%", bonus:"-", target:"5%", result:"-", ach:null,
+        desc:"FY26 Reach [X] PERCENTAGE % target attainment to qualify for accelerator multiplier."}
     ]}
 ];
 
