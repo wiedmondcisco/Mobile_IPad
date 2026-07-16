@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu, Settings } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -204,7 +204,7 @@ const recentPaymentPeriods = [
                 {range:"20 – 75%", peRate:"0.75%", prior:"-", incr:"4%", mult:"3.0%", active:true},
                 {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
               ]}},
-          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08",
+          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08", txnKey:"CUSEC",
             /* Desktop reference: 2% × 75,500 × 100% × 2.3% = 34.73 − 22.65 = 12.08.
                Multiplier: 3% prior × 0.50% = 1.5%, +1% incr × 0.75% = 0.8%. */
             calc:{incrementalAtt:"1%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"2.3%", totalEarned:"34.73", prevPaid:"22.65", result:"12.08", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
@@ -213,7 +213,7 @@ const recentPaymentPeriods = [
                 {range:"3 – 75%", peRate:"0.75%", prior:"-", incr:"1%", mult:"0.8%", active:true},
                 {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
               ]}},
-          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08",
+          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08", txnKey:"CUCOLLAB",
             /* Desktop reference: same shape as Security Comp Uplift — 2% × 75,500 × 100% × 2.3% = 34.73 − 22.65 = 12.08 */
             calc:{incrementalAtt:"1%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"2.3%", totalEarned:"34.73", prevPaid:"22.65", result:"12.08", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
               rateIncremental:[
@@ -465,7 +465,29 @@ const orders = [
   {id:"SO-105078", pe:"PE1", status:"Partial",      customer:"Helix Networks",     partner:"CDW Corp.",        bookings:"$21,000", backlog:"$14,000", revenue:"$7,000"},
   {id:"SO-104821", pe:"PE1", status:"Full Revenue", customer:"Acme Corp",          partner:"Direct",           bookings:"$12,500", backlog:"$0",      revenue:"$12,500"},
   {id:"SO-104650", pe:"PE1", status:"Backlog",      customer:"Cortex Financial",   partner:"Direct",           bookings:"$23,000", backlog:"$23,000", revenue:"$0"},
-  {id:"SO-104512", pe:"PE3", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$8,850",  backlog:"$0",      revenue:"$8,850"}
+  {id:"SO-104512", pe:"PE3", status:"Full Revenue", customer:"Summit Digital",     partner:"CDW Corp.",        bookings:"$8,850",  backlog:"$0",      revenue:"$8,850"},
+  /* Orders behind the Payments "Revenue Transactions" popups — every SO
+     shown there resolves to one of these (deep-linked via Order Search) */
+  {id:"SO-105201", pe:"PE1", status:"Full Revenue", customer:"Meridian Corp",       partner:"Direct",           bookings:"$5,800",  backlog:"$0", revenue:"$5,800"},
+  {id:"SO-105189", pe:"PE1", status:"Full Revenue", customer:"Apex Healthcare",     partner:"CDW Corp.",        bookings:"$4,450",  backlog:"$0", revenue:"$4,450"},
+  {id:"SO-104998", pe:"PE1", status:"Full Revenue", customer:"NovaTech Inc",        partner:"Insight Enterpr.", bookings:"$3,850",  backlog:"$0", revenue:"$3,850"},
+  {id:"SO-104890", pe:"PE1", status:"Full Revenue", customer:"Pinnacle Group",      partner:"Direct",           bookings:"$2,875",  backlog:"$0", revenue:"$2,875"},
+  {id:"SO-104780", pe:"PE1", status:"Full Revenue", customer:"Atlas Manufacturing", partner:"SHI Internat.",    bookings:"$3,230",  backlog:"$0", revenue:"$3,230"},
+  {id:"SO-104670", pe:"PE1", status:"Full Revenue", customer:"Cortex Financial",    partner:"Direct",           bookings:"$2,320",  backlog:"$0", revenue:"$2,320"},
+  {id:"SO-104550", pe:"PE1", status:"Full Revenue", customer:"Summit Logistics",    partner:"CDW Corp.",        bookings:"$2,180",  backlog:"$0", revenue:"$2,180"},
+  {id:"SO-104402", pe:"PE1", status:"Full Revenue", customer:"Ironwood Retail",     partner:"Direct",           bookings:"$1,295",  backlog:"$0", revenue:"$1,295"},
+  {id:"SO-105144", pe:"PE2", status:"Full Revenue", customer:"ClearPath Systems",   partner:"Direct",           bookings:"$18,500", backlog:"$0", revenue:"$18,500"},
+  {id:"SO-105044", pe:"PE2", status:"Full Revenue", customer:"Quantum Analytics",   partner:"Insight Enterpr.", bookings:"$12,000", backlog:"$0", revenue:"$12,000"},
+  {id:"SO-104515", pe:"PE2", status:"Full Revenue", customer:"BlueStar Solutions",  partner:"Insight Enterpr.", bookings:"$15,500", backlog:"$0", revenue:"$15,500"},
+  {id:"SO-104089", pe:"PE2", status:"Full Revenue", customer:"Vector Systems",      partner:"Direct",           bookings:"$16,000", backlog:"$0", revenue:"$16,000"},
+  {id:"SO-105112", pe:"PE3", status:"Full Revenue", customer:"Summit Digital",      partner:"CDW Corp.",        bookings:"$15,000", backlog:"$0", revenue:"$15,000"},
+  {id:"SO-104876", pe:"PE3", status:"Full Revenue", customer:"Orion Networks",      partner:"Direct",           bookings:"$14,500", backlog:"$0", revenue:"$14,500"},
+  {id:"SO-104655", pe:"PE3", status:"Full Revenue", customer:"Phoenix Labs",        partner:"SHI Internat.",    bookings:"$10,500", backlog:"$0", revenue:"$10,500"},
+  {id:"SO-104733", pe:"PE1", status:"Full Revenue", customer:"Helix Networks",      partner:"CDW Corp.",        bookings:"$1,800",  backlog:"$0", revenue:"$1,800"},
+  {id:"SO-104489", pe:"PE1", status:"Full Revenue", customer:"Vertex Dynamics",     partner:"SHI Internat.",    bookings:"$1,200",  backlog:"$0", revenue:"$1,200"},
+  {id:"SO-104702", pe:"PE1", status:"Full Revenue", customer:"BlueStar Solutions",  partner:"Insight Enterpr.", bookings:"$1,400",  backlog:"$0", revenue:"$1,400"},
+  {id:"SO-104481", pe:"PE1", status:"Full Revenue", customer:"Acme Corp",           partner:"Direct",           bookings:"$1,000",  backlog:"$0", revenue:"$1,000"},
+  {id:"SO-104615", pe:"PE3", status:"Full Revenue", customer:"GlobalNet Inc",       partner:"Direct",           bookings:"$1,900",  backlog:"$0", revenue:"$1,900"}
 ];
 const ORDER_STATUSES = ["All Statuses", "Backlog", "Full Revenue", "Partial"];
 const ORDER_PES = ["All Plan Elements", "PE1 - Prod+Services", "PE2 - Recurring Software", "PE3 - Services"];
@@ -476,12 +498,19 @@ const ORDER_PES = ["All Plan Elements", "PE1 - Prod+Services", "PE2 - Recurring 
 const ORDER_SEARCH_TYPES = ["SO Number", "Deal ID", "PO Number", "Subscription Reference ID", "Book Date Range", "End Customer", "Account Name (UCD C4)", "Account ID (UCD C4)"];
 const ORDER_TYPE_FIELDS = {"SO Number":["id"], "End Customer":["customer"], "Account Name (UCD C4)":["customer","partner"], "Account ID (UCD C4)":["customer","partner"]};
 
-/* Revenue Transactions — shown by the PDF/breakdown icon on Payments (per plan element) */
+/* Revenue Transactions — shown by the note icon on Payments rows (per plan
+   element / uplift component). Every SO here is an actual order in `orders`,
+   so the popup can deep-link into Order Search for full order details. */
 const revenueTxns = {
   PE1:{total:"26,000.00", rows:[
-    {so:"SO-105201", date:"May 12, 2026", customer:"Meridian Corp",   rev:"$11,500.00"},
-    {so:"SO-105189", date:"May 8, 2026",  customer:"Apex Healthcare", rev:"$8,200.00"},
-    {so:"SO-104998", date:"Apr 28, 2026", customer:"NovaTech Inc",    rev:"$6,300.00"}
+    {so:"SO-105201", date:"May 12, 2026", customer:"Meridian Corp",       rev:"$5,800.00"},
+    {so:"SO-105189", date:"May 8, 2026",  customer:"Apex Healthcare",     rev:"$4,450.00"},
+    {so:"SO-104998", date:"Apr 28, 2026", customer:"NovaTech Inc",        rev:"$3,850.00"},
+    {so:"SO-104890", date:"Apr 20, 2026", customer:"Pinnacle Group",      rev:"$2,875.00"},
+    {so:"SO-104780", date:"Apr 14, 2026", customer:"Atlas Manufacturing", rev:"$3,230.00"},
+    {so:"SO-104670", date:"Apr 5, 2026",  customer:"Cortex Financial",    rev:"$2,320.00"},
+    {so:"SO-104550", date:"Mar 22, 2026", customer:"Summit Logistics",    rev:"$2,180.00"},
+    {so:"SO-104402", date:"Mar 2, 2026",  customer:"Ironwood Retail",     rev:"$1,295.00"}
   ]},
   PE2:{total:"62,000.00", rows:[
     {so:"SO-105144", date:"Apr 22, 2026", customer:"ClearPath Systems",  rev:"$18,500.00"},
@@ -493,6 +522,18 @@ const revenueTxns = {
     {so:"SO-105112", date:"Apr 15, 2026", customer:"Summit Digital", rev:"$15,000.00"},
     {so:"SO-104876", date:"Mar 20, 2026", customer:"Orion Networks", rev:"$14,500.00"},
     {so:"SO-104655", date:"Mar 1, 2026",  customer:"Phoenix Labs",   rev:"$10,500.00"}
+  ]},
+  /* PE1 breakdown components (keyed via each child's txnKey) */
+  CUSEC:{total:"3,000.00", rows:[
+    {so:"SO-104733", date:"Apr 11, 2026", customer:"Helix Networks",  rev:"$1,800.00"},
+    {so:"SO-104489", date:"Mar 15, 2026", customer:"Vertex Dynamics", rev:"$1,200.00"}
+  ]},
+  CUCOLLAB:{total:"2,400.00", rows:[
+    {so:"SO-104702", date:"Apr 9, 2026",  customer:"BlueStar Solutions", rev:"$1,400.00"},
+    {so:"SO-104481", date:"Mar 14, 2026", customer:"Acme Corp",          rev:"$1,000.00"}
+  ]},
+  MY:{total:"1,900.00", rows:[
+    {so:"SO-104615", date:"Mar 28, 2026", customer:"GlobalNet Inc", rev:"$1,900.00"}
   ]}
 };
 
@@ -919,13 +960,14 @@ function NotifDropdown({s, onClose, ipad=false}) {
 }
 
 /* Utility icons (desktop reference), folded into two buttons to keep the
-   header uncluttered. Popovers are informational only — no live links yet. */
+   header uncluttered. Settings consolidates the old Support links with the
+   At A Glance widget manager (show/hide + reorder by position number). */
 const UTIL_ITEMS = [
-  {id:"support", Icon:HelpCircle, label:"Support", items:["Help","Open Case"]},
+  {id:"settings", Icon:Settings, label:"Settings"},
   {id:"dash", Icon:LayoutGrid, label:"Dashboards",
     items:["Next Gen Claiming","Sales Incentive Calendar","MBR","Sales Comp Portal"]},
 ];
-function UtilityIcons({ipad=false}) {
+function UtilityIcons({s, ipad=false}) {
   const [open, setOpen] = useState(null);
   const cur = UTIL_ITEMS.find(u=>u.id===open);
   return <div className={`m-utils ${ipad?"i-utils":""}`}>
@@ -936,11 +978,27 @@ function UtilityIcons({ipad=false}) {
       </button>)}
     {cur && <>
       <div className="m-notif-overlay m-util-overlay" onClick={()=>setOpen(null)}/>
-      <div className="m-util-pop">
-        {cur.items
-          ? <><b className="m-util-pop-title">{cur.label}</b>
-              {cur.items.map(d=><span key={d} className="m-util-pop-item">{d}</span>)}</>
-          : <span className="m-util-pop-label">{cur.label}</span>}
+      <div className={`m-util-pop ${cur.id==="settings" ? "m-util-pop-wide" : ""}`}>
+        {cur.id==="settings"
+          ? <>
+              <b className="m-util-pop-title">Settings</b>
+              <span className="m-util-pop-item">Help</span>
+              <span className="m-util-pop-item">Open Case</span>
+              <b className="m-wgt-title"><Eye size={12}/> Widgets — Show / Hide & Reorder</b>
+              {s.widgets.map((w,i)=><div key={w.id} className={`m-wgt-row ${w.on ? "" : "m-wgt-off"}`}>
+                <button className="m-wgt-eye" aria-pressed={w.on} aria-label={`${w.on ? "Hide" : "Show"} ${w.label}`}
+                  onClick={()=>s.toggleWidget(w.id)}>{w.on ? <Eye size={15}/> : <EyeOff size={15}/>}</button>
+                <span className="m-wgt-name">{w.label}</span>
+                <select className="m-wgt-pos" value={i+1} aria-label={`Position of ${w.label}`}
+                  onChange={e=>s.moveWidget(w.id, Number(e.target.value)-1)}>
+                  {s.widgets.map((_,j)=><option key={j} value={j+1}>{j+1}</option>)}
+                </select>
+              </div>)}
+            </>
+          : cur.items
+            ? <><b className="m-util-pop-title">{cur.label}</b>
+                {cur.items.map(d=><span key={d} className="m-util-pop-item">{d}</span>)}</>
+            : <span className="m-util-pop-label">{cur.label}</span>}
       </div>
     </>}
   </div>;
@@ -968,7 +1026,7 @@ function MobileHeader({s}) {
         <h1>Alex Johnson</h1>
       </div>
       <div className="m-header-actions">
-        <UtilityIcons/>
+        <UtilityIcons s={s}/>
         <div className="m-bell" onClick={()=>s.setNotifOpen(!s.notifOpen)}>
           <Bell size={18}/>{s.notifs.length>0 && <span className="m-bell-count">{s.notifs.length}</span>}
         </div>
@@ -1021,9 +1079,9 @@ function AtAGlancePage({s}) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const sheet = goalSheetOptions[sheetIdx];
 
-  return <div className="m-page">
-    <MobileHeader s={s}/>
-
+  /* Widgets render in the order set from the Settings popover; hidden ones
+     drop out entirely. "payments" = hero + prev/next strip. */
+  const paymentsBlock = <>
     {/* HERO — current month payment is the single largest element on the page; opens Payments */}
     <div className="m-hero" role="button" tabIndex={0} title="View Payments"
       onClick={()=>s.openPayPeriod(hero.period)} onKeyDown={e=>e.key==="Enter"&&s.openPayPeriod(hero.period)}>
@@ -1052,8 +1110,22 @@ function AtAGlancePage({s}) {
         <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
       </div>)}
     </div>
+  </>;
 
-    {/* Plan Elements — donut is the dominant visual per card */}
+  return <div className="m-page">
+    <MobileHeader s={s}/>
+    {s.widgets.filter(w=>w.on).map(w=><React.Fragment key={w.id}>
+      {w.id==="payments" && paymentsBlock}
+      {w.id==="plan" && planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOpen)}
+      {w.id==="insights" && <AagInsightsSection s={s}/>}
+    </React.Fragment>)}
+  </div>;
+}
+
+/* "Plan Elements & Incentives" widget — PE cards + SPIFF section (kept as a
+   plain function so the goal-sheet dropdown state stays in AtAGlancePage) */
+function planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOpen) {
+  return <>
     <div className="m-section-label"><Menu size={13} className="m-section-icon"/> PLAN ELEMENTS & INCENTIVES</div>
     <div className="m-section">
       <div className="m-section-hdr"><h2>PLAN ELEMENTS</h2>
@@ -1091,10 +1163,7 @@ function AtAGlancePage({s}) {
 
     {/* SPIFF & Bonus — first 2 programs, expandable */}
     <AagSpiffSection s={s}/>
-
-    {/* Insights — one collapsed row; expands to pinned/AI cards */}
-    <AagInsightsSection s={s}/>
-  </div>;
+  </>;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1223,9 +1292,9 @@ function PaymentCalendarPopup({onClose}) {
 /* Goal-sheet attainment bar. Hover pins a compact tooltip stack to the right
    end of the bar — the emptiest spot — instead of chasing the pointer. */
 function PbAttBar({item}) {
-  /* Two-tone fill matching the desktop reference: green = attainment before
-     the recent change, blue = the change itself. Both segments share the
-     track's % scale, so total fill = pct and the blue width = attChange. */
+  /* Two-tone fill matching the desktop reference: blue = attainment before
+     the recent change, green = the change itself. Both segments share the
+     track's % scale, so total fill = pct and the green width = attChange. */
   const attW = Math.min(item.pct, 100);
   const chg = Math.min(item.attChange || 0, attW);
   const [hover, setHover] = useState(false);
@@ -1289,6 +1358,8 @@ function GoalSheetItemRow({item, onOpenCalc, onOpenPdf, onOpenKso}) {
         <div className="m-pb-kid-top">
           <span className="m-pb-pe-badge" style={{background:kid.color+"22", color:kid.color}}>{kid.pe}</span>
           <span className="m-pb-pe-name">{kid.label}</span>
+          {revenueTxns[kid.txnKey || kid.pe] && <button className="m-pb-pe-pdf m-pb-pe-pdf-sm" aria-label={`${kid.label} revenue transactions`}
+            onClick={()=>onOpenPdf(kid)}><FileText size={13}/></button>}
           <span className="m-pb-pe-payout-link" onClick={()=>onOpenCalc(kid)}>{amt("$"+kid.payout)}</span>
         </div>
         <PbAttBar item={kid}/>
@@ -1691,8 +1762,8 @@ function PaymentHistoryPopup({item, onClose}) {
    per the desktop reference: snapshot banner, "N transactions contributing"
    line with the period total, SO links, green revenue, and a bottom total.
    No export (removed app-wide). */
-function PdfPopup({item, onClose}) {
-  const t = revenueTxns[item.pe];
+function PdfPopup({item, onClose, onOpenOrder}) {
+  const t = revenueTxns[item.txnKey || item.pe];
   if (!t) return null;
   const n = t.rows.length;
   return <div className="m-fs">
@@ -1710,7 +1781,7 @@ function PdfPopup({item, onClose}) {
         <div className="m-txn-list-hdr"><span>SO Number</span><span className="r">Revenue</span></div>
         {t.rows.map((r,i)=><div key={i} className="m-txn-row2">
           <div className="m-txn-line1">
-            <span className="m-txn-so">{r.so}</span>
+            <button className="m-txn-so" onClick={()=>onOpenOrder(r.so)} title={`View ${r.so} order details`}>{r.so}</button>
             <span className="m-txn-rev">{amt(r.rev)}</span>
           </div>
           <div className="m-txn-line2">{r.date} · {r.customer}</div>
@@ -3332,6 +3403,20 @@ function useCompXState() {
   const [showRecovBal, setShowRecovBal] = useState(false);          // Recoverable Balance History popup
   const [showPayCal, setShowPayCal] = useState(false);              // Full Payment Calendar popup
   const [notifs, setNotifs] = useState(notifications);              // dismissible notification list
+  /* At A Glance widgets — settings popover controls visibility + order
+     ("reorder by number": each row's position select moves the widget) */
+  const [widgets, setWidgets] = useState([
+    {id:"payments", label:"Monthly Payments", on:true},
+    {id:"plan", label:"Plan Elements & Incentives", on:true},
+    {id:"insights", label:"Insights", on:true}
+  ]);
+  const toggleWidget = id => setWidgets(ws=>ws.map(w=>w.id===id ? {...w, on:!w.on} : w));
+  const moveWidget = (id, to) => setWidgets(ws=>{
+    const next = [...ws];
+    const [it] = next.splice(next.findIndex(w=>w.id===id), 1);
+    next.splice(to, 0, it);
+    return next;
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -3358,6 +3443,17 @@ function useCompXState() {
     setTab("goals");
   };
 
+  /* Deep-link: open Order Search pre-filtered to one SO (Revenue Transactions
+     popup — "Click any SO to view full order details") */
+  const openOrder = so => {
+    setOrderType("SO Number");
+    setOrderQuery(so);
+    setOrderStatus("All Statuses");
+    setOrderPe("All Plan Elements");
+    setOrderSubmitted(true);
+    setTab("orders");
+  };
+
   /* Deep-link: open SPIFF & Bonus with the target program visible —
      clears filters and expands past the first-2 fold when needed */
   const openSpiff = name => {
@@ -3371,7 +3467,7 @@ function useCompXState() {
     calcItem, setCalcItem, pdfItem, setPdfItem,
     sellerItem, setSellerItem, sellerView, setSellerView, enterSellerView, exitSellerView,
     showAskIQ, setShowAskIQ, notifOpen, setNotifOpen, reminders, setReminders,
-    periodIdx, setPeriodIdx, openPayPeriod, openGoal, openSpiff, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
+    periodIdx, setPeriodIdx, openPayPeriod, openGoal, openSpiff, openOrder, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
     orderQuery, setOrderQuery, orderType, setOrderType, orderStatus, setOrderStatus, orderPe, setOrderPe,
     orderSubmitted, setOrderSubmitted, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
     aagSpiffExpanded, setAagSpiffExpanded, backlogFilter, setBacklogFilter,
@@ -3385,6 +3481,7 @@ function useCompXState() {
     sideCollapsed, setSideCollapsed, hideAmts, setHideAmts,
     insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
     showRecovBal, setShowRecovBal, showPayCal, setShowPayCal, notifs, setNotifs,
+    widgets, toggleWidget, moveWidget,
     currentMonth: fullPaymentPeriods[fullPaymentPeriods.length-1].month
   };
 }
@@ -3400,7 +3497,8 @@ function FramePopups({s, variant="mobile"}) {
   const selMonth = fullPaymentPeriods[s.periodIdx].month;
   return <>
     {s.calcItem && shell(<CompCalcPopup item={s.calcItem} month={selMonth} onClose={()=>s.setCalcItem(null)}/>, ()=>s.setCalcItem(null))}
-    {s.pdfItem && shell(<PdfPopup item={s.pdfItem} onClose={()=>s.setPdfItem(null)}/>, ()=>s.setPdfItem(null))}
+    {s.pdfItem && shell(<PdfPopup item={s.pdfItem} onClose={()=>s.setPdfItem(null)}
+      onOpenOrder={so=>{ s.setPdfItem(null); s.openOrder(so); }}/>, ()=>s.setPdfItem(null))}
     {s.sellerItem && shell(<SellerBreakdownPopup s={s.sellerItem} onClose={()=>s.setSellerItem(null)}/>, ()=>s.setSellerItem(null))}
     {s.showAskIQ && shell(<AskIQPopup onClose={()=>s.setShowAskIQ(false)}/>, ()=>s.setShowAskIQ(false), "i-modal-lg")}
     {s.insightCanvasOpen && shell(<InsightCanvasPopup s={s} onClose={()=>s.setInsightCanvasOpen(false)}/>, ()=>s.setInsightCanvasOpen(false), "i-modal-xl")}
@@ -3565,7 +3663,7 @@ function IPadHeader({title, sub, s, right}) {
     </div>
     <div className="i-head-actions">
       {right}
-      <UtilityIcons ipad/>
+      <UtilityIcons s={s} ipad/>
       <button className="i-iconbtn" onClick={()=>s.setNotifOpen(!s.notifOpen)} aria-label="Notifications"><Bell size={19}/>{s.notifs.length>0 && <span className="m-bell-count">{s.notifs.length}</span>}</button>
       {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
         <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)} ipad/></>}
@@ -3574,11 +3672,9 @@ function IPadHeader({title, sub, s, right}) {
 }
 
 function IPadGlance({s}) {
-  return <div className="i-page">
-    <IPadHeader title="At A Glance" sub="Your compensation snapshot · H1 2026" s={s}/>
-    {/* Payment timeline — cards read chronologically left→right (Apr · May · Jun),
-        with the current month as the dominant hero in the middle */}
-    <div className="i-glance-top">
+  /* Payment timeline — cards read chronologically left→right (Apr · May · Jun),
+      with the current month as the dominant hero in the middle */
+  const paymentsBlock = <div className="i-glance-top">
       {monthlyPayCards.map((c,i)=> c.current
         ? <div key={i} className="m-hero i-hero" role="button" tabIndex={0} title="View Payments"
             onClick={()=>s.openPayPeriod(c.period)} onKeyDown={e=>e.key==="Enter"&&s.openPayPeriod(c.period)}>
@@ -3601,10 +3697,12 @@ function IPadGlance({s}) {
             <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
             <small className="i-timeline-date">{c.payDate}</small>
           </div>)}
-    </div>
+    </div>;
+
+  /* Desktop reference layout: plan elements stacked left, SPIFF panel right —
+      the columns stay height-matched so no dead space opens up under PE3 */
+  const planIpadBlock = <>
     <div className="m-section-label"><Menu size={13} className="m-section-icon"/> PLAN ELEMENTS & INCENTIVES</div>
-    {/* Desktop reference layout: plan elements stacked left, SPIFF panel right —
-        the columns stay height-matched so no dead space opens up under PE3 */}
     <div className="i-glance-cols">
       <div className="i-glance-pes">
         {planElements.map((pe,i)=><div key={i} className="m-pe-card i-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
@@ -3623,8 +3721,15 @@ function IPadGlance({s}) {
       </div>
       <AagSpiffSection s={s}/>
     </div>
+  </>;
 
-    <AagInsightsSection s={s} defaultOpen className="i-insights"/>
+  return <div className="i-page">
+    <IPadHeader title="At A Glance" sub="Your compensation snapshot · H1 2026" s={s}/>
+    {s.widgets.filter(w=>w.on).map(w=><React.Fragment key={w.id}>
+      {w.id==="payments" && paymentsBlock}
+      {w.id==="plan" && planIpadBlock}
+      {w.id==="insights" && <AagInsightsSection s={s} defaultOpen className="i-insights"/>}
+    </React.Fragment>)}
   </div>;
 }
 

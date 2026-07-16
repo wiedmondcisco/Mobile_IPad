@@ -110,6 +110,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-util-pop-label{display:block;padding:4px 18px;font-size:13.5px;font-weight:600;color:var(--text-2);text-align:center;white-space:nowrap}
 .m-util-pop-title{display:block;padding:4px 18px 10px;font-size:15px;font-weight:800;color:var(--text);text-align:center;border-bottom:1px solid var(--divider);margin-bottom:4px}
 .m-util-pop-item{display:block;padding:9px 18px;font-size:13px;font-weight:600;color:var(--text-2);white-space:nowrap}
+/* Settings popover: widget show/hide + reorder-by-number rows */
+.m-util-pop-wide{min-width:284px}
+.m-wgt-title{display:flex;align-items:center;gap:6px;padding:10px 18px 6px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--divider);margin-top:6px}
+.m-wgt-row{display:flex;align-items:center;gap:9px;padding:7px 18px}
+.m-wgt-eye{border:none;background:none;cursor:pointer;padding:0;display:flex;color:var(--green)}
+.m-wgt-off .m-wgt-eye{color:var(--muted)}
+.m-wgt-name{flex:1;font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap}
+.m-wgt-off .m-wgt-name{color:var(--muted)}
+.m-wgt-pos{border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;font-weight:800;border-radius:8px;padding:3px 8px;cursor:pointer}
 .i-utils{gap:8px}
 .i-utils .m-util-btn{width:38px;height:38px;border:1px solid var(--border);color:var(--text)}
 .i-utils .m-util-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -317,8 +326,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-pb-pe-row{padding:12px 0;border-bottom:1px solid var(--divider)}
 .m-pb-pe-row:last-child{border-bottom:none}
 .m-pb-pe-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.m-pb-pe-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
-.m-pb-pe-name{font-size:11px;font-weight:600;color:var(--text);flex:1}
+.m-pb-pe-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px}
+.m-pb-pe-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
 .m-pb-pe-weight{font-size:10px;color:var(--muted);font-weight:500}
 .m-pb-pe-bar-wrap{position:relative;margin-bottom:6px;padding-right:8px}
 /* hover tooltips on the goal-sheet attainment bars */
@@ -326,11 +335,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
    fixed in place so they never cover the row's labels or amounts */
 .m-pbtips{position:absolute;top:50%;right:10px;transform:translateY(-50%);display:flex;align-items:center;gap:3px;z-index:8;pointer-events:none}
 .m-pbtip{white-space:nowrap;font-size:8px;font-weight:700;color:#fff;padding:2px 5px;border-radius:5px;box-shadow:0 4px 10px rgba(0,0,0,.28)}
-.m-pbtip-rev{background:#0f7a4d}
-.m-pbtip-chg{background:#1e40af}
+.m-pbtip-rev{background:#1e40af}
+.m-pbtip-chg{background:#0f7a4d}
 .m-pb-pe-bar-track{display:flex;height:8px;background:var(--track);border-radius:4px;overflow:hidden;border:2px solid var(--border)}
-.m-pb-pe-bar-fill{height:100%;background:var(--green);transition:width .4s ease}
-.m-pb-pe-bar-chg{height:100%;background:#3b82f6;transition:width .4s ease}
+.m-pb-pe-bar-fill{height:100%;background:#3b82f6;transition:width .4s ease}
+.m-pb-pe-bar-chg{height:100%;background:var(--green);transition:width .4s ease}
 .m-pb-pe-bar-marker{position:absolute;top:-1px;width:2px;height:10px;background:var(--text);border-radius:1px}
 .m-pb-pe-stats{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
 .m-pb-pe-att{font-size:12.5px;color:var(--text)}
@@ -387,9 +396,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* Replaced goal sheet — amber frame + indent + dashed elbow connector
    so it reads as "swapped out, but still reconciled into the current sheet" */
 .m-replaced{border-top:1px solid var(--divider);margin-top:12px;padding-top:10px}
-.m-replaced-hdr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding-bottom:4px}
-.m-replaced-title{font-size:12.5px;font-weight:800;color:var(--text-2);white-space:nowrap}
+.m-replaced-hdr{display:flex;align-items:center;gap:9px;padding-bottom:8px}
+.m-replaced-icon{width:26px;height:26px;border-radius:9px;background:rgba(245,158,11,.16);color:#b45309;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+:root[data-theme="dark"] .m-replaced-icon{color:#fbbf24}
+.m-replaced-hdr-text{display:flex;flex-direction:column;gap:1px;min-width:0}
+.m-replaced-title{font-size:12.5px;font-weight:800;color:var(--text);white-space:nowrap}
 .m-replaced-period{font-size:10.5px;color:var(--muted)}
+.m-replaced-total{margin-left:auto;font-size:12.5px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums;border:1px solid rgba(245,158,11,.45);background:rgba(245,158,11,.08);border-radius:10px;padding:5px 10px;white-space:nowrap}
+.m-replaced-banner{display:flex;align-items:flex-start;gap:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.28);border-radius:10px;padding:9px 10px;margin-bottom:8px}
+.m-replaced-banner svg{flex-shrink:0;color:#3b82f6;margin-top:1px}
+.m-replaced-banner p{font-size:11px;font-weight:600;color:var(--text-2);line-height:1.5}
+.m-replaced-rows{border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:0 10px}
 .m-replaced-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:6px 8px;padding:10px 0;border-bottom:1px solid var(--divider)}
 .m-replaced-row .m-pb-pe-badge{grid-column:1}
 .m-replaced-row .m-insight-chev{grid-column:3}
@@ -407,11 +424,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-otb-replaced-hdr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .m-otb-replaced-hdr b{font-size:12px;font-weight:800;color:var(--text-2)}
 .m-otb-replaced-hdr small{font-size:10.5px;color:var(--muted);font-weight:600}
-.m-otb-replaced-note{font-size:10.5px;color:var(--muted);font-style:italic;margin:3px 0 4px}
+.m-otb-replaced-note{margin-left:auto;font-size:10.5px;color:var(--muted);font-style:italic;text-align:right}
 .m-otb-replaced-amt{font-size:13px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
-.m-replaced-paid{flex-basis:100%;max-width:max-content;font-size:11px;font-weight:600;color:var(--muted);background:var(--track);border-radius:8px;padding:4px 9px}
+.m-replaced-paid{flex-basis:100%;max-width:max-content;font-size:11px;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:4px 9px}
 .m-replaced-paid b{color:var(--green);font-weight:800}
-.m-replaced-note{flex-basis:100%;font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.45}
 
 .m-pb-past-group{margin-bottom:12px}
 .m-pb-past-group:last-child{margin-bottom:0}
@@ -696,8 +712,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* two-trigger row on Payments goal sheet */
 .m-pb-pe-actions{gap:14px}
-.m-pb-pe-pdf{border:none;background:var(--accent-light);color:var(--accent);width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.m-pb-pe-pdf{border:none;background:var(--accent-light);color:var(--accent);width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .m-pb-pe-pdf:active{transform:scale(.92)}
+.m-pb-pe-pdf-sm{width:26px;height:26px;border-radius:7px}
 
 /* PDF / statement popup */
 .m-pdf-doc{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
@@ -725,7 +742,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-txn-list-hdr .r{text-align:right}
 .m-txn-row2{display:flex;flex-direction:column;gap:3px;padding:12px 0;border-bottom:1px solid var(--divider)}
 .m-txn-line1{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.m-txn-so{font-size:14px;font-weight:700;font-style:italic;color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+.m-txn-so{border:none;background:none;padding:0;cursor:pointer;font-size:14px;font-weight:700;font-style:italic;color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
 .m-txn-rev{font-size:16px;font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
 .m-txn-line2{font-size:12px;color:var(--muted)}
 .m-txn-total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:2px;border-top:2px solid var(--border)}
@@ -811,32 +828,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-kso-hdr .m-insight-chev{flex-shrink:0;align-self:center;color:var(--muted)}
 .m-kso-hdr-left{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-width:0}
 .m-kso-q{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.2px}
-.m-kso-pill{font-size:9.5px;font-weight:700;border:1px solid;padding:3px 10px;border-radius:20px;white-space:nowrap}
 .m-kso-cap{font-size:11px;color:var(--muted);font-weight:500}
 .m-kso-cap b{color:var(--text);font-weight:700}
 .m-kso-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-left:auto}
 .m-kso-bonus-blk{display:flex;flex-direction:column;align-items:flex-end}
 .m-kso-bonus-blk small{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .m-kso-bonus-blk b{font-size:21px;font-weight:900;color:var(--text);letter-spacing:-.3px;font-variant-numeric:tabular-nums}
-.m-kso-date{font-size:10.5px;color:var(--muted);display:flex;gap:5px;align-items:baseline}
-.m-kso-date b{color:var(--text-2);font-weight:700}
-/* objective rows: mobile = 2-col grid (name + progress span both) */
-.m-kso-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;padding:14px 0;border-bottom:1px solid var(--divider)}
-.m-kso-row:last-child{border-bottom:none;padding-bottom:2px}
-.m-kso-cell-name{grid-column:1/-1}
-.m-kso-cell-name b{font-size:13.5px;font-weight:800;color:var(--text)}
+/* objective rows: mobile = name on top, figure strip below */
+.m-kso-row{display:flex;flex-direction:column;gap:9px;padding:14px 0;border-bottom:1px solid var(--divider)}
+.m-kso-row:last-of-type{border-bottom:none;padding-bottom:2px}
+.m-kso-cell-name b{display:block;font-size:13.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .m-kso-row-desc{display:block;font-size:11px;color:var(--muted);line-height:1.45;margin-top:3px}
+.m-kso-figs{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
 .m-kso-fig{display:flex;flex-direction:column;gap:2px}
 .m-kso-fig small{font-size:8.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .m-kso-fig b{font-size:15px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
-.m-kso-prog{grid-column:1/-1}
-.m-kso-prog-lbl{display:block;font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:6px}
-.m-kso-bar{height:8px;background:var(--track);border-radius:4px;overflow:hidden}
-.m-kso-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
-/* iPad: mirror the desktop's columnar row (name | bonus | weight | progress) */
-.i-page .m-kso-row{grid-template-columns:minmax(170px,1.25fr) auto auto minmax(180px,1.5fr);align-items:center}
-.i-page .m-kso-cell-name{grid-column:auto}
-.i-page .m-kso-prog{grid-column:auto}
+.m-kso-ach{display:inline-block;min-width:44px;text-align:center;font-size:12px;font-weight:800;padding:4px 10px;border-radius:14px;background:var(--track);color:var(--text-2);font-variant-numeric:tabular-nums}
+.m-kso-ach.good{background:rgba(16,185,129,.14);color:var(--green)}
+.m-kso-ach.bad{background:rgba(239,68,68,.14);color:var(--red)}
+/* View Calculation expander (desktop reference) */
+.m-kso-viewcalc{display:inline-flex;align-items:center;gap:5px;border:none;background:none;color:var(--accent);font-size:12px;font-weight:800;cursor:pointer;padding:12px 0 0}
+.m-kso-calc{border-top:1px solid var(--divider);margin-top:10px;padding-top:10px}
+.m-kso-calc-title{display:block;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.m-kso-calc-row{display:flex;flex-direction:column;gap:4px;padding:9px 0;border-bottom:1px solid var(--divider)}
+.m-kso-calc-row:last-child{border-bottom:none;padding-bottom:0}
+.m-kso-calc-ach{font-size:14px;font-weight:800;color:var(--text)}
+.m-kso-calc-inst{font-size:11.5px;font-weight:600;color:var(--text-2);font-variant-numeric:tabular-nums;line-height:1.5}
+.m-kso-calc-lbl{font-size:12px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.m-kso-formula-chip{font-style:normal;font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:var(--track);color:var(--muted);border-radius:6px;padding:3px 7px}
+.m-kso-calc-total{font-size:12.5px;font-weight:800;color:var(--text)}
+.m-kso-calc-note{font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.5}
+/* iPad: portrait keeps the stacked row (name over figures — the narrow
+   column can't fit both side by side without truncating names); landscape
+   mirrors the desktop's columnar row (name | figure strip) */
+.i-device.land .m-kso-row{flex-direction:row;align-items:center;gap:18px}
+.i-device.land .m-kso-cell-name{flex:1;min-width:180px}
+.i-device.land .m-kso-figs{flex-wrap:nowrap;gap:18px}
+.i-device.land .m-kso-fig small{white-space:nowrap}
+.i-page .m-kso-calc-row{flex-direction:row;align-items:baseline;justify-content:space-between;gap:18px}
+.i-page .m-kso-calc-row .m-kso-calc-inst,.i-page .m-kso-calc-note{text-align:right;max-width:62%}
 
 /* ─── BACKLOG INSIGHTS ─── */
 /* Mobile backlog hero — selected bucket at a glance, dropdown filter */
@@ -958,9 +988,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-gsel-menu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:31;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.22);padding:6px;display:flex;flex-direction:column;gap:2px}
 .m-gsel-menu button{display:flex;align-items:flex-start;gap:8px;border:none;background:none;text-align:left;padding:10px;border-radius:10px;cursor:pointer}
 .m-gsel-menu button:hover{background:var(--track)}
-.m-gsel-menu button.on{background:var(--accent-light)}
+/* selected sheet = blue pill row, white text + check (desktop reference) */
+.m-gsel-menu button.on{background:#5871f0}
+.m-gsel-menu button.on:hover{background:#5871f0}
+.m-gsel-menu button.on .m-gsel-opt,.m-gsel-menu button.on .m-gsel-check{color:#fff}
+.m-gsel-menu button.on .m-gsel-opt{font-weight:700}
+:root[data-theme="dark"] .m-gsel-menu button.on{background:#6d7bff}
 .m-gsel-check{width:14px;flex-shrink:0;font-size:12px;font-weight:900;color:var(--accent)}
 .m-gsel-opt{display:block;font-size:12px;font-weight:600;color:var(--text);line-height:1.45;min-width:0}
+/* compact chip trigger (Plan Elements header) with a right-anchored menu */
+.m-gsel-chip{margin-left:auto}
+.m-badge-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(4,159,217,.25);background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;cursor:pointer;white-space:nowrap}
+.m-badge-chip .m-insight-chev{color:var(--accent)}
+.m-gsel-menu-anchored{left:auto;right:0;width:330px;max-width:calc(100vw - 48px)}
 .m-gsel-opt b{font-weight:800}
 .m-gsel-opt small{color:var(--muted);font-weight:600;font-size:11px}
 .i-gsel-row{max-width:520px;margin-bottom:14px}
@@ -972,9 +1012,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-formula-chip{display:flex;flex-direction:column;align-items:center;gap:2px;background:linear-gradient(135deg,#2e7fc2,#1d5d92);border-radius:14px;padding:10px 18px;box-shadow:0 4px 12px rgba(30,95,150,.3)}
 .m-formula-chip b{font-size:19px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
 .m-formula-chip small{font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.82);white-space:nowrap}
-.m-kso-tool{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:44px 20px}
-.m-kso-tool > svg{color:var(--accent)}
-.m-kso-tool p{font-size:13.5px;color:var(--text-2);line-height:1.6;max-width:420px}
+.m-kso-tool-pane{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:44px 20px}
+.m-kso-tool-pane > svg{color:var(--accent)}
+.m-kso-tool-pane p{font-size:13.5px;color:var(--text-2);line-height:1.6;max-width:420px}
 .m-kso-tool-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px 22px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(4,159,217,.35)}
 .m-kso-tool-btn:active{transform:scale(.97)}
 
@@ -1170,7 +1210,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 /* Chart subtitle + sort select on one row */
 .m-team-chart-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 12px}
 .m-team-chart-controls .m-team-chart-sub{margin:0;flex:1}
-.m-team-chart-controls .m-seller-sort{margin-left:0;flex-shrink:0}
 .m-abars{display:flex;flex-direction:column;gap:9px}
 .m-abar-row{display:flex;align-items:center;gap:8px}
 .m-abar-name{width:78px;flex-shrink:0;font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1206,6 +1245,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .m-member-breakdown:hover{text-decoration:underline}
 .m-member-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
 .m-member-id b{font-size:14px;font-weight:800;color:var(--text)}
+/* highlighted seller name → manager seller view (desktop reference link) */
+.m-member-name-link{color:var(--accent) !important;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.m-member-name-link:hover{opacity:.85}
+
+/* Manager seller-view banner (desktop reference: blue strip under header) */
+.m-sellerview{display:flex;align-items:center;gap:10px;background:var(--hero-grad);border-radius:12px;padding:9px 12px;margin-bottom:12px;color:#fff;box-shadow:0 3px 12px var(--hero-glow)}
+.m-sellerview-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.24);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;flex-shrink:0;letter-spacing:.3px}
+.m-sellerview-txt{font-size:12px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-sellerview-txt b{font-weight:800}
+.m-sellerview-exit{margin-left:auto;display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.65);background:rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:800;padding:5px 10px;border-radius:14px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.m-sellerview-exit:active{transform:scale(.97)}
+/* iPad: the banner spans the content column above the page header */
+.i-main > .m-sellerview{margin:0 0 14px}
 .m-tstat{font-size:11px;font-weight:700;border:1px solid;padding:2px 8px;border-radius:20px;white-space:nowrap}
 .m-member-gs{font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:10px}
 .m-member-pes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -1223,7 +1275,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 
 /* Section-label right-side chips */
 .m-label-right{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0;text-transform:none;white-space:nowrap}
-.m-seller-sort{margin-left:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:10px;font-weight:700;padding:4px 4px;border-radius:8px;letter-spacing:0;text-transform:none;cursor:pointer;min-width:0}
 .m-canvas-chip{margin-left:auto;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:9px;letter-spacing:0;text-transform:none}
 
 /* Team insight cards (Canvas — dismissible) */
@@ -1496,6 +1547,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Ro
 .i-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(208px,1fr));gap:14px;margin-bottom:18px;align-items:start}
 .i-grid-3 > *{min-width:0}
 .i-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px;margin-bottom:18px;align-items:start}
+/* At A Glance: plan elements stacked left, SPIFF panel right (desktop reference) */
+.i-glance-cols{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-bottom:18px;align-items:start}
+.i-glance-cols > *{min-width:0}
+.i-glance-pes{display:flex;flex-direction:column;gap:16px;min-width:0}
+/* payment timeline side cards: center the short content so they don't read hollow */
+.i-timeline-card{justify-content:center;gap:4px}
+/* Pay Estimator: portrait stacks the two cards full-width (264px columns cramp
+   the stats and truncate the summary); landscape splits estimator | summary */
+.i-est-split{grid-template-columns:1fr}
+.i-device.land .i-est-split{grid-template-columns:1.6fr 1fr}
 .i-col-a,.i-col-b{display:flex;flex-direction:column;gap:16px}
 /* Payment timeline: Apr | May (hero) | Jun — chronological left→right */
 .i-glance-top{display:grid;grid-template-columns:1fr 1.9fr 1fr;gap:16px;margin-bottom:14px;align-items:stretch}
