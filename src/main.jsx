@@ -43,7 +43,7 @@ function getInitialTheme() {
   return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
 }
 
-const PE_COLOR = { PE1:"#f59e0b", PE2:"#10b981", PE3:"#3b82f6", KSO:"#6366f1", OTB:"#8b5cf6", NDR:"#06b6d4" };
+const PE_COLOR = { PE1:"#fbab2c", PE2:"#74bf4b", PE3:"#0077c2", KSO:"#52719c", OTB:"#3e7bd6", NDR:"#00bceb" };
 
 const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"8,688.08", change:"▲ 40.4%", payDate:"Paid May 2, 2026"},
@@ -52,24 +52,24 @@ const monthlyPayCards = [
 ];
 
 const planElements = [
-  {id:"PE1", name:"Prod+Services", goal:"$109k Goal", bookingsAmt:"$68k", bookingsPct:63, revenueAmt:"$26k", revenuePct:24, backlogAmt:"$42k", backlogPct:39, attPct:24, color:PE_COLOR.PE1, blColor:"#fbbf24"},
-  {id:"PE2", name:"Recurring Software", goal:"$87k Goal", bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71, backlogAmt:"$28k", backlogPct:32, attPct:71, color:PE_COLOR.PE2, blColor:"#6ee7b7"},
-  {id:"PE3", name:"Services", goal:"$90k Goal", bookingsAmt:"$85k", bookingsPct:94, revenueAmt:"$40k", revenuePct:44, backlogAmt:"$45k", backlogPct:50, attPct:44, color:PE_COLOR.PE3, blColor:"#93c5fd"}
+  {id:"PE1", name:"Prod+Services", goal:"$109k Goal", bookingsAmt:"$68k", bookingsPct:63, revenueAmt:"$26k", revenuePct:24, backlogAmt:"$42k", backlogPct:39, attPct:24, color:PE_COLOR.PE1, blColor:"#fcc661"},
+  {id:"PE2", name:"Recurring Software", goal:"$87k Goal", bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71, backlogAmt:"$28k", backlogPct:32, attPct:71, color:PE_COLOR.PE2, blColor:"#a8d98d"},
+  {id:"PE3", name:"Services", goal:"$90k Goal", bookingsAmt:"$85k", bookingsPct:94, revenueAmt:"$40k", revenuePct:44, backlogAmt:"$45k", backlogPct:50, attPct:44, color:PE_COLOR.PE3, blColor:"#7fc5ea"}
 ];
 
 /* Glance section shows the two active programs + the latest completed one;
    the full catalog lives on the SPIFF & Bonus page (spiffPrograms). */
 const spiffBonus = [
-  {status:"Active", statusColor:"#3b82f6", name:"Q2 Cloud Migration SPIFF", sub:"Cloud deals ≥ $15K TCV", amount:"$5,000", date:"Apr 1 – Jun 30, 2026", pct:25},
-  {status:"Active", statusColor:"#3b82f6", name:"Partner Acceleration Q2", sub:"Partner-sourced bookings", amount:"$3,500", date:"Apr 1 – Jun 30, 2026", pct:25},
-  {status:"Achieved", statusColor:"#10b981", name:"FY25 H2 Attainment Milestone", sub:"Bonus earned", amount:"$7,560", date:"Paid Apr 16, 2026", pct:100}
+  {status:"Active", statusColor:"#0077c2", name:"Q2 Cloud Migration SPIFF", sub:"Cloud deals ≥ $15K TCV", amount:"$5,000", date:"Apr 1 – Jun 30, 2026", pct:25},
+  {status:"Active", statusColor:"#0077c2", name:"Partner Acceleration Q2", sub:"Partner-sourced bookings", amount:"$3,500", date:"Apr 1 – Jun 30, 2026", pct:25},
+  {status:"Achieved", statusColor:"#74bf4b", name:"FY25 H2 Attainment Milestone", sub:"Bonus earned", amount:"$7,560", date:"Paid Apr 16, 2026", pct:100}
 ];
 
 /* ── SPIFF & Bonus page — every strategic incentive program (desktop reference).
    Projected = open programs (Active + Eligible): 5,000+12,000+3,500+4,200 = 24,700.
    Paid YTD = FY25 H2 milestone 7,560 + Splunk 8,330 + Q2 progress paid 2,125 = 18,015. ── */
-const SPIFF_TYPE_COLOR = {SPIFF:"#049fd9", Accelerator:"#dc2626", Bonus:"#b08a1d", Uplift:"#8b5cf6"};
-const SPIFF_STATUS_COLOR = {Active:"#10b981", Eligible:"#3b82f6", Completed:"#16a34a", Expired:"#6b7280"};
+const SPIFF_TYPE_COLOR = {SPIFF:"#0051af", Accelerator:"#e3241b", Bonus:"#b08a1d", Uplift:"#3e7bd6"};
+const SPIFF_STATUS_COLOR = {Active:"#74bf4b", Eligible:"#0077c2", Completed:"#16a34a", Expired:"#6b7280"};
 const spiffPrograms = [
   {name:"Q2 Cloud Migration SPIFF", type:"SPIFF", status:"Active", period:"Q2 2026", projected:"$5,000", earned:"$1,250", target:"$5,000", pct:25,
     desc:"Earn bonus for closing cloud migration deals over $15K TCV. Stackable with ARR quota.",
@@ -102,9 +102,9 @@ function filterSpiffs(f) {
 }
 
 const insightCards = [
-  {peBadge:"Prod+Services", peColor:PE_COLOR.PE1, tag:"$18K ★", tagColor:"#dc2626", title:"High Value Booking", desc:"Stargate AI ($18K) is your largest eligible booking this period. Top backlog: Cortex Financial ($23K), Helix Networks ($14K). Clearing both pushes PE1 past the 50% threshold."},
-  {peBadge:"Services", peColor:PE_COLOR.PE3, tag:"$38K ★", tagColor:"#dc2626", title:"Services Backlog Opportunity", desc:"Services sits at 44% attainment — $5K from the 50% tier. GlobalNet Inc ($38K backlog, PE3) clearing alone would lift you past the 75% tier."},
-  {peBadge:"CA Review", peColor:"#6b7280", tag:"✓ Clear ★", tagColor:"#10b981", title:"Comp Assurance", desc:"No CA review triggered this period. Your May payment of $8,434 is 92% below the $100K threshold."}
+  {peBadge:"Prod+Services", peColor:PE_COLOR.PE1, tag:"$18K ★", tagColor:"#e3241b", title:"High Value Booking", desc:"Stargate AI ($18K) is your largest eligible booking this period. Top backlog: Cortex Financial ($23K), Helix Networks ($14K). Clearing both pushes PE1 past the 50% threshold."},
+  {peBadge:"Services", peColor:PE_COLOR.PE3, tag:"$38K ★", tagColor:"#e3241b", title:"Services Backlog Opportunity", desc:"Services sits at 44% attainment — $5K from the 50% tier. GlobalNet Inc ($38K backlog, PE3) clearing alone would lift you past the 75% tier."},
+  {peBadge:"CA Review", peColor:"#6b7280", tag:"✓ Clear ★", tagColor:"#74bf4b", title:"Comp Assurance", desc:"No CA review triggered this period. Your May payment of $8,434 is 92% below the $100K threshold."}
 ];
 
 /* ── Insight Canvas catalog (from the desktop reference) ──
@@ -112,18 +112,18 @@ const insightCards = [
    with no pins, the AI-selected `insightCards` above are shown. */
 const MAX_PINS = 6;
 const INSIGHT_CATS = [
-  {name:"Fast Start", color:"#f59e0b", fast:true, items:[
+  {name:"Fast Start", color:"#fbab2c", fast:true, items:[
     {id:"what-selling", title:"What Am I Selling?", live:true, tags:["Seller"], cta:"View Plan", ctaTab:"goals", desc:"Review your active plan elements and quota targets for the current goal sheet period."},
     {id:"who-selling-to", title:"Who Am I Selling To?", live:true, tags:["Seller"], cta:"View Territory", ctaTab:"orders", desc:"Explore your territory accounts, named customers, and top opportunities for this period."},
     {id:"how-make-money", title:"How Do I Make Money?", live:true, tags:["Seller"], cta:"View Incentives", ctaTab:"payments", desc:"Understand your compensation structure, active SPIFs, and fastest paths to higher payout tiers."}]},
-  {name:"Attainment & Tiers", color:"#3b82f6", items:[
+  {name:"Attainment & Tiers", color:"#0077c2", items:[
     {id:"gap-next-tier", title:"Gap to Next Tier", live:true, tags:["Seller"], desc:"The % and $ needed to reach your next payout tier based on current revenue attainment."},
     {id:"strongest-pe", title:"Strongest Plan Element", live:true, tags:["Seller"], desc:"Your top-performing plan element by attainment percentage this period."},
     {id:"tier-milestone", title:"Tier Milestone", live:true, tags:["Seller"], desc:"You just crossed into a new attainment tier — your payout rate has increased accordingly."},
     {id:"weakest-pe", title:"Weakest Plan Element", tags:["Seller"], desc:"The plan element most at risk of missing target — focus here to maximize payout."},
     {id:"excellence-points", title:"Excellence Point Proximity", tags:["Seller"], desc:"How close you are to earning Excellence Points and what actions can accelerate them."},
     {id:"proration-impact", title:"Proration Impact", tags:["Seller","Ops"], desc:"How mid-period plan changes or territory adjustments have affected your prorated quota."}]},
-  {name:"Payments & Payout", color:"#049fd9", items:[
+  {name:"Payments & Payout", color:"#0051af", items:[
     {id:"payment-change", title:"Payment Change", live:true, tags:["Seller"], desc:"Month-over-month delta in your payout — what drove the change and what to expect next."},
     {id:"payout-rate", title:"Current Payout Rate", live:true, tags:["Seller"], desc:"Your effective payout rate at current attainment levels across all active plan elements."},
     {id:"adjustment-applied", title:"Adjustment Applied", live:true, tags:["Seller"], desc:"A compensation adjustment was applied to your account — review the change and reason code."},
@@ -139,7 +139,7 @@ const INSIGHT_CATS = [
     {id:"order-debooked", title:"Order Debooked", live:true, tags:["Seller"], desc:"A previously booked order was debooked — understand the revenue and payout impact."},
     {id:"orders-summary", title:"Orders Summary", tags:["Seller"], desc:"Aggregate view of bookings, backlog, and revenue by plan element for the current period."},
     {id:"pipeline-health", title:"Pipeline Health", tags:["Seller","Manager"], desc:"Assessment of your open opportunities and likelihood to close against remaining quota gap."}]},
-  {name:"Manager & Team", color:"#8b5cf6", items:[
+  {name:"Manager & Team", color:"#3e7bd6", items:[
     {id:"team-attainment", title:"Team Attainment Distribution", live:true, tags:["Manager"], desc:"Breakdown of your team's attainment spread — who is ahead, on track, or at risk."},
     {id:"at-risk-sellers", title:"At-Risk Sellers", live:true, tags:["Manager"], desc:"Team members unlikely to hit target based on current pace — suggested coaching actions included."},
     {id:"top-performers", title:"Top Performers", live:true, tags:["Manager"], desc:"Your highest-attaining reps this period with deal composition and momentum details."},
@@ -150,7 +150,7 @@ const INSIGHT_CATS = [
     {id:"system-health", title:"System Health", tags:["Ops","Sio"], desc:"Status of data feeds, integration pipelines, and any known data quality issues affecting payroll."},
     {id:"access-status", title:"Access Status", tags:["Ops"], desc:"Current provisioning status for sellers in your plan — flags missing access or stale profiles."},
     {id:"dispute-volume", title:"Dispute Volume", tags:["Ops","Sio"], desc:"Open compensation disputes by age, plan element, and priority with resolution timeline."}]},
-  {name:"Self-Service", color:"#06b6d4", items:[
+  {name:"Self-Service", color:"#00bceb", items:[
     {id:"self-validation", title:"Self-Service Validation", tags:["Seller"], desc:"Verify your own attainment calculations and flag discrepancies before the lock date."},
     {id:"fix-verification", title:"Fix Verification", tags:["Seller","Ops"], desc:"Confirm that a previously reported data fix has been applied correctly to your comp record."},
     {id:"predictive-attainment", title:"Predictive Attainment", tags:["Seller","Manager"], desc:"ML-based projection of your period-end attainment given current pace, pipeline, and seasonality."}]}
@@ -204,7 +204,7 @@ const recentPaymentPeriods = [
                 {range:"20 – 75%", peRate:"0.75%", prior:"-", incr:"4%", mult:"3.0%", active:true},
                 {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
               ]}},
-          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08", txnKey:"CUSEC",
+          {pe:"CU", label:"Security Comp Uplift", color:"#3e7bd6", pct:4, attChange:1, payout:"12.08", txnKey:"CUSEC",
             /* Desktop reference: 2% × 75,500 × 100% × 2.3% = 34.73 − 22.65 = 12.08.
                Multiplier: 3% prior × 0.50% = 1.5%, +1% incr × 0.75% = 0.8%. */
             calc:{incrementalAtt:"1%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"2.3%", totalEarned:"34.73", prevPaid:"22.65", result:"12.08", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
@@ -213,7 +213,7 @@ const recentPaymentPeriods = [
                 {range:"3 – 75%", peRate:"0.75%", prior:"-", incr:"1%", mult:"0.8%", active:true},
                 {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
               ]}},
-          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", pct:4, attChange:1, payout:"12.08", txnKey:"CUCOLLAB",
+          {pe:"CU", label:"Collab Comp Uplift", color:"#3e7bd6", pct:4, attChange:1, payout:"12.08", txnKey:"CUCOLLAB",
             /* Desktop reference: same shape as Security Comp Uplift — 2% × 75,500 × 100% × 2.3% = 34.73 − 22.65 = 12.08 */
             calc:{incrementalAtt:"1%", totalAtt:"4%", weight:"2%", targetIncentive:"75,500.00", proration:"100%", payoutRate:"2.3%", totalEarned:"34.73", prevPaid:"22.65", result:"12.08", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
               rateIncremental:[
@@ -221,7 +221,7 @@ const recentPaymentPeriods = [
                 {range:"3 – 75%", peRate:"0.75%", prior:"-", incr:"1%", mult:"0.8%", active:true},
                 {range:"75 – 100%", peRate:"1.10%", prior:"-", incr:"-", mult:"-"}
               ]}},
-          {pe:"MY", label:"Services MY", color:"#3b82f6", pct:5, attChange:1, payout:"3.02",
+          {pe:"MY", label:"Services MY", color:"#0077c2", pct:5, attChange:1, payout:"3.02",
             /* Desktop reference: 1% × 75,500 × 50% × 2.8% = 10.57 − 7.55 = 3.02.
                Multiplier: 4% prior × 0.50% = 2.0%, +1% incr × 0.75% = 0.8%. */
             calc:{incrementalAtt:"1%", totalAtt:"5%", weight:"1%", targetIncentive:"75,500.00", proration:"50%", payoutRate:"2.8%", totalEarned:"10.57", prevPaid:"7.55", result:"3.02", rateName:"CS402", totalLabel:"Total Payout Rate Multiplier",
@@ -351,9 +351,9 @@ const recentPaymentPeriods = [
       items:[
         {pe:"PE1", label:"Prod+Services", paidNote:"Previously Paid", paid:"$650.00", amount:"$-650.00", children:[
           {pe:"PE1", label:"Prod+Services", paidNote:"Previously Paid", paid:"$500.00", amount:"$-500.00"},
-          {pe:"CU", label:"Security Comp Uplift", color:"#8b5cf6", paidNote:"Previously Paid", paid:"$50.00", amount:"$-50.00"},
-          {pe:"CU", label:"Collab Comp Uplift", color:"#8b5cf6", paidNote:"Previously Paid", paid:"$50.00", amount:"$-50.00"},
-          {pe:"MY", label:"Services MY", color:"#3b82f6", paidNote:"Previously Paid", paid:"$50.00", amount:"$-50.00"}
+          {pe:"CU", label:"Security Comp Uplift", color:"#3e7bd6", paidNote:"Previously Paid", paid:"$50.00", amount:"$-50.00"},
+          {pe:"CU", label:"Collab Comp Uplift", color:"#3e7bd6", paidNote:"Previously Paid", paid:"$50.00", amount:"$-50.00"},
+          {pe:"MY", label:"Services MY", color:"#0077c2", paidNote:"Previously Paid", paid:"$50.00", amount:"$-50.00"}
         ]},
         {pe:"PE2", label:"Recurring Software", paidNote:"Previously Paid", paid:"$100.00", amount:"$-100.00"},
         {pe:"PE3", label:"Services", paidNote:"Previously Paid", paid:"$100.00", amount:"$-100.00"}
@@ -432,12 +432,12 @@ const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slic
 /* blColor = the lighter backlog segment tint, matching planElements so the
    revenue/backlog distinction reads the same on Goals as on At A Glance */
 const goalTabs = [
-  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, blColor:"#fbbf24", goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,386.18"},
-  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, blColor:"#6ee7b7", goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.47"},
-  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#93c5fd", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.08"},
+  {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, blColor:"#fcc661", goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,386.18"},
+  {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, blColor:"#a8d98d", goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.47"},
+  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#7fc5ea", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.08"},
   {id:"KSO", name:"Key Sales Objectives",color:PE_COLOR.KSO, goal:"$2.5k", attPct:100,  bookingsAmt:"—",    bookingsPct:100, revenueAmt:"—",    revenuePct:100, backlogAmt:"—",    backlogPct:0,  incentive:"$2,500.00"},
-  {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, blColor:"#c4b5fd", goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
-  {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, blColor:"#67e8f9", goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}
+  {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, blColor:"#9db9e8", goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
+  {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, blColor:"#7ee1f7", goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}
 ];
 
 /* Example goal sheet rendered inside the View Goal Sheet popup */
@@ -546,10 +546,10 @@ const revenueTxns = {
    steps so each hue clears the card surface it actually renders on. The
    legend rows carry every slice's label + value, covering the two light-mode
    hues that sit under 3:1 contrast. */
-/* Modern Pie Chart scheme: Majorelle Blue, Disco, Tangy Pink, Outrageous
-   Orange, Yellow Sea — plus a bridging purple for the sixth slice. */
-const DONUT_LIGHT = ["#6050DC","#D52DB7","#FF2E7E","#FF6B45","#FFAB05","#7A28C7"];
-const DONUT_DARK  = ["#7264E3","#DD4AC4","#FF4E92","#FF7E5C","#FFB52A","#9146D6"];
+/* Cisco brand scheme: Medium Blue, Sky Blue, Orange, Red, Green, plus a
+   Midnight tint for the sixth slice (dark theme uses brighter tints). */
+const DONUT_LIGHT = ["#0051AF","#00BCEB","#FBAB2C","#E3241B","#74BF4B","#52719C"];
+const DONUT_DARK  = ["#3E7BD6","#33CDF0","#FFC155","#F0564D","#8FD86A","#7E9BC4"];
 function paymentDonutItems(p, dark) {
   const pal = dark ? DONUT_DARK : DONUT_LIGHT;
   return [
@@ -1973,7 +1973,7 @@ const backlogBuckets = [
   {id:"Jul",    label:"July 2026",      amt:"$35K",  orders:2, est:"+$365 est.",  color:"var(--green)"},
   {id:"Aug",    label:"August 2026",    amt:"$38K",  orders:1, est:"+$395 est.",  color:"var(--amber)"},
   {id:"Sep",    label:"September 2026", amt:"$21K",  orders:2, est:"+$220 est.",  color:"var(--red)"},
-  {id:"Beyond", label:"Beyond",         amt:"$7K",   orders:1, est:"+$75 est.",   color:"#8b5cf6", note:"Oct+ or no date"}
+  {id:"Beyond", label:"Beyond",         amt:"$7K",   orders:1, est:"+$75 est.",   color:"#3e7bd6", note:"Oct+ or no date"}
 ];
 const daysTone = d => d==null ? "var(--muted)" : d<=90 ? "var(--green)" : d<=140 ? "var(--amber)" : "var(--red)";
 
@@ -2406,7 +2406,7 @@ function KsoSection() {
 }
 
 /* ── Net Dollar Retention tab (reference-matched) ── */
-const NDR_TEAL = "#0d9488";
+const NDR_TEAL = "#0083c9";
 const ndrStats = [
   {label:"Baseline ATR", value:"$3,520,090.00"},
   {label:"Eligible ACV Bookings", value:"$452,330.00"},
@@ -2692,7 +2692,7 @@ function OrderSearchPage({s}) {
 const TEAM_AS_OF = "All data as of May 26, 2026, 6:00 AM";
 
 const STATUS_COLOR = {
-  "Exceeding":"#10b981", "On Track":"#3b82f6", "Watch":"#f59e0b", "At Risk":"#ef4444"
+  "Exceeding":"#74bf4b", "On Track":"#0077c2", "Watch":"#fbab2c", "At Risk":"#e3241b"
 };
 
 /* earned = Earned vs Target Incentive %, bookings = Bookings Attainment %,
@@ -2720,7 +2720,7 @@ const MEMBER_PE_META = [
   {id:"PE3", label:"Strategic"}
 ];
 /* tones = per-PE tier color for chip + % (g green, b blue, a amber, r red) */
-const TONE_COLOR = {g:"#10b981", b:"#3b82f6", a:"#f59e0b", r:"#ef4444"};
+const TONE_COLOR = {g:"#74bf4b", b:"#0077c2", a:"#fbab2c", r:"#e3241b"};
 const teamMembers = [
   {name:"Sarah Chen",    initials:"SC", status:"Exceeding", att:107, pe:[115,116,117], tones:["g","g","g"]},
   {name:"Lisa Kumar",    initials:"LK", status:"Exceeding", att:106, pe:[112,113,110], tones:["g","g","g"]},
@@ -2737,25 +2737,25 @@ const teamMembers = [
 
 /* Team Insights — Canvas cards (supportive coaching tone; dismissible) */
 const teamInsights = [
-  {title:"4 Sellers Need Coaching", tag:"Coaching", metric:"4 need support", color:"#f59e0b",
+  {title:"4 Sellers Need Coaching", tag:"Coaching", metric:"4 need support", color:"#fbab2c",
     desc:"Four sellers are currently below the expected attainment pace (below 70%). Early coaching can improve attainment and increase payout opportunities before period end.",
     action:"Recommended focus: John Smith, Daniel Kim, Rachel Lee, Marcus Green — Review pipeline, backlog, and upcoming opportunities with these sellers.",
     names:"John Smith, Daniel Kim, Rachel Lee +1 more"},
-  {title:"Goal Coverage Health", tag:"Coverage", metric:"74%", color:"#3b82f6",
+  {title:"Goal Coverage Health", tag:"Coverage", metric:"74%", color:"#0077c2",
     desc:"Your team has achieved $2.33M in bookings toward a $3.15M combined goal. You're building strong momentum — only $0.82M remains to reach full goal coverage.",
     action:"Keep the momentum going! Focus on advancing high-probability opportunities and converting qualified pipeline to close the remaining gap before period end."},
-  {title:"Performance Spread — Opportunity to Level Up", tag:"Performance", metric:"Level up", color:"#f59e0b",
+  {title:"Performance Spread — Opportunity to Level Up", tag:"Performance", metric:"Level up", color:"#fbab2c",
     desc:"Your team is making solid progress. Top performers are leading the way at 107%, while emerging sellers at 54% have strong opportunities to increase attainment with focused coaching and collaboration.",
     action:"Encourage peer mentoring, pipeline reviews, and deal strategy sessions to help more sellers achieve their goals this period. Pair top performers with emerging sellers: connect Sarah Chen with John Smith, Lisa Kumar with Bob Wilson.",
     names:"John Smith, Bob Wilson, Marcus Green +1 more"},
-  {title:"Team Attainment Distribution", tag:"Attainment", metric:"81.9%", color:"#10b981",
+  {title:"Team Attainment Distribution", tag:"Attainment", metric:"81.9%", color:"#74bf4b",
     desc:"Team of 11 averaging 81.9% attainment. Distribution: 2 exceeding goal, 4 on track (75–100%), 5 building momentum.",
     action:"5 sellers building momentum — review deal strategy to accelerate this period."},
-  {title:"Top Performers — Celebrate & Scale", tag:"Recognition", metric:"2 exceeding goal", color:"#10b981",
+  {title:"Top Performers — Celebrate & Scale", tag:"Recognition", metric:"2 exceeding goal", color:"#74bf4b",
     desc:"2 team members exceeding goal at 106.7% average attainment. Great opportunity to share winning strategies across the team.",
     action:"Recognize excellence: Sarah Chen, Lisa Kumar. Consider peer-led knowledge sharing.",
     names:"Sarah Chen, Lisa Kumar"},
-  {title:"Forecasted End-of-Period Attainment", tag:"Forecast", metric:"96.2%", color:"#3b82f6",
+  {title:"Forecasted End-of-Period Attainment", tag:"Forecast", metric:"96.2%", color:"#0077c2",
     desc:"Based on current pace (66% of period elapsed), team is projected to finish at 96.2% — close to full goal.",
     action:"Accelerate 3–4 deals in late stages to push team over 100% by period close."}
 ];
@@ -3074,7 +3074,7 @@ const histRow = (member, pi, pe) => {
   return {earned:Math.round(e*w), target:Math.round(t*w), book:Math.round(b*f), goal:g, att:+Math.min(125, a*f).toFixed(1)};
 };
 const fmtUsd = n => amt("$" + n.toLocaleString("en-US"));
-const histTier = a => a >= 100 ? "#16a34a" : a >= 70 ? "#d97706" : "#dc2626";
+const histTier = a => a >= 100 ? "#16a34a" : a >= 70 ? "#d97706" : "#e3241b";
 
 function HistSingle({s}) {
   const pe = s.histPe, meta = HIST_PE[pe];
