@@ -2632,11 +2632,11 @@ function GoalsPage({s}) {
    ════════════════════════════════════════════════════════════════ */
 /* Single order result card (shared by search results + recent-order list) */
 const ORDER_STATUS_CHIP = {"Backlog":"m-status-upcoming", "Partial":"m-status-open", "Full Revenue":"m-status-paid"};
-function OrderCard({o}) {
+function OrderCard({o, onOpen}) {
   return <div className="m-order-card">
     <div className="m-order-top">
       <span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>
-      <span className="m-order-id">{o.id}</span>
+      <button className="m-order-id m-order-id-link" onClick={onOpen} title={`View ${o.id} order details`}>{o.id}</button>
       <span className={`m-pay-status ${ORDER_STATUS_CHIP[o.status]||"m-status-paid"}`}>{o.status}</span>
     </div>
     <div className="m-order-mid"><b>{o.customer}</b><span>{o.partner}</span></div>
@@ -2646,6 +2646,49 @@ function OrderCard({o}) {
       <div><small>Revenue</small><b>{o.revenue}</b></div>
     </div>
   </div>;
+}
+
+/* ── Sales Order drilldown (desktop reference) — the blue SO number on any
+   order card opens the full order: header IDs, order details, and the
+   plan-element bookings/backlog/revenue summary. Web/PO/Deal IDs and the
+   book date derive deterministically from the SO (demo data). */
+const ORDER_PE_LABEL = {PE1:"Prod+Services", PE2:"Recurring Software", PE3:"Services"};
+function orderDetailMeta(o) {
+  const digits = o.id.replace(/\D/g, "");
+  const num = parseInt(digits, 10);
+  const txn = Object.values(revenueTxns).flatMap(t=>t.rows).find(r=>r.so===o.id);
+  return {
+    webId: "WEB-" + digits,
+    po: "PO-" + (60000 + (num % 9000)),
+    deal: "DL-" + (9900000 + ((num * 7) % 99999)),
+    booked: txn ? txn.date : `${["Mar","Apr","May"][num % 3]} ${(num % 27) + 1}, 2026`
+  };
+}
+function OrderDetailPopup({o, onClose}) {
+  const m = orderDetailMeta(o);
+  return <FullScreenPopup title={`Sales Order ${o.id}`}
+    subtitle={`Web ID: ${m.webId} · P.O. Number: ${m.po} · Deal ID: ${m.deal}`} onClose={onClose}>
+    <div className="m-section">
+      <div className="m-section-hdr"><h2>Order Details</h2></div>
+      <div className="m-od-grid">
+        <div className="m-od-item"><b>{o.customer}</b><small>End Customer</small></div>
+        <div className="m-od-item"><b>{o.partner}</b><small>Partner Name</small></div>
+        <div className="m-od-item"><b>{m.booked}</b><small>Comp Book Date</small></div>
+        <div className="m-od-item"><span className={`m-pay-status ${ORDER_STATUS_CHIP[o.status]||"m-status-paid"}`}>{o.status}</span><small>Commission Status</small></div>
+        <div className="m-od-item"><b>{amt(o.bookings)}</b><small>TCV</small></div>
+      </div>
+    </div>
+    <div className="m-section">
+      <div className="m-section-hdr"><h2>Plan Element Summary</h2><span className="m-od-gs">Goal Sheet: H1 FY2026</span></div>
+      <div className="m-od-tr m-od-th"><span/><span className="r">Bookings</span><span className="r">Backlog</span><span className="r">Revenue</span></div>
+      <div className="m-od-tr">
+        <span className="m-od-pe"><span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>{ORDER_PE_LABEL[o.pe] || o.pe}</span>
+        <span className="r m-od-num">{amt(o.bookings)}</span>
+        <span className={`r m-od-num ${o.backlog !== "$0" ? "m-od-backlog" : ""}`}>{amt(o.backlog)}</span>
+        <span className="r m-od-num">{amt(o.revenue)}</span>
+      </div>
+    </div>
+  </FullScreenPopup>;
 }
 
 /* Search controls (desktop reference): [type ▾][query][go] plus Status /
@@ -2693,7 +2736,7 @@ function OrderSearchPage({s}) {
       <div className="m-os-results-hdr">
         <p className="m-search-count">{list.length} order{list.length===1?"":"s"} found</p>
       </div>
-      {list.map(o=><OrderCard key={o.id} o={o}/>)}
+      {list.map(o=><OrderCard key={o.id} o={o} onOpen={()=>s.setOrderDetail(o)}/>)}
       {list.length===0 && <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or loosen the filters.</span></div>}
     </> : <div className="m-search-empty">
       <Search size={30}/>
@@ -3578,6 +3621,7 @@ function useCompXState() {
   const [pdfItem, setPdfItem] = useState(null);
   const [sellerItem, setSellerItem] = useState(null);
   const [sellerView, setSellerView] = useState(null);    // manager drill-in: team member whose data is being viewed
+  const [orderDetail, setOrderDetail] = useState(null);  // sales-order drilldown (blue SO number on order cards)
   const [showAskIQ, setShowAskIQ] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [reminders, setReminders] = useState(REMINDERS_SEED);
@@ -3669,6 +3713,7 @@ function useCompXState() {
     tab, setTab, viewMode, setViewMode, theme, toggleTheme,
     calcItem, setCalcItem, pdfItem, setPdfItem,
     sellerItem, setSellerItem, sellerView, setSellerView, enterSellerView, exitSellerView,
+    orderDetail, setOrderDetail,
     showAskIQ, setShowAskIQ, notifOpen, setNotifOpen, reminders, setReminders,
     periodIdx, setPeriodIdx, openPayPeriod, openGoal, openSpiff, openOrder, showAllPeriods, setShowAllPeriods, expanded, setExpanded, goalIdx, setGoalIdx,
     orderQuery, setOrderQuery, orderType, setOrderType, orderStatus, setOrderStatus, orderPe, setOrderPe,
@@ -3702,6 +3747,7 @@ function FramePopups({s, variant="mobile"}) {
     {s.pdfItem && shell(<PdfPopup item={s.pdfItem} onClose={()=>s.setPdfItem(null)}
       onOpenOrder={so=>{ s.setPdfItem(null); s.openOrder(so); }}/>, ()=>s.setPdfItem(null))}
     {s.sellerItem && shell(<SellerBreakdownPopup s={s.sellerItem} onClose={()=>s.setSellerItem(null)}/>, ()=>s.setSellerItem(null))}
+    {s.orderDetail && shell(<OrderDetailPopup o={s.orderDetail} onClose={()=>s.setOrderDetail(null)}/>, ()=>s.setOrderDetail(null))}
     {s.showAskIQ && shell(<AskIQPopup onClose={()=>s.setShowAskIQ(false)}/>, ()=>s.setShowAskIQ(false), "i-modal-lg")}
     {s.insightCanvasOpen && shell(<InsightCanvasPopup s={s} onClose={()=>s.setInsightCanvasOpen(false)}/>, ()=>s.setInsightCanvasOpen(false), "i-modal-xl")}
     {s.showRecovBal && shell(<RecovBalancePopup onClose={()=>s.setShowRecovBal(false)}/>, ()=>s.setShowRecovBal(false))}
@@ -4030,7 +4076,7 @@ function IPadOrders({s}) {
       <div className="m-os-results-hdr">
         <p className="m-search-count">{list.length} order{list.length===1?"":"s"} found</p>
       </div>
-      {list.length>0 ? <div className="i-grid-3">{list.map(o=><OrderCard key={o.id} o={o}/>)}</div>
+      {list.length>0 ? <div className="i-grid-3">{list.map(o=><OrderCard key={o.id} o={o} onOpen={()=>s.setOrderDetail(o)}/>)}</div>
         : <div className="m-search-empty"><Search size={30}/><b>No orders found</b><span>Try a different {s.orderType} or loosen the filters.</span></div>}
     </> : <div className="m-search-empty">
       <Search size={30}/>
