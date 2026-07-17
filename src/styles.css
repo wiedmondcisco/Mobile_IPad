@@ -436,15 +436,17 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-pb-past-group .m-pb-detail-row{padding-left:8px}
 
 /* Schedule */
-.m-sched-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--divider)}
-.m-sched-row:last-child{border-bottom:none}
-.m-sched-row svg{color:var(--accent)}
-.m-sched-row span{flex:1;font-size:11px;color:var(--muted)}
-.m-sched-row b{font-size:12.5px;color:var(--text)}
-.m-sched-cal{display:flex;align-items:center;gap:6px;border:none;background:none;color:var(--accent);font-size:13px;font-weight:700;padding:11px 0 3px;cursor:pointer}
-.m-sched-cal:active{opacity:.7}
-.m-sched-est{font-size:11.5px;font-weight:600;color:var(--muted);padding-top:4px}
-.m-sched-est svg{opacity:.7}
+/* Payment schedule dates strip — top of Payments, above the period chips */
+.m-pdates{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.m-pdates-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.m-pdate{display:flex;flex-direction:column;gap:2px;min-width:0}
+.m-pdate small{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.m-pdate b{font-size:12px;font-weight:800;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}
+.m-pdates-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--divider)}
+.m-pdates-btn{display:inline-flex;align-items:center;gap:5px;border:none;background:none;padding:0;color:var(--accent);font-size:11.5px;font-weight:700;cursor:pointer}
+.m-pdates-btn:active{opacity:.7}
+.m-pdates-btn-dim{color:var(--muted);font-weight:600}
+.m-pdates-btn-dim svg{opacity:.7}
 
 /* ─── PAYMENT CALENDAR POPUP ─── */
 .m-paycal-monthhdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
@@ -825,27 +827,28 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-kso-tool{display:inline-flex;align-items:center;gap:5px;border:none;background:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;padding:0;flex-shrink:0}
 .m-kso-info-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:8px 0 0}
 .m-kso-card{background:var(--card);border-radius:var(--radius);border-left:3px solid var(--accent);padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.m-kso-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--divider);cursor:pointer}
+.m-kso-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--divider);cursor:pointer}
 .m-kso-card:not(.m-kso-open) .m-kso-hdr{padding-bottom:0;border-bottom:none}
 .m-kso-hdr .m-insight-chev{flex-shrink:0;align-self:center;color:var(--muted)}
-.m-kso-hdr-left{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-width:0}
+.m-kso-hdr-left{display:flex;align-items:center;gap:9px;min-width:0}
 .m-kso-q{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.2px}
 .m-kso-cap{font-size:11px;color:var(--muted);font-weight:500}
 .m-kso-cap b{color:var(--text);font-weight:700}
 .m-kso-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-left:auto}
-.m-kso-bonus-blk{display:flex;flex-direction:column;align-items:flex-end}
-.m-kso-bonus-blk small{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-.m-kso-bonus-blk b{font-size:21px;font-weight:900;color:var(--text);letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.m-kso-bonus-blk{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.m-kso-bonus-blk small{font-size:8.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.m-kso-bonus-blk b{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.2px;font-variant-numeric:tabular-nums;white-space:nowrap}
 /* objective rows: mobile = name on top, figure strip below */
 .m-kso-row{display:flex;flex-direction:column;gap:9px;padding:14px 0;border-bottom:1px solid var(--divider)}
 .m-kso-row:last-of-type{border-bottom:none;padding-bottom:2px}
-.m-kso-cell-name b{display:block;font-size:13.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m-kso-row-desc{display:block;font-size:11px;color:var(--muted);line-height:1.45;margin-top:3px}
-.m-kso-figs{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
-.m-kso-fig{display:flex;flex-direction:column;gap:2px}
-.m-kso-fig small{font-size:8.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.m-kso-fig b{font-size:15px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
-.m-kso-ach{display:inline-block;min-width:44px;text-align:center;font-size:12px;font-weight:800;padding:4px 10px;border-radius:14px;background:var(--track);color:var(--text-2);font-variant-numeric:tabular-nums}
+.m-kso-cell-name b{display:block;font-size:13px;font-weight:800;color:var(--text);line-height:1.35}
+.m-kso-row-desc{display:block;font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px}
+/* figure strip: five even columns so every quarter's rows line up */
+.m-kso-figs{display:grid;grid-template-columns:auto auto auto auto auto;justify-content:space-between;align-items:end;gap:8px}
+.m-kso-fig{display:flex;flex-direction:column;gap:2px;min-width:0}
+.m-kso-fig small{font-size:8px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.m-kso-fig b{font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-kso-ach{display:inline-block;min-width:40px;text-align:center;font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:12px;background:var(--track);color:var(--text-2);font-variant-numeric:tabular-nums}
 .m-kso-ach.good{background:rgba(116,191,75,.14);color:var(--green)}
 .m-kso-ach.bad{background:rgba(227,36,27,.14);color:var(--red)}
 /* View Calculation expander (desktop reference) */
@@ -865,10 +868,56 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
    mirrors the desktop's columnar row (name | figure strip) */
 .i-device.land .m-kso-row{flex-direction:row;align-items:center;gap:18px}
 .i-device.land .m-kso-cell-name{flex:1;min-width:180px}
-.i-device.land .m-kso-figs{flex-wrap:nowrap;gap:18px}
+.i-device.land .m-kso-figs{display:flex;flex-wrap:nowrap;gap:18px}
 .i-device.land .m-kso-fig small{white-space:nowrap}
 .i-page .m-kso-calc-row{flex-direction:row;align-items:baseline;justify-content:space-between;gap:18px}
 .i-page .m-kso-calc-row .m-kso-calc-inst,.i-page .m-kso-calc-note{text-align:right;max-width:62%}
+
+/* ─── USAGE ANALYTICS (SIO/Admin) ─── */
+.m-ua-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.m-ua-asof{font-size:10px;color:var(--muted);font-weight:600}
+.m-ua-pills{display:flex;gap:6px;flex-wrap:wrap}
+.m-ua-pills button{border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:11px;font-weight:700;padding:6px 12px;border-radius:14px;cursor:pointer}
+.m-ua-pills button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.m-ua-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.m-ua-kpi{background:var(--card);border:1px solid var(--border);border-top:3px solid;border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.m-ua-kpi b{font-size:20px;font-weight:900;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.m-ua-kpi span{font-size:11px;font-weight:800;color:var(--text)}
+.m-ua-kpi small{font-size:9.5px;color:var(--muted);font-weight:600}
+.m-ua-insight{display:flex;align-items:flex-start;gap:9px;border-left:3px solid;border-radius:6px;background:var(--card-2);padding:9px 11px;margin-bottom:8px}
+.m-ua-insight:last-child{margin-bottom:0}
+.m-ua-instag{flex-shrink:0;font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border:1px solid;border-radius:10px;padding:3px 8px;margin-top:1px;white-space:nowrap}
+.m-ua-insight p{font-size:11.5px;line-height:1.55;color:var(--text-2);font-weight:600}
+.m-ua-tr{display:grid;grid-template-columns:1.5fr .65fr .75fr .6fr .55fr;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--divider);font-size:11px}
+.m-ua-ftr{display:grid;grid-template-columns:1.6fr .95fr .55fr .55fr;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--divider);font-size:11px}
+.m-ua-tr:last-child,.m-ua-ftr:last-child{border-bottom:none}
+.m-ua-th{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-ua-tr .r,.m-ua-ftr .r{text-align:right}
+.m-ua-page{font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.m-ua-num{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.m-ua-dim{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.m-ua-trend{font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
+.m-ua-trend.neg{color:var(--red)}
+.m-ua-sub{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin:-4px 0 10px}
+.m-ua-sub2{font-size:10px;color:var(--muted);font-weight:700}
+.m-ua-heat{display:grid;grid-template-columns:34px repeat(7,1fr);gap:3px;align-items:center}
+.m-ua-heat-day{font-size:8.5px;font-weight:800;color:var(--muted);text-align:center;text-transform:uppercase}
+.m-ua-heat-hour{font-size:8.5px;font-weight:700;color:var(--muted);text-align:right;padding-right:4px;font-variant-numeric:tabular-nums}
+.m-ua-heat-cell{height:20px;border-radius:5px;background:var(--track);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.m-ua-heat-leg{display:flex;align-items:center;gap:4px;margin-top:10px;font-size:9px;font-weight:700;color:var(--muted)}
+.m-ua-heat-leg i{width:16px;height:10px;border-radius:3px}
+.m-ua-pain{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--divider)}
+.m-ua-pain:last-child{border-bottom:none}
+.m-ua-rank{flex-shrink:0;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.m-ua-pain-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.m-ua-pain-txt b{font-size:12.5px;font-weight:800;color:var(--text)}
+.m-ua-pain-txt span{font-size:10.5px;color:var(--muted);font-weight:600}
+.m-ua-ptrend{flex-shrink:0;font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:12px;text-transform:capitalize}
+.m-ua-ptrend-improving{color:var(--green);background:rgba(116,191,75,.14)}
+.m-ua-ptrend-stable{color:var(--muted);background:var(--track)}
+.m-ua-ptrend-worsening{color:var(--red);background:rgba(227,36,27,.14)}
+/* iPad: KPI strip runs five-up */
+.i-page .m-ua-kpis{grid-template-columns:repeat(5,1fr)}
 
 /* ─── BACKLOG INSIGHTS ─── */
 /* Mobile backlog hero — selected bucket at a glance, dropdown filter */
@@ -1120,6 +1169,8 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-leg2-badge{flex-shrink:0;min-width:38px;text-align:center;font-size:11px;font-weight:800;color:#fff;padding:3px 6px;border-radius:6px;font-variant-numeric:tabular-nums;letter-spacing:.2px}
 .m-leg2-label{flex:1;font-size:12.5px;font-weight:700;color:var(--text)}
 .m-leg2-val{font-size:14px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.m-leg2-ded{font-style:normal;font-size:8px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--red);margin-left:6px;vertical-align:1px}
+.m-leg2-neg{color:var(--red)}
 .m-leg2-more{width:100%;border-left-color:var(--divider);cursor:pointer;font:inherit}
 .m-leg2-more .m-leg2-label{color:var(--accent)}
 .m-leg2-more-badge{background:var(--muted)}

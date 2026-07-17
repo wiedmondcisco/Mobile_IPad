@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu } from "lucide-react";
+import { Home, DollarSign, Target, Search, ChevronRight, ChevronDown, ChevronLeft, Bell, X, FileText, Calendar, ArrowUp, RefreshCw, Moon, Sun, Users, User, Layers, Sparkles, Send, Smartphone, Tablet, RotateCw, Share, Copy, Plus, ExternalLink, Eye, EyeOff, CheckCircle2, Trophy, Calculator, MoreHorizontal, HelpCircle, LayoutGrid, AlertTriangle, Check, Info, Menu, BarChart3 } from "lucide-react";
 import "./styles.css";
 
 /* ════════════════════════════════════════════════════════════════
@@ -552,14 +552,20 @@ const DONUT_LIGHT = ["#0051AF","#00BCEB","#FBAB2C","#E3241B","#74BF4B","#52719C"
 const DONUT_DARK  = ["#3E7BD6","#33CDF0","#FFC155","#F0564D","#8FD86A","#7E9BC4"];
 function paymentDonutItems(p, dark) {
   const pal = dark ? DONUT_DARK : DONUT_LIGHT;
-  return [
-    {label:"Goal Sheet", value:parseFloat(p.goalSheet.total.replace(/,/g,'')), color:pal[0]},
+  /* A replaced goal sheet reconciles pay already issued on the old sheet, so
+     it appears as a signed DEDUCTION slice; the current sheet then shows its
+     gross payout, keeping the signed sum equal to the net payment. */
+  const ded = p.replaced ? Math.abs(parseFloat(p.replaced.total.replace(/[^0-9.-]/g,''))) : 0;
+  const items = [
+    {label:"Goal Sheet", value:parseFloat(p.goalSheet.total.replace(/,/g,'')) + ded, color:pal[0]},
     {label:"SPIFF & Bonus", value:parseFloat(p.spiff.total.replace(/,/g,'')), color:pal[1]},
     {label:"Draws", value:parseFloat(p.draws.total.replace(/,/g,'')), color:pal[2]},
     {label:"Adjustments", value:parseFloat(p.adj.total.replace(/,/g,'')), color:pal[3]},
     {label:"On-Top Bonus", value:parseFloat(p.otb.total.replace(/,/g,'')), color:pal[4]},
     {label:"Past Goal Sheets", value:parseFloat(p.past.total.replace(/,/g,'')), color:pal[5]}
   ].filter(d=>d.value>0);
+  if (ded > 0) items.splice(1, 0, {label:"Replaced Goal Sheet", value:-ded, deduction:true, color:dark ? "#F0564D" : "#E3241B"});
+  return items;
 }
 
 /* Little type chips on accordion detail rows (desktop reference) */
@@ -1189,23 +1195,30 @@ function PeriodChips({s}) {
 function PaymentBreakdownCard({p, s, donutSize=180, compact=false}) {
   const total = parseFloat(p.amount.replace(/,/g,''));
   const donutItems = paymentDonutItems(p, s.theme==="dark");
+  const hasDed = donutItems.some(d=>d.deduction);
+  /* slice size = |amount|; legend percentages stay signed vs the net total */
+  const slices = donutItems.map(d=>({...d, value:Math.abs(d.value)}));
+  const sliceTotal = slices.reduce((a,d)=>a+d.value,0);
   const [showAll, setShowAll] = useState(false);
-  const minor = compact ? donutItems.filter(d=>d.value/total < .05) : [];
+  const minor = compact ? donutItems.filter(d=>Math.abs(d.value)/total < .05) : [];
   const fold = minor.length >= 2;
-  const rows = fold && !showAll ? donutItems.filter(d=>d.value/total >= .05) : donutItems;
+  const rows = fold && !showAll ? donutItems.filter(d=>Math.abs(d.value)/total >= .05) : donutItems;
   const minorSum = minor.reduce((a,d)=>a+d.value,0);
   const legRow = (d,i) => {
     const pct = ((d.value/total)*100).toFixed(0);
     return <div key={i} className="m-leg2" style={{borderLeftColor:d.color}}>
       <span className="m-leg2-badge" style={{background:d.color}}>{pct}%</span>
-      <span className="m-leg2-label">{d.label}</span>
-      <b className="m-leg2-val">{amt("$"+d.value.toLocaleString(undefined,{minimumFractionDigits:2}))}</b>
+      <span className="m-leg2-label">{d.label}{d.deduction && <i className="m-leg2-ded">Deduction</i>}</span>
+      <b className={`m-leg2-val ${d.deduction ? "m-leg2-neg" : ""}`}>
+        {d.deduction ? <>-{amt("$"+Math.abs(d.value).toLocaleString(undefined,{minimumFractionDigits:2}))}</>
+          : amt("$"+d.value.toLocaleString(undefined,{minimumFractionDigits:2}))}
+      </b>
     </div>;
   };
   return <div className="m-section">
     <div className="m-section-hdr"><h2>Payment Breakdown · {p.month}</h2><span className={`m-pay-status m-status-${p.status.toLowerCase()}`}>{p.status}</span></div>
     <div className="m-donut-hero">
-      <SegmentDonut items={donutItems} total={total} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={amt(`$${p.amount}`)} centerSub="Total" interactive/>
+      <SegmentDonut items={slices} total={sliceTotal} size={donutSize} stroke={Math.round(donutSize*0.145)} centerTop={amt(`$${p.amount}`)} centerSub={hasDed ? "Net" : "Total"} interactive/>
     </div>
     <div className="m-leg2-list">
       {rows.map(legRow)}
@@ -1219,14 +1232,20 @@ function PaymentBreakdownCard({p, s, donutSize=180, compact=false}) {
   </div>;
 }
 
-function PaymentScheduleCard({p, s}) {
-  return <div className="m-section">
-    <div className="m-section-hdr"><h2>Payment Schedule</h2></div>
-    <div className="m-sched-row"><Calendar size={13}/><span>Next Payment</span><b>{p.payDate}</b></div>
-    <div className="m-sched-row"><Calendar size={13}/><span>Lock Date</span><b>{p.lockDate}</b></div>
-    <div className="m-sched-row"><Calendar size={13}/><span>Revenue Dates</span><b>{p.revDates}</b></div>
-    <button className="m-sched-cal" onClick={()=>s.setShowPayCal(true)}>View Full Payment Calendar <ExternalLink size={13}/></button>
-    <button className="m-sched-cal m-sched-est" onClick={()=>s.setTab("estimator")}>Estimate a future paycheck <Calculator size={12}/></button>
+/* Key schedule dates as a compact strip at the top of Payments — the seller
+   sees Next Payment / Lock / Revenue dates first; the calendar popup and the
+   Pay Estimator stay one tap away on the same strip. */
+function PaymentDatesStrip({p, s}) {
+  return <div className="m-pdates">
+    <div className="m-pdates-row">
+      <div className="m-pdate"><small>Next Payment</small><b>{p.payDate}</b></div>
+      <div className="m-pdate"><small>Lock Date</small><b>{p.lockDate}</b></div>
+      <div className="m-pdate"><small>Revenue Dates</small><b>{p.revDates}</b></div>
+    </div>
+    <div className="m-pdates-actions">
+      <button className="m-pdates-btn" onClick={()=>s.setShowPayCal(true)}>Full Payment Calendar <ExternalLink size={11}/></button>
+      <button className="m-pdates-btn m-pdates-btn-dim" onClick={()=>s.setTab("estimator")}>Estimate a future paycheck <Calculator size={11}/></button>
+    </div>
   </div>;
 }
 
@@ -1545,9 +1564,9 @@ function PaymentsPage({s}) {
       <button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button>
     </div>
     <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
+    <PaymentDatesStrip p={p} s={s}/>
     <PeriodChips s={s}/>
     <PaymentBreakdownCard p={p} s={s} compact/>
-    <PaymentScheduleCard p={p} s={s}/>
     <div className="m-expandall-row"><ExpandAllBtn s={s} p={p}/></div>
     <PaymentAccordion p={p} s={s}/>
   </div>;
@@ -2350,7 +2369,7 @@ function KsoSection() {
      quarter's detail matters most, so only one opens at a time. The fine
      print is hidden by default; one "More info" toggle at the top reveals
      every objective's description at once. */
-  const [openQ, setOpenQ] = useState(0);
+  const [openQ, setOpenQ] = useState(-1);   // all quarters start collapsed
   const [showInfo, setShowInfo] = useState(false);
   return <>
     <div className="m-kso-info">
@@ -2363,7 +2382,7 @@ function KsoSection() {
           <button className="m-kso-tool">View in KSO Tool <ExternalLink size={13}/></button>
         </div>
       </div>
-      {showInfo && <p className="m-kso-info-note">Your plan elements represents 20% of your target Incentive (Compensation for the CS402 FY26 goal sheet)</p>}
+      {showInfo && <p className="m-kso-info-note">KSOs represent 20% of your target incentive on the 2026 CS532 goal sheet. Each quarter lists its objectives with weight, bonus earned, target, result, and achievement — expand a quarter to see the detail, and use More info to read the full objective descriptions.</p>}
     </div>
     {ksoQuarters.map((qt,qi)=>{
       const open = qi===openQ;
@@ -2374,7 +2393,7 @@ function KsoSection() {
           <div className="m-kso-hdr-left">
             <ChevronDown size={15} className={`m-insight-chev ${open?"open":""}`}/>
             <span className="m-kso-q">{qt.q}</span>
-            <span className="m-kso-cap">Achievement Cap: <b>{qt.cap}</b></span>
+            <span className="m-kso-cap">Cap: <b>{qt.cap}</b></span>
           </div>
           <div className="m-kso-hdr-right">
             <div className="m-kso-bonus-blk"><small>Bonus Earned</small><b>{amt(qt.bonus)}</b></div>
@@ -2386,7 +2405,7 @@ function KsoSection() {
             return <div key={i} className="m-kso-row">
             <div className="m-kso-cell-name" title={desc}>
               <b>{r.name}</b>
-              <span className="m-kso-row-desc">{showInfo && desc ? desc : "Objective"}</span>
+              {showInfo && desc && <span className="m-kso-row-desc">{desc}</span>}
             </div>
             <div className="m-kso-figs">
               <div className="m-kso-fig"><small>KSO Weight</small><b>{r.weight}</b></div>
@@ -3370,6 +3389,184 @@ function IPadStatusBar() {
 }
 
 /* ════════════════════════════════════════════════════════════════
+   USAGE ANALYTICS (SIO/Admin view) — what's getting used, what isn't
+   ════════════════════════════════════════════════════════════════ */
+const UA_ASOF = "All data as of Jul 17, 2026 3:55 PM";
+const UA_PERIODS = ["Weekly","Monthly","Quarterly","Yearly"];
+/* KPI strip per period (demo) — hits in the tables scale with the period */
+const UA_KPIS = {
+  Weekly:   {users:"1,240", sessions:"2,105",  sesSub:"+9% vs last week",    dur:"4m 18s", durSub:"Up from 4m 02s", pages:"3.6", adopt:"84%", adoptSub:"9/11 modules used"},
+  Monthly:  {users:"2,020", sessions:"8,420",  sesSub:"+14% vs last period", dur:"4m 32s", durSub:"Up from 3m 48s", pages:"3.8", adopt:"87%", adoptSub:"9/11 modules used"},
+  Quarterly:{users:"2,180", sessions:"24,960", sesSub:"+11% vs last quarter",dur:"4m 21s", durSub:"Up from 4m 05s", pages:"3.7", adopt:"91%", adoptSub:"10/11 modules used"},
+  Yearly:   {users:"2,310", sessions:"96,400", sesSub:"+26% vs last year",   dur:"4m 08s", durSub:"Up from 3m 22s", pages:"3.5", adopt:"95%", adoptSub:"11/11 modules used"}
+};
+const UA_SCALE = {Weekly:.25, Monthly:1, Quarterly:3, Yearly:11.6};
+/* Page-wise usage (Monthly base) — hits, dwell, bounce, trend */
+const UA_PAGES = [
+  {page:"At A Glance",      hits:4820, time:"2m 15s", bounce:"12%", trend:8},
+  {page:"Payments",         hits:3940, time:"4m 32s", bounce:"8%",  trend:15},
+  {page:"Goals",            hits:3210, time:"3m 48s", bounce:"10%", trend:5},
+  {page:"Orders",           hits:2870, time:"3m 05s", bounce:"15%", trend:12},
+  {page:"Pay Estimator",    hits:2450, time:"5m 12s", bounce:"6%",  trend:22},
+  {page:"SPIFF & Bonus",    hits:1890, time:"1m 45s", bounce:"18%", trend:-3},
+  {page:"Backlog Insights", hits:1650, time:"2m 30s", bounce:"14%", trend:7},
+  {page:"Smart Reports",    hits:1420, time:"6m 08s", bounce:"5%",  trend:28},
+  {page:"AI Canvas",        hits:980,  time:"8m 22s", bounce:"4%",  trend:45},
+  {page:"Support",          hits:620,  time:"3m 15s", bounce:"22%", trend:-8}
+];
+/* Hour × day session counts (Mon–Sun, 6am–6pm) */
+const UA_HEAT_HOURS = ["6am","7am","8am","9am","10am","11am","12pm","1pm","2pm","3pm","4pm","5pm","6pm"];
+const UA_HEAT = [
+  [2,3,2,4,2,null,null],[8,12,10,11,9,1,null],[45,52,48,50,42,3,1],[82,88,85,90,78,5,2],
+  [95,98,92,96,88,8,3],[78,82,80,85,72,6,2],[35,38,42,40,32,4,1],[62,68,65,70,58,5,2],
+  [88,92,90,94,82,7,3],[75,80,78,82,68,4,1],[55,60,58,62,48,3,1],[28,32,30,35,22,2,null],[12,15,14,18,10,1,null]
+];
+const UA_HEAT_COLORS = ["rgba(0,188,235,.10)","rgba(0,188,235,.22)","rgba(0,188,235,.38)","rgba(0,188,235,.55)","#0086c9","#0051af"];
+const uaHeatStep = v => v==null ? -1 : v<5 ? 0 : v<15 ? 1 : v<45 ? 2 : v<65 ? 3 : v<85 ? 4 : 5;
+/* Component-level interactions (Monthly base) */
+const UA_FEATURES = [
+  {comp:"Compensation Calculation Modal", page:"Payments",      clicks:2840, unique:1650},
+  {comp:"PE Attainment Bar",              page:"Goals",         clicks:2120, unique:1380},
+  {comp:"Revenue Slider",                 page:"Pay Estimator", clicks:1980, unique:1420},
+  {comp:"KPI Cards (Hover)",              page:"At A Glance",   clicks:1750, unique:1200},
+  {comp:"Order Detail Drilldown",         page:"Orders",        clicks:1540, unique:980},
+  {comp:"Export CSV",                     page:"Payments",      clicks:1320, unique:890},
+  {comp:"Trend Chart Toggle (3M/6M/1Y)",  page:"At A Glance",   clicks:1180, unique:820},
+  {comp:"Rate Table Expand",              page:"Payments",      clicks:1050, unique:740},
+  {comp:"AI Prompt Submit",               page:"AI Canvas",     clicks:890,  unique:620},
+  {comp:"Dark Mode Toggle",               page:"At A Glance",   clicks:780,  unique:540}
+];
+/* Pain points — auto-ranked weekly from in-app reports + support cases */
+const UA_PAINS = [
+  {rank:1, title:"Payment calculation unclear", where:"Payments — 142 reports", trend:"improving"},
+  {rank:2, title:"Order not found in search",   where:"Orders — 98 reports",   trend:"stable"},
+  {rank:3, title:"Attainment mismatch with MBR",where:"Goals — 87 reports",    trend:"worsening"},
+  {rank:4, title:"Slow page load on Goals",     where:"Goals — 64 reports",    trend:"improving"},
+  {rank:5, title:"Export missing columns",      where:"Orders — 51 reports",   trend:"stable"}
+];
+const UA_RANK_COLOR = ["#e3241b","#e3241b","#e08b00","#e08b00","#4e8a31"];
+/* Auto-generated findings — the "so what" layer: what's working, what isn't */
+const UA_INSIGHTS = [
+  {tag:"Hidden gem", tone:"green",
+    text:"AI Canvas holds the longest sessions (8m 22s), the lowest bounce (4%), and the fastest growth (+45%) — yet ranks 9th of 11 in traffic. Surfacing it from At A Glance could compound engagement."},
+  {tag:"Underused", tone:"amber",
+    text:"SPIFF & Bonus has the highest seller-page bounce (18%) and is the only seller page shrinking (−3%). Sellers appear to land expecting payout math that lives on Payments — cross-link the calculation modal."},
+  {tag:"Win", tone:"green",
+    text:"Self-serve is working: Support visits are down 8% while the #1 pain point (payment calculation) improves. The Compensation Calculation Modal — the most-used component at 2,840 clicks — is deflecting cases."},
+  {tag:"Ops", tone:"blue",
+    text:"Usage peaks Tue & Thu, 9–11am, and weekends are near zero. Land data refreshes and comms before 8am; reserve Saturdays for maintenance windows."},
+  {tag:"Risk", tone:"red",
+    text:"Attainment mismatch with MBR is the only worsening pain point (87 reports) and correlates with Goals' slow-load complaints — worth prioritizing before H2 goal-sheet acceptance."}
+];
+const UA_TONE = {green:"#4e8a31", amber:"#e08b00", red:"#e3241b", blue:"#0051af"};
+
+function UsageContent({grid=""}) {
+  const [period, setPeriod] = useState("Monthly");
+  const k = UA_KPIS[period];
+  const mult = UA_SCALE[period];
+  const n = v => Math.round(v*mult).toLocaleString("en-US");
+  const kpis = [
+    {v:k.users, label:"Total Users", sub:"Active this period", c:"#00bceb"},
+    {v:k.sessions, label:"Total Sessions", sub:k.sesSub, c:"#4e8a31"},
+    {v:k.dur, label:"Avg Session Duration", sub:k.durSub, c:"#0051af"},
+    {v:k.pages, label:"Pages / Session", sub:"Healthy engagement", c:"#e08b00"},
+    {v:k.adopt, label:"Feature Adoption", sub:k.adoptSub, c:"#52719c"}
+  ];
+  return <>
+    <div className="m-ua-controls">
+      <small className="m-ua-asof">{UA_ASOF}</small>
+      <div className="m-ua-pills">
+        {UA_PERIODS.map(p=><button key={p} className={p===period?"on":""} onClick={()=>setPeriod(p)}>{p}</button>)}
+      </div>
+    </div>
+
+    <div className="m-ua-kpis">
+      {kpis.map((x,i)=><div key={i} className="m-ua-kpi" style={{borderTopColor:x.c}}>
+        <b style={{color:x.c}}>{x.v}</b><span>{x.label}</span><small>{x.sub}</small>
+      </div>)}
+    </div>
+
+    {/* the "so what" layer first — findings an admin can act on */}
+    <div className="m-section">
+      <div className="m-section-hdr"><h2>What's Working · What Isn't</h2></div>
+      {UA_INSIGHTS.map((ins,i)=><div key={i} className="m-ua-insight" style={{borderLeftColor:UA_TONE[ins.tone]}}>
+        <span className="m-ua-instag" style={{color:UA_TONE[ins.tone], borderColor:UA_TONE[ins.tone]+"66", background:UA_TONE[ins.tone]+"14"}}>{ins.tag}</span>
+        <p>{ins.text}</p>
+      </div>)}
+    </div>
+
+    <div className={grid}>
+      <div className="m-section">
+        <div className="m-section-hdr"><h2>Page-wise Usage</h2></div>
+        <div className="m-ua-tr m-ua-th"><span>Page</span><span className="r">Hits</span><span className="r">Avg Time</span><span className="r">Bounce</span><span className="r">Trend</span></div>
+        {UA_PAGES.map((p,i)=><div key={i} className="m-ua-tr">
+          <span className="m-ua-page">{p.page}</span>
+          <span className="r m-ua-num">{n(p.hits)}</span>
+          <span className="r m-ua-num">{p.time}</span>
+          <span className="r m-ua-dim">{p.bounce}</span>
+          <span className={`r m-ua-trend ${p.trend<0?"neg":""}`}>{p.trend>0?"+":""}{p.trend}%</span>
+        </div>)}
+      </div>
+
+      <div className="m-section">
+        <div className="m-section-hdr"><h2>Usage Heatmap</h2></div>
+        <small className="m-ua-sub">When sellers use the tool — sessions by hour and day</small>
+        <div className="m-ua-heat">
+          <span/>
+          {["M","T","W","T","F","S","S"].map((d,i)=><span key={i} className="m-ua-heat-day">{d}</span>)}
+          {UA_HEAT.map((row,r)=><React.Fragment key={r}>
+            <span className="m-ua-heat-hour">{UA_HEAT_HOURS[r]}</span>
+            {row.map((v,c)=>{
+              const st = uaHeatStep(v);
+              return <span key={c} className="m-ua-heat-cell"
+                style={st<0?{}:{background:UA_HEAT_COLORS[st], color:st>=4?"#fff":"var(--text-2)"}}>{v==null?"":v}</span>;
+            })}
+          </React.Fragment>)}
+        </div>
+        <div className="m-ua-heat-leg">Low {UA_HEAT_COLORS.map((c,i)=><i key={i} style={{background:c}}/>)} High</div>
+      </div>
+    </div>
+
+    <div className={grid}>
+      <div className="m-section">
+        <div className="m-section-hdr"><h2>Top Feature Interactions</h2></div>
+        <div className="m-ua-ftr m-ua-th"><span>Component</span><span>Page</span><span className="r">Clicks</span><span className="r">Unique</span></div>
+        {UA_FEATURES.map((f,i)=><div key={i} className="m-ua-ftr">
+          <span className="m-ua-page">{f.comp}</span>
+          <span className="m-ua-dim">{f.page}</span>
+          <span className="r m-ua-num">{n(f.clicks)}</span>
+          <span className="r m-ua-dim">{n(f.unique)}</span>
+        </div>)}
+      </div>
+
+      <div className="m-section">
+        <div className="m-section-hdr"><h2>Pain Points</h2><span className="m-ua-sub2">Auto-ranked weekly</span></div>
+        {UA_PAINS.map((p,i)=><div key={i} className="m-ua-pain">
+          <span className="m-ua-rank" style={{color:UA_RANK_COLOR[i], background:UA_RANK_COLOR[i]+"1a"}}>#{p.rank}</span>
+          <div className="m-ua-pain-txt"><b>{p.title}</b><span>{p.where}</span></div>
+          <span className={`m-ua-ptrend m-ua-ptrend-${p.trend}`}>{p.trend}</span>
+        </div>)}
+      </div>
+    </div>
+  </>;
+}
+
+function UsagePage({s}) {
+  return <div className="m-page">
+    <MobileHeader s={s}/>
+    <h1 className="m-page-title" style={{marginBottom:2}}>Usage Analytics</h1>
+    <p className="m-team-sub">SIO/Admin view — feature-level usage, pain points, and engagement patterns</p>
+    <UsageContent/>
+  </div>;
+}
+function IPadUsage({s}) {
+  return <div className="i-page">
+    <IPadHeader title="Usage Analytics" sub="SIO/Admin view — feature-level usage metrics, pain points, and engagement patterns" s={s}/>
+    <UsageContent grid="i-grid-2"/>
+  </div>;
+}
+
+/* ════════════════════════════════════════════════════════════════
    SHARED STATE + POPUPS  (live above both frames so toggling the
    device never resets the tab, filters, inputs, or open modals)
    ════════════════════════════════════════════════════════════════ */
@@ -3386,7 +3583,7 @@ function useCompXState() {
   const [reminders, setReminders] = useState(REMINDERS_SEED);
   const [periodIdx, setPeriodIdx] = useState(fullPaymentPeriods.length-1);   // newest (current) month
   const [showAllPeriods, setShowAllPeriods] = useState(false);               // last 3 ↔ last 12 months
-  const [expanded, setExpanded] = useState({goalSheet:true});
+  const [expanded, setExpanded] = useState({});   // payment sections start collapsed — Expand All / per-section taps open them
   const [goalIdx, setGoalIdx] = useState(0);
   const [orderQuery, setOrderQuery] = useState("");
   const [orderType, setOrderType] = useState(ORDER_SEARCH_TYPES[0]);   // search-by field
@@ -3523,11 +3720,12 @@ const NAV_TABS = [
   {id:"orders", label:"Order Search", Icon:Search},
   {id:"spiff", label:"SPIFF & Bonus", Icon:Target},
   {id:"backlog", label:"Backlog", Icon:Layers},
-  {id:"estimator", label:"Pay Estimator", short:"Estimator", Icon:Calculator}
+  {id:"estimator", label:"Pay Estimator", short:"Estimator", Icon:Calculator},
+  {id:"usage", label:"Usage Analytics", short:"Usage", Icon:BarChart3}
 ];
 /* Mobile bottom bar: the four core tabs; the rest live in the More sheet */
 const MOBILE_TAB_IDS = ["glance","payments","goals","orders"];
-const MOBILE_MORE_IDS = ["spiff","backlog","estimator"];
+const MOBILE_MORE_IDS = ["spiff","backlog","estimator","usage"];
 const MOBILE_TABS = NAV_TABS.filter(t=>MOBILE_TAB_IDS.includes(t.id));
 const MOBILE_MORE = NAV_TABS.filter(t=>MOBILE_MORE_IDS.includes(t.id));
 
@@ -3625,6 +3823,7 @@ function MobileFrame({s}) {
                 {s.tab==="spiff"    && <SpiffBonusPage s={s}/>}
                 {s.tab==="backlog"  && <BacklogPage s={s}/>}
                 {s.tab==="estimator" && <PayEstimatorPage s={s}/>}
+                {s.tab==="usage" && <UsagePage s={s}/>}
               </>}
         </div>
 
@@ -3739,11 +3938,11 @@ function IPadPayments({s}) {
   return <div className="i-page">
     <IPadHeader title="Payments" sub={`${DATA_AS_OF} · ${REFRESH_NOTE}`} s={s}
       right={<><button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button><ExpandAllBtn s={s} p={fullPaymentPeriods[s.periodIdx]}/><HideBtn s={s}/></>}/>
+    <PaymentDatesStrip p={p} s={s}/>
     <PeriodChips s={s}/>
     <div className="i-split">
       <div className="i-col-a">
         <PaymentBreakdownCard p={p} s={s} donutSize={188}/>
-        <PaymentScheduleCard p={p} s={s}/>
       </div>
       <div className="i-col-b">
         <PaymentAccordion p={p} s={s}/>
@@ -3953,6 +4152,7 @@ function IPadFrame({s, landscape=false}) {
             {s.tab==="spiff"    && <IPadSpiff s={s}/>}
             {s.tab==="backlog"  && <IPadBacklog s={s}/>}
             {s.tab==="estimator" && <IPadEstimator s={s}/>}
+            {s.tab==="usage" && <IPadUsage s={s}/>}
           </>}
         </main>
       </div>
