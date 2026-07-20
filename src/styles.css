@@ -565,15 +565,31 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-donut2-center small{font-size:11px;color:var(--accent);font-weight:700;margin-top:3px}
 
 /* ─── AT A GLANCE: HERO ─── */
-.m-hero{background:var(--hero-grad);border-radius:20px;padding:18px 18px 16px;margin-bottom:12px;color:#fff;box-shadow:0 10px 26px var(--hero-glow);cursor:pointer;transition:transform .15s,filter .15s}
+.m-hero{background:var(--hero-grad);border-radius:20px;padding:18px 15px 16px;margin-bottom:12px;color:#fff;box-shadow:0 10px 26px var(--hero-glow);cursor:pointer;transition:transform .15s,filter .15s;display:flex;align-items:center;gap:9px}
+.m-hero-body{flex:1;min-width:0}
 .m-hero:hover{filter:brightness(1.04)}
 .m-hero:active{transform:scale(.99)}
 .m-hero-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .m-hero-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9}
 .m-hero .m-pay-status{background:rgba(255,255,255,.22);color:#fff}
 .m-hero-amt-row{display:flex;align-items:baseline;gap:6px}
-.m-hero-amt{font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
+.m-hero-amt{font-size:48px;font-weight:900;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
+.m-hero-amt.m-hero-amt-sm{font-size:39px;letter-spacing:-1.5px}
+.m-hero-amt.m-hero-amt-xs{font-size:30px;letter-spacing:-1px}
 .m-hero-usd{font-size:15px;font-weight:700;opacity:.75}
+/* Currency chip on the hero + its dropdown (reuses goal-sheet menu skeleton) */
+.m-cur-wrap{position:relative;margin-bottom:0;display:inline-flex;align-self:center}
+.m-cur-btn{display:inline-flex;align-items:center;gap:2px;border:1px solid rgba(255,255,255,.42);background:rgba(255,255,255,.14);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.3px;padding:3px 7px;border-radius:12px;cursor:pointer}
+.m-cur-btn:hover{background:rgba(255,255,255,.24)}
+.m-gsel-menu.m-cur-menu{left:auto;right:0;min-width:224px}
+.m-cur-menu button{align-items:center}
+.m-cur-sym{width:36px;flex-shrink:0;font-weight:800;font-size:14px;color:var(--accent);text-align:center}
+.m-cur-menu button.on .m-cur-sym{color:#fff}
+.m-cur-opt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;color:var(--text)}
+.m-cur-opt b{font-size:13px}
+.m-cur-opt small{color:var(--text-2);font-size:11px;font-weight:600}
+.m-cur-menu button.on .m-cur-opt,.m-cur-menu button.on .m-cur-opt small{color:#fff}
+.m-cur-note{display:block;padding:7px 10px 3px;color:var(--text-2);font-size:10.5px;border-top:1px solid var(--border);margin-top:3px}
 .m-hero-meta{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);display:flex;flex-direction:column;gap:4px}
 .m-hero-asof{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
 .m-hero-change{font-size:11px;opacity:.85}
@@ -592,8 +608,18 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 
 /* Prev/next context strip — de-emphasized */
 .m-context-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.m-context-card{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius-sm);padding:9px 11px;display:flex;flex-direction:column;gap:2px}
+.m-context-card{background:var(--card);border:1px solid var(--divider);border-radius:var(--radius-sm);padding:9px 11px;display:flex;align-items:center;gap:10px}
+.m-context-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .m-context-month{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.3px}
+
+/* Circular calendar badge on payment cards + as-of banners (desktop reference);
+   tint tracks the payment status — Cisco palette, no purple for Upcoming */
+.m-pcal-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;flex-shrink:0}
+.m-pcb-hero{width:28px;height:28px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff}
+.m-pcb-paid{background:rgba(116,191,75,.13);border:1px solid rgba(116,191,75,.32);color:#4e8a31}
+.m-pcb-open{background:rgba(0,81,175,.09);border:1px solid rgba(0,81,175,.24);color:#0051af}
+.m-pcb-upcoming{background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);color:#7c3aed}
+.m-pcb-asof{width:28px;height:28px;background:#fff;border:1px solid rgba(0,81,175,.2)}
 /* Card deep-links to its period on the Payments page */
 .m-context-click{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
 .m-context-click:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.08)}
@@ -1230,8 +1256,12 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 /* ─── DARK-MODE POLISH ─── */
 /* status pills need brighter fills/text on dark surfaces */
 :root[data-theme="dark"] .m-status-paid{background:rgba(52,211,153,.16);color:#6ee7b7}
-:root[data-theme="dark"] .m-status-open{background:rgba(109,123,255,.2);color:#aab2ff}
+:root[data-theme="dark"] .m-status-open{background:rgba(0,188,235,.16);color:#7fd9f5}
 :root[data-theme="dark"] .m-status-upcoming{background:rgba(255,255,255,.09);color:#b7bcc8}
+:root[data-theme="dark"] .m-pcb-paid{background:rgba(116,191,75,.16);border-color:rgba(116,191,75,.38);color:#a8d98d}
+:root[data-theme="dark"] .m-pcb-open{background:rgba(0,188,235,.14);border-color:rgba(0,188,235,.32);color:#00bceb}
+:root[data-theme="dark"] .m-pcb-upcoming{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.32);color:#c4b5fd}
+:root[data-theme="dark"] .m-pcb-asof{background:rgba(0,188,235,.12);border-color:rgba(0,188,235,.3)}
 /* soft borders give cards definition against the near-black bg */
 :root[data-theme="dark"] .m-section,
 :root[data-theme="dark"] .m-pb-section,
@@ -1628,8 +1658,9 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .i-glance-cols{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-bottom:18px;align-items:start}
 .i-glance-cols > *{min-width:0}
 .i-glance-pes{display:flex;flex-direction:column;gap:16px;min-width:0}
-/* payment timeline side cards: center the short content so they don't read hollow */
-.i-timeline-card{justify-content:center;gap:4px}
+/* payment timeline side cards: badge left, short content stacked beside it */
+.i-timeline-card{gap:12px}
+.i-timeline-card .m-context-body{gap:4px}
 /* Pay Estimator: portrait stacks the two cards full-width (264px columns cramp
    the stats and truncate the summary); landscape splits estimator | summary */
 .i-est-split{grid-template-columns:1fr}
@@ -1638,7 +1669,7 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 /* Payment timeline: Apr | May (hero) | Jun — chronological left→right */
 .i-glance-top{display:grid;grid-template-columns:1fr 1.9fr 1fr;gap:16px;margin-bottom:14px;align-items:stretch}
 .i-glance-top .m-hero{margin-bottom:0}
-.i-timeline-card{justify-content:center;gap:4px;padding:14px 16px}
+.i-timeline-card{padding:14px 16px}
 .i-timeline-card .m-context-amt{font-size:22px}
 .i-timeline-date{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
 .i-goaltab-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
@@ -1664,6 +1695,8 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .i-main .m-section-label{font-size:12px;letter-spacing:.6px;margin-bottom:10px}
 .i-main .m-hero{padding:24px 26px 22px;border-radius:24px;height:100%;box-sizing:border-box}
 .i-main .m-hero-amt{font-size:50px;letter-spacing:-1.5px}
+.i-main .m-hero-amt.m-hero-amt-sm{font-size:42px}
+.i-main .m-hero-amt.m-hero-amt-xs{font-size:35px}
 .i-main .m-hero-label{font-size:12px}
 .i-main .m-context-amt{font-size:20px}
 .i-main .m-pe-left b{font-size:14px}
@@ -1715,6 +1748,8 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .i-device:not(.land) .i-hero{padding:16px 16px 14px}
 .i-device:not(.land) .i-hero .m-hero-label{font-size:10px}
 .i-device:not(.land) .i-hero .m-hero-amt{font-size:36px;letter-spacing:-1px}
+.i-device:not(.land) .i-hero .m-hero-amt.m-hero-amt-sm{font-size:30px}
+.i-device:not(.land) .i-hero .m-hero-amt.m-hero-amt-xs{font-size:26px}
 .i-device:not(.land) .i-hero .m-hero-asof{flex-wrap:wrap}
 .i-device:not(.land) .i-timeline-card .m-context-amt{font-size:17px}
 /* Looser rhythm between blocks */

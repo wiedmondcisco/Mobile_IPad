@@ -17,8 +17,36 @@ const REFRESH_NOTE = "Refreshes daily at 6:00 AM PST";
    site — safe because the whole tree re-renders from App when it flips. */
 let AMOUNTS_HIDDEN = false;
 const DOTS = "•••••";
-const amt = v => AMOUNTS_HIDDEN ? (String(v).startsWith("$") ? "$" + DOTS : DOTS) : v;
-const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, "$" + DOTS) : t;
+
+/* Display currency — payments are always MADE in USD; the seller can flip the
+   on-screen figures to CAD / EUR / JPY from the hero's currency chip. Fixed
+   demo rates; module mirror for the same reason as AMOUNTS_HIDDEN. */
+const CURRENCIES = [
+  {code:"USD", sym:"$",   rate:1,    dec:2, name:"US Dollar",       note:"Base currency"},
+  {code:"CAD", sym:"CA$", rate:1.37, dec:2, name:"Canadian Dollar", note:"1 USD ≈ CA$1.37"},
+  {code:"EUR", sym:"€",   rate:0.92, dec:2, name:"Euro",            note:"1 USD ≈ €0.92"},
+  {code:"JPY", sym:"¥",   rate:157,  dec:0, name:"Japanese Yen",    note:"1 USD ≈ ¥157"},
+];
+let ACTIVE_CUR = CURRENCIES[0];
+
+/* Rewrites every $-amount inside a string to the active display currency,
+   preserving k/M abbreviations ($109k → ¥17.1M). USD is a no-op. The
+   lookbehind keeps already-converted "CA$…" from converting twice. */
+const cvt = t => {
+  const c = ACTIVE_CUR;
+  if (c.rate === 1 || typeof t !== "string") return t;
+  return t.replace(/(?<![A-Za-z])\$(\d[\d,]*(?:\.\d+)?)([kKM]?)/g, (_, num, suf) => {
+    let v = parseFloat(num.replace(/,/g, "")) * c.rate;
+    if (suf) v *= suf === "M" ? 1e6 : 1e3;
+    if (suf && v >= 999500) return c.sym + (v/1e6 >= 10 ? Math.round(v/1e6) : (v/1e6).toFixed(1)) + "M";
+    if (suf) return c.sym + Math.round(v/1e3) + "k";
+    const dec = num.includes(".") ? c.dec : 0;
+    return c.sym + v.toLocaleString("en-US", {minimumFractionDigits:dec, maximumFractionDigits:dec});
+  });
+};
+
+const amt = v => AMOUNTS_HIDDEN ? (String(v).startsWith("$") ? ACTIVE_CUR.sym + DOTS : DOTS) : cvt(v);
+const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, ACTIVE_CUR.sym + DOTS) : cvt(t);
 
 /* SalesComp IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
@@ -741,14 +769,14 @@ function SegmentDonut({items, total, size=180, stroke=26, centerTop, centerSub, 
           transition:"opacity .15s, filter .15s"}}/>)}
     </svg>
     <div className="m-donut2-center">
-      <b style={{fontSize:size*0.125}}>{centerTop}</b>
+      <b style={{fontSize:size*(String(centerTop).length>11 ? 0.085 : String(centerTop).length>9 ? 0.105 : 0.125)}}>{centerTop}</b>
       {centerSub && <small>{centerSub}</small>}
     </div>
     {hv && <div className="m-donut-tip" style={{left:pos.x, top:pos.y}}>
       <span className="m-donut-tip-dot" style={{background:hv.color}}/>
       <div className="m-donut-tip-txt">
         <b>{hv.label}</b>
-        <span>${hv.value.toLocaleString(undefined,{minimumFractionDigits:2})} · {((hv.value/total)*100).toFixed(0)}%</span>
+        <span>{amt("$"+hv.value.toLocaleString(undefined,{minimumFractionDigits:2}))} · {((hv.value/total)*100).toFixed(0)}%</span>
       </div>
     </div>}
   </div>;
@@ -762,7 +790,7 @@ function BookingsBar({pe}) {
   const blW = (pe.backlogPct / pe.bookingsPct) * 100;
   const markerPos = (100 / scale) * 100;
   return <div className="m-pe-bar-section">
-    <div className="m-pe-book-row"><span className="m-pe-book-icon"></span> Bookings <b>{pe.bookingsAmt}</b> {pe.bookingsPct}%</div>
+    <div className="m-pe-book-row"><span className="m-pe-book-icon"></span> Bookings <b>{cvt(pe.bookingsAmt)}</b> {pe.bookingsPct}%</div>
     <div className="m-pe-bar-track">
       <div className="m-pe-bar-bookings" style={{width:bookingsW+"%"}}>
         <div className="m-pe-bar-rev" style={{width:revW+"%", background:pe.color}}></div>
@@ -773,8 +801,8 @@ function BookingsBar({pe}) {
       <div className="m-pe-bar-100" style={{left:markerPos+"%"}}><span>Goal</span></div>
     </div>
     <div className="m-pe-legend">
-      <span><i className="m-dot" style={{background:pe.color}}></i> Revenue <b>{pe.revenueAmt}</b> {pe.revenuePct}%</span>
-      <span><i className="m-dot" style={{background:pe.blColor||pe.color}}></i> Backlog <b>{pe.backlogAmt}</b> {pe.backlogPct}%</span>
+      <span><i className="m-dot" style={{background:pe.color}}></i> Revenue <b>{cvt(pe.revenueAmt)}</b> {pe.revenuePct}%</span>
+      <span><i className="m-dot" style={{background:pe.blColor||pe.color}}></i> Backlog <b>{cvt(pe.backlogAmt)}</b> {pe.backlogPct}%</span>
     </div>
   </div>;
 }
@@ -848,6 +876,38 @@ function HideBtn({s, light=false}) {
   </span>;
 }
 
+/* Hero payment amount — steps the font down when a converted currency
+   (CA$11,554.90 / ¥1,324,174) runs longer than the USD figure. */
+function HeroAmt({value}) {
+  const a = amt("$" + value);
+  const cls = a.length > 11 ? "m-hero-amt-xs" : a.length > 9 ? "m-hero-amt-sm" : "";
+  return <span className={`m-hero-amt ${cls}`}>{a}</span>;
+}
+
+/* Currency chip on the payment hero — tap "USD" to flip the display currency.
+   Conversion is display-only (fixed demo rates); payments are made in USD. */
+function CurSwitch({s}) {
+  const [open, setOpen] = useState(false);
+  return <span className="m-gsel-wrap m-cur-wrap" onClick={e=>e.stopPropagation()} onKeyDown={e=>e.stopPropagation()}>
+    <button className="m-cur-btn" onClick={()=>setOpen(o=>!o)}
+      aria-haspopup="listbox" aria-expanded={open} aria-label="Display currency">
+      {s.cur} <ChevronDown size={10}/>
+    </button>
+    {open && <>
+      <div className="m-gsel-backdrop" onClick={()=>setOpen(false)}/>
+      <div className="m-gsel-menu m-cur-menu" role="listbox" aria-label="Display currency">
+        {CURRENCIES.map(c=><button key={c.code} role="option" aria-selected={s.cur===c.code}
+          className={s.cur===c.code?"on":""} onClick={()=>{ s.setCur(c.code); setOpen(false); }}>
+          <span className="m-gsel-check">{s.cur===c.code ? "✓" : ""}</span>
+          <span className="m-cur-sym">{c.sym}</span>
+          <span className="m-cur-opt"><b>{c.code}</b><small>{c.name} · {c.note}</small></span>
+        </button>)}
+        <small className="m-cur-note">Demo rates · payments are made in USD</small>
+      </div>
+    </>}
+  </span>;
+}
+
 /* One collapsible insight card — details stay hidden behind a chevron
    dropdown so the feed shows a clean list of titles. */
 function InsightCard({badge, badgeColor, tag, title, children}) {
@@ -873,7 +933,7 @@ function InsightCardsList({s}) {
   const pinned = INSIGHT_INDEX.filter(it=>s.pinnedInsights.includes(it.id));
   if (!pinned.length) return <>{insightCards.map((c,i)=>
     <InsightCard key={i} badge={c.peBadge} badgeColor={c.peColor} title={c.title}
-      tag={<span className="m-insight-tag" style={{color:c.tagColor}}>{c.tag}</span>}>
+      tag={<span className="m-insight-tag" style={{color:c.tagColor}}>{cvt(c.tag)}</span>}>
       {maskText(c.desc)}
     </InsightCard>)}</>;
   return <>{pinned.map(it=>
@@ -1074,17 +1134,20 @@ function AtAGlancePage({s}) {
     {/* HERO — current month payment is the single largest element on the page; opens Payments */}
     <div className="m-hero" role="button" tabIndex={0} title="View Payments"
       onClick={()=>s.openPayPeriod(hero.period)} onKeyDown={e=>e.key==="Enter"&&s.openPayPeriod(hero.period)}>
-      <div className="m-hero-top">
-        <span className="m-hero-label">Current Payment · {hero.month}</span>
-        <span className={`m-pay-status m-status-${hero.status.toLowerCase()}`}>{hero.status}</span>
-      </div>
-      <div className="m-hero-amt-row">
-        <span className="m-hero-amt">{amt("$"+hero.amount)}</span>
-        <span className="m-hero-usd">USD</span>
-      </div>
-      <div className="m-hero-meta">
-        <span className="m-hero-asof"><Calendar size={11}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
-        <span className="m-hero-change">{hero.change} vs Apr · {hero.payDate}</span>
+      <PayCalBadge hero/>
+      <div className="m-hero-body">
+        <div className="m-hero-top">
+          <span className="m-hero-label">Current Payment · {hero.month}</span>
+          <span className={`m-pay-status m-status-${hero.status.toLowerCase()}`}>{hero.status}</span>
+        </div>
+        <div className="m-hero-amt-row">
+          <HeroAmt value={hero.amount}/>
+          <CurSwitch s={s}/>
+        </div>
+        <div className="m-hero-meta">
+          <span className="m-hero-asof"><Calendar size={11}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
+          <span className="m-hero-change">{hero.change} vs Apr · {hero.payDate}</span>
+        </div>
       </div>
     </div>
 
@@ -1094,9 +1157,12 @@ function AtAGlancePage({s}) {
         role={c.period?"button":undefined} tabIndex={c.period?0:undefined} title={c.period?`View ${c.month} payment`:undefined}
         onClick={c.period?()=>s.openPayPeriod(c.period):undefined}
         onKeyDown={c.period?(e=>e.key==="Enter"&&s.openPayPeriod(c.period)):undefined}>
-        <span className="m-context-month">{c.month}</span>
-        <b className="m-context-amt">{amt("$"+c.amount)}</b>
-        <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+        <PayCalBadge status={c.status}/>
+        <div className="m-context-body">
+          <span className="m-context-month">{c.month}</span>
+          <b className="m-context-amt">{amt("$"+c.amount)}</b>
+          <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+        </div>
       </div>)}
     </div>
   </>;
@@ -1132,13 +1198,13 @@ function planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOpen) {
           </>}
         </div>
       </div>
-      <small className="m-pe-sub">All values in USD · {sheet.dates}</small>
+      <small className="m-pe-sub">All values in {ACTIVE_CUR.code} · {sheet.dates}</small>
       {planElements.map((pe,i)=><div key={i} className="m-pe-card m-pe-flat m-pe-click" role="button" tabIndex={0}
         aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
         onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
         <div className="m-pe-top">
           <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
-          <span className="m-pe-goal">{pe.goal}</span>
+          <span className="m-pe-goal">{cvt(pe.goal)}</span>
         </div>
         <div className="m-pe-att-row">
           <b className="m-pe-att-big" style={{color:pe.color}}>{pe.attPct}%</b>
@@ -1157,6 +1223,14 @@ function planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOpen) {
    PAYMENTS
    ════════════════════════════════════════════════════════════════ */
 /* Shared payment sub-components (consumed by mobile PaymentsPage + iPad) */
+/* Circular calendar badge on the monthly payment cards (desktop reference);
+   tint follows the payment status — the hero variant sits on the blue gradient. */
+function PayCalBadge({status, hero}) {
+  return <span className={`m-pcal-badge ${hero ? "m-pcb-hero" : `m-pcb-${status.toLowerCase()}`}`}>
+    <Calendar size={hero ? 14 : 13}/>
+  </span>;
+}
+
 function PeriodChips({s}) {
   /* Chronological chips (oldest → newest). Collapsed shows April · May ·
      June-upcoming so the open statement sits front and center; the compact
@@ -1563,7 +1637,7 @@ function PaymentsPage({s}) {
       <h1 className="m-page-title">Payments</h1>
       <button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button>
     </div>
-    <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
+    <div className="m-asof-banner"><span className="m-pcal-badge m-pcb-asof"><Calendar size={14}/></span><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
     <PaymentDatesStrip p={p} s={s}/>
     <PeriodChips s={s}/>
     <PaymentBreakdownCard p={p} s={s} compact/>
@@ -1777,7 +1851,7 @@ function PaymentHistoryPopup({item, onClose}) {
           <div><small>Book Date</small><b>{h.current.book}</b></div>
           <div><small>Processed Date</small><b>{h.current.processed}</b></div>
           <div><small>Bonus Amount</small><b>{amt(h.current.bonus)}</b></div>
-          <div><small>Payment Amount (USD)</small><b>{amt(h.current.payment)}</b></div>
+          <div><small>Payment Amount ({ACTIVE_CUR.code})</small><b>{amt(h.current.payment)}</b></div>
           <div><small>User Comments</small><b>{h.current.comments}</b></div>
           <div><small>Created By</small><b>{h.current.createdBy}</b></div>
           <div><small>Program Name</small><b>{h.current.program}</b></div>
@@ -2169,13 +2243,14 @@ function EstimatorCard({s}) {
   const setAdd = v => s.setEstAdd(prev=>({...prev, [p.pe]: Math.max(0, Math.min(max, v))}));
   /* % mode edits the same additional revenue, expressed in attainment points */
   const pct = s.estMode === "pct";
+  const R = ACTIVE_CUR.rate;
   const maxPct = Math.max(1, Math.round(150 - attBase));
   const addPct = Math.round(addRev / p.goal * 100);
   const setAddPct = v => setAdd(Math.round(Math.max(0, Math.min(maxPct, v)) / 100 * p.goal));
   return <div className="m-section m-est-card" style={{borderLeftColor:p.color}}>
     <div className="m-section-hdr">
       <div className="m-pe-left"><span className="m-pe-badge" style={{background:p.color}}>{p.pe}</span><b>{p.name}</b></div>
-      <span className="m-pe-goal">{fmtGoalK(p.goal)} Goal</span>
+      <span className="m-pe-goal">{cvt(fmtGoalK(p.goal))} Goal</span>
     </div>
     <div className="m-goal-stats m-est-stats">
       <div><small>Revenue</small><span>{amt(fmtGoalK(p.revenue))}</span></div>
@@ -2188,9 +2263,9 @@ function EstimatorCard({s}) {
               <input type="number" inputMode="numeric" min="0" max={maxPct} step="1" value={addPct||""} placeholder="0"
                 onChange={e=>setAddPct(Number(e.target.value)||0)}/>
             </div>
-          : <div className="m-est-field"><span>$</span>
-              <input type="number" inputMode="numeric" min="0" max={max} step="1000" value={addRev||""} placeholder="0"
-                onChange={e=>setAdd(Number(e.target.value)||0)}/>
+          : <div className="m-est-field"><span>{ACTIVE_CUR.sym}</span>
+              <input type="number" inputMode="numeric" min="0" max={Math.round(max*R)} step={Math.round(1000*R)} value={addRev ? Math.round(addRev*R) : ""} placeholder="0"
+                onChange={e=>setAdd(Math.round((Number(e.target.value)||0)/R))}/>
             </div>}
       </label>
       <div className="m-est-input"><small>Additional Earnings</small>
@@ -2204,9 +2279,9 @@ function EstimatorCard({s}) {
           <div className="m-est-slider-lbls"><span>0%</span><b>{addPct>0 ? `+${addPct}%` : ""}</b><span>{maxPct}%</span></div>
         </>
       : <>
-          <input type="range" className="m-est-slider" min="0" max={max} step="1000" value={addRev}
-            onChange={e=>setAdd(Number(e.target.value))} aria-label="Additional attainment"/>
-          <div className="m-est-slider-lbls"><span>$0</span><b>{addRev>0 ? `+${fmtGoalK(addRev)}` : ""}</b><span>{fmtGoalK(max)}</span></div>
+          <input type="range" className="m-est-slider" min="0" max={Math.round(max*R)} step={Math.round(1000*R)} value={Math.round(addRev*R)}
+            onChange={e=>setAdd(Math.round(Number(e.target.value)/R))} aria-label="Additional attainment"/>
+          <div className="m-est-slider-lbls"><span>{ACTIVE_CUR.sym}0</span><b>{addRev>0 ? cvt(`+${fmtGoalK(addRev)}`) : ""}</b><span>{cvt(fmtGoalK(max))}</span></div>
         </>}
     <EstChart p={p} addRev={addRev}/>
     <EstRateTable p={p} addRev={addRev}/>
@@ -2387,7 +2462,7 @@ function KsoViewCalc({c, objCount}) {
         <span className="m-kso-calc-inst">{formula}</span>
       </div>
       <div className="m-kso-calc-row">
-        <b className="m-kso-calc-total">Bonus Total : {amt(c.total)} (USD)</b>
+        <b className="m-kso-calc-total">Bonus Total : {amt(c.total)} ({ACTIVE_CUR.code})</b>
         <span className="m-kso-calc-note">*Overachievement for payment of any single objective is capped at 100%, 125% or 200% in accordance with the policy of the associated Comp Plan</span>
       </div>
     </div>}
@@ -2440,8 +2515,8 @@ function KsoSection() {
             <div className="m-kso-figs">
               <div className="m-kso-fig"><small>KSO Weight</small><b>{r.weight}</b></div>
               <div className="m-kso-fig"><small>Bonus Earned</small><b>{amt(r.bonus)}</b></div>
-              <div className="m-kso-fig"><small>Target</small><b>{r.target}</b></div>
-              <div className="m-kso-fig"><small>Result</small><b>{r.result}</b></div>
+              <div className="m-kso-fig"><small>Target</small><b>{cvt(r.target)}</b></div>
+              <div className="m-kso-fig"><small>Result</small><b>{cvt(r.result)}</b></div>
               <div className="m-kso-fig"><small>Achievement %</small>
                 <span className={`m-kso-ach ${r.ach==null ? "" : r.ach>=100 ? "good" : r.ach===0 ? "bad" : ""}`}>{r.ach==null ? "-" : r.ach+"%"}</span>
               </div>
@@ -2534,7 +2609,7 @@ function NdrAcvChart() {
     <svg viewBox={`0 0 ${W} ${H}`} aria-label="Monthly eligible ACV">
       {[0,35,70,105,140].map(v=><g key={v}>
         <line x1={L} x2={W-R} y1={py(v)} y2={py(v)} stroke="var(--border)" strokeDasharray="3 3" strokeWidth=".7"/>
-        <text x={L-5} y={py(v)+2.5} textAnchor="end" className="m-ndr-axis">${v}K</text>
+        <text x={L-5} y={py(v)+2.5} textAnchor="end" className="m-ndr-axis">{cvt(`$${v}K`)}</text>
       </g>)}
       {ndrAcv.map((d,i)=><g key={d[0]}>
         <rect x={bx(i)-bw/2} y={py(d[1])} width={bw} height={plotH+T-py(d[1])} rx="2" fill={NDR_TEAL} opacity={hov==null||hov===i?1:.5}/>
@@ -2639,7 +2714,7 @@ function GoalsPage({s}) {
     <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
       <div className="m-section-hdr">
         <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
-        <span className="m-pe-goal">{g.goal} Goal</span>
+        <span className="m-pe-goal">{cvt(g.goal)} Goal</span>
       </div>
       <div className="m-pe-att-row">
         <b className="m-pe-att-big" style={{color:g.color}}>{g.attPct}%</b>
@@ -2648,7 +2723,7 @@ function GoalsPage({s}) {
       <BookingsBar pe={g}/>
       {g.id==="PE1" && <CompUpliftSection s={s}/>}
       <div className="m-goal-stats">
-        <div><small>Goal</small><span>{g.goal}</span></div>
+        <div><small>Goal</small><span>{cvt(g.goal)}</span></div>
         <div><small>Attainment</small><span style={{color:g.color}}>{g.attPct}%</span></div>
         <div><small>Incentive</small><span className="m-goal-earn">{amt(g.incentive)}</span></div>
       </div>
@@ -3073,7 +3148,7 @@ function TeamInsightCard({c, onDismiss}) {
     <div className="m-insight-top">
       <span className="m-insight-badge" style={{color:c.color, borderColor:c.color}}>{c.tag}</span>
       <span className="m-tinsight-stat">
-        <span className="m-insight-tag" style={{color:c.color}}>{c.metric} ★</span>
+        <span className="m-insight-tag" style={{color:c.color}}>{cvt(c.metric)} ★</span>
         <button className="m-tinsight-x" aria-label="Dismiss insight" onClick={e=>{e.stopPropagation(); onDismiss();}}><X size={14}/></button>
       </span>
     </div>
@@ -3118,7 +3193,7 @@ function TeamPage({s}) {
     <MobileHeader s={s}/>
     <h1 className="m-page-title" style={{marginBottom:4}}>Team Dashboard</h1>
     <p className="m-team-sub">Overview of your team's performance for H1 2026</p>
-    <div className="m-asof-banner"><Calendar size={13}/><div className="m-asof-text"><span>{TEAM_AS_OF}</span><small>{REFRESH_NOTE}</small></div></div>
+    <div className="m-asof-banner"><span className="m-pcal-badge m-pcb-asof"><Calendar size={14}/></span><div className="m-asof-text"><span>{TEAM_AS_OF}</span><small>{REFRESH_NOTE}</small></div></div>
 
     {/* Period / trend / export controls */}
     <TeamControls s={s}/>
@@ -3690,6 +3765,8 @@ function useCompXState() {
   const [sideCollapsed, setSideCollapsed] = useState(false);        // iPad sidebar rail mode
   const [hideAmts, setHideAmts] = useState(true);                   // privacy default: figures dotted out until the seller taps Show
   AMOUNTS_HIDDEN = hideAmts;
+  const [cur, setCur] = useState("USD");                            // display currency (demo conversion, USD base)
+  ACTIVE_CUR = CURRENCIES.find(c => c.code === cur) || CURRENCIES[0];
   const [insightCanvasOpen, setInsightCanvasOpen] = useState(false);
   const [pinnedInsights, setPinnedInsights] = useState([]);         // insight ids, max MAX_PINS
   const [showRecovBal, setShowRecovBal] = useState(false);          // Recoverable Balance History popup
@@ -3757,7 +3834,7 @@ function useCompXState() {
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
     histCmpMember, setHistCmpMember, histPeriods, setHistPeriods, histPe, setHistPe,
-    sideCollapsed, setSideCollapsed, hideAmts, setHideAmts,
+    sideCollapsed, setSideCollapsed, hideAmts, setHideAmts, cur, setCur,
     insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
     showRecovBal, setShowRecovBal, showPayCal, setShowPayCal, notifs, setNotifs,
     currentMonth: fullPaymentPeriods[fullPaymentPeriods.length-1].month
@@ -3957,24 +4034,30 @@ function IPadGlance({s}) {
       {monthlyPayCards.map((c,i)=> c.current
         ? <div key={i} className="m-hero i-hero" role="button" tabIndex={0} title="View Payments"
             onClick={()=>s.openPayPeriod(c.period)} onKeyDown={e=>e.key==="Enter"&&s.openPayPeriod(c.period)}>
-            <div className="m-hero-top">
-              <span className="m-hero-label">Current Payment · {c.month}</span>
-              <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
-            </div>
-            <div className="m-hero-amt-row"><span className="m-hero-amt">{amt("$"+c.amount)}</span><span className="m-hero-usd">USD</span></div>
-            <div className="m-hero-meta">
-              <span className="m-hero-asof"><Calendar size={12}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
-              <span className="m-hero-change">{c.change} vs Apr · {c.payDate}</span>
+            <PayCalBadge hero/>
+            <div className="m-hero-body">
+              <div className="m-hero-top">
+                <span className="m-hero-label">Current Payment · {c.month}</span>
+                <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+              </div>
+              <div className="m-hero-amt-row"><HeroAmt value={c.amount}/><CurSwitch s={s}/></div>
+              <div className="m-hero-meta">
+                <span className="m-hero-asof"><Calendar size={12}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
+                <span className="m-hero-change">{c.change} vs Apr · {c.payDate}</span>
+              </div>
             </div>
           </div>
         : <div key={i} className={`m-context-card i-timeline-card ${c.period?"m-context-click":""}`}
             role={c.period?"button":undefined} tabIndex={c.period?0:undefined} title={c.period?`View ${c.month} payment`:undefined}
             onClick={c.period?()=>s.openPayPeriod(c.period):undefined}
             onKeyDown={c.period?(e=>e.key==="Enter"&&s.openPayPeriod(c.period)):undefined}>
-            <span className="m-context-month">{c.month}</span>
-            <b className="m-context-amt">{amt("$"+c.amount)}</b>
-            <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
-            <small className="i-timeline-date">{c.payDate}</small>
+            <PayCalBadge status={c.status}/>
+            <div className="m-context-body">
+              <span className="m-context-month">{c.month}</span>
+              <b className="m-context-amt">{amt("$"+c.amount)}</b>
+              <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+              <small className="i-timeline-date">{c.payDate}</small>
+            </div>
           </div>)}
     </div>;
 
@@ -3989,7 +4072,7 @@ function IPadGlance({s}) {
           onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
           <div className="m-pe-top">
             <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
-            <span className="m-pe-goal">{pe.goal}</span>
+            <span className="m-pe-goal">{cvt(pe.goal)}</span>
           </div>
           <div className="m-pe-att-row">
             <b className="m-pe-att-big" style={{color:pe.color}}>{pe.attPct}%</b>
@@ -4054,7 +4137,7 @@ function IPadGoals({s}) {
         {goalTabs.slice(0,3).map(t=><div key={t.id} className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:t.color}}>
           <div className="m-section-hdr">
             <div className="m-pe-left"><span className="m-pe-badge" style={{background:t.color}}>{t.id}</span><b>{t.name}</b></div>
-            <span className="m-pe-goal">{t.goal} Goal</span>
+            <span className="m-pe-goal">{cvt(t.goal)} Goal</span>
           </div>
           <div className="m-pe-att-row">
             <b className="m-pe-att-big" style={{color:t.color}}>{t.attPct}%</b>
@@ -4062,7 +4145,7 @@ function IPadGoals({s}) {
           </div>
           <BookingsBar pe={t}/>
           <div className="m-goal-stats">
-            <div><small>Goal</small><span>{t.goal}</span></div>
+            <div><small>Goal</small><span>{cvt(t.goal)}</span></div>
             <div><small>Attainment</small><span style={{color:t.color}}>{t.attPct}%</span></div>
             <div><small>Incentive</small><span className="m-goal-earn">{amt(t.incentive)}</span></div>
           </div>
@@ -4074,14 +4157,14 @@ function IPadGoals({s}) {
         <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
           <div className="m-section-hdr">
             <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
-            <span className="m-pe-goal">{g.goal} Goal</span>
+            <span className="m-pe-goal">{cvt(g.goal)} Goal</span>
           </div>
           <div className="m-pe-att-row">
             <b className="m-pe-att-big" style={{color:g.color}}>{g.attPct}%</b>
             <span className="m-pe-att-lbl">REVENUE ATT.</span>
           </div>
           <div className="m-goal-stats">
-            <div><small>Goal</small><span>{g.goal}</span></div>
+            <div><small>Goal</small><span>{cvt(g.goal)}</span></div>
             <div><small>Attainment</small><span style={{color:g.color}}>{g.attPct}%</span></div>
             <div><small>Incentive</small><span className="m-goal-earn">{amt(g.incentive)}</span></div>
           </div>
