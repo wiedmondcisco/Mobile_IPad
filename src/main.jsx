@@ -45,8 +45,14 @@ const cvt = t => {
   });
 };
 
-const amt = v => AMOUNTS_HIDDEN ? (String(v).startsWith("$") ? ACTIVE_CUR.sym + DOTS : DOTS) : cvt(v);
-const maskText = t => AMOUNTS_HIDDEN ? t.replace(/\$\d[\d.,]*[KMk]?/g, ACTIVE_CUR.sym + DOTS) : cvt(t);
+/* Seller-money amounts render bare-number + "USD" (desktop reference style:
+   "8,434.23 USD", no $ prefix). Goal/scale figures that don't flow through
+   amt()/maskText() (e.g. "$109k Goal") keep their $ prefix. */
+const bareUsd = s => typeof s === "string" ? s.replace(/^([+-]?)\$([+-]?\d.+)$/, "$1$2 USD") : s;
+const amt = v => AMOUNTS_HIDDEN ? (String(v).startsWith("$") ? DOTS + " USD" : DOTS) : bareUsd(cvt(v));
+const maskText = t => AMOUNTS_HIDDEN
+  ? t.replace(/\$\d[\d.,]*[KMk]?/g, DOTS + " USD")
+  : cvt(t).replace(/(?<![A-Za-z])\$(\d[\d.,]*[KMk]?)/g, "$1 USD");
 
 /* SalesComp IQ assistant — canned responses keyed by keyword (from original build) */
 const botResponses = {
@@ -76,7 +82,7 @@ const PE_COLOR = { PE1:"#fbab2c", PE2:"#74bf4b", PE3:"#0077c2", KSO:"#52719c", O
 const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"8,688.08", change:"▲ 40.4%", payDate:"Paid May 2, 2026"},
   {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▼ 2.9%", payDate:"Pay: Jun 2, 2026"},
-  {month:"JUN 2026", period:"June 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // clicks into the upcoming statement (lock/pay schedule)
+  {month:"JUN 2026", period:"June 2026", status:"Upcoming", amount:"0.00", lock:"Jun 28, 2026", payDate:"Pay: Jul 2, 2026"}   // clicks into the upcoming statement (lock/pay schedule)
 ];
 
 const planElements = [
@@ -891,7 +897,7 @@ function HideBtn({s, light=false}) {
 /* Hero payment amount — steps the font down when a converted currency
    (CA$11,554.90 / ¥1,324,174) runs longer than the USD figure. */
 function HeroAmt({value}) {
-  const a = amt("$" + value);
+  const a = amt(String(value));           // no $ prefix — the USD label next to it carries the currency
   const cls = a.length > 11 ? "m-hero-amt-xs" : a.length > 9 ? "m-hero-amt-sm" : "";
   return <span className={`m-hero-amt ${cls}`}>{a}</span>;
 }
@@ -1148,8 +1154,9 @@ function AtAGlancePage({s}) {
         <PayCalBadge status={c.status}/>
         <div className="m-context-body">
           <span className="m-context-month">{c.month}</span>
-          <b className="m-context-amt">{amt("$"+c.amount)}</b>
+          <b className="m-context-amt">{amt(c.amount)} <small>USD</small></b>
           <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+          <small className="m-context-dates">{c.lock ? <>Lock: {c.lock} · {c.payDate}</> : c.payDate}</small>
         </div>
       </div>)}
     </div>
@@ -1253,7 +1260,7 @@ function UpcomingPaymentCard({p}) {
     <div className="m-section-hdr"><h2>Payment Breakdown · {p.month}</h2><span className="m-pay-status m-status-upcoming">Upcoming</span></div>
     <div className="m-upc-body">
       <span className="m-pcal-badge m-pcb-upcoming m-upc-badge"><Calendar size={16}/></span>
-      <b className="m-upc-amt">{amt("$"+p.amount)} <small>USD (Est.)</small></b>
+      <b className="m-upc-amt">{amt(p.amount)} <small>USD (Est.)</small></b>
       <p className="m-upc-note">This statement hasn't opened yet — bookings and revenue from <b>{p.revDates}</b> will start appearing after the first data refresh.</p>
       <div className="m-upc-dates">
         <span>Lock: <b>{p.lockDate}</b></span><i>·</i><span>Pay: <b>{p.payDate}</b></span>
@@ -1854,7 +1861,7 @@ function PaymentHistoryPopup({item, onClose}) {
           <div><small>Book Date</small><b>{h.current.book}</b></div>
           <div><small>Processed Date</small><b>{h.current.processed}</b></div>
           <div><small>Bonus Amount</small><b>{amt(h.current.bonus)}</b></div>
-          <div><small>Payment Amount ({ACTIVE_CUR.code})</small><b>{amt(h.current.payment)}</b></div>
+          <div><small>Payment Amount</small><b>{amt(h.current.payment)}</b></div>
           <div><small>User Comments</small><b>{h.current.comments}</b></div>
           <div><small>Created By</small><b>{h.current.createdBy}</b></div>
           <div><small>Program Name</small><b>{h.current.program}</b></div>
@@ -2465,7 +2472,7 @@ function KsoViewCalc({c, objCount}) {
         <span className="m-kso-calc-inst">{formula}</span>
       </div>
       <div className="m-kso-calc-row">
-        <b className="m-kso-calc-total">Bonus Total : {amt(c.total)} ({ACTIVE_CUR.code})</b>
+        <b className="m-kso-calc-total">Bonus Total : {amt(c.total)}</b>
         <span className="m-kso-calc-note">*Overachievement for payment of any single objective is capped at 100%, 125% or 200% in accordance with the policy of the associated Comp Plan</span>
       </div>
     </div>}
@@ -4058,9 +4065,9 @@ function IPadGlance({s}) {
             <PayCalBadge status={c.status}/>
             <div className="m-context-body">
               <span className="m-context-month">{c.month}</span>
-              <b className="m-context-amt">{amt("$"+c.amount)}</b>
+              <b className="m-context-amt">{amt(c.amount)} <small>USD</small></b>
               <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
-              <small className="i-timeline-date">{c.payDate}</small>
+              <small className="i-timeline-date">{c.lock ? <>Lock: {c.lock} · {c.payDate}</> : c.payDate}</small>
             </div>
           </div>)}
     </div>;
