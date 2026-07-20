@@ -577,19 +577,6 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-hero-amt.m-hero-amt-sm{font-size:39px;letter-spacing:-1.5px}
 .m-hero-amt.m-hero-amt-xs{font-size:30px;letter-spacing:-1px}
 .m-hero-usd{font-size:15px;font-weight:700;opacity:.75}
-/* Currency chip on the hero + its dropdown (reuses goal-sheet menu skeleton) */
-.m-cur-wrap{position:relative;margin-bottom:0;display:inline-flex;align-self:center}
-.m-cur-btn{display:inline-flex;align-items:center;gap:2px;border:1px solid rgba(255,255,255,.42);background:rgba(255,255,255,.14);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.3px;padding:3px 7px;border-radius:12px;cursor:pointer}
-.m-cur-btn:hover{background:rgba(255,255,255,.24)}
-.m-gsel-menu.m-cur-menu{left:auto;right:0;min-width:224px}
-.m-cur-menu button{align-items:center}
-.m-cur-sym{width:36px;flex-shrink:0;font-weight:800;font-size:14px;color:var(--accent);text-align:center}
-.m-cur-menu button.on .m-cur-sym{color:#fff}
-.m-cur-opt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;color:var(--text)}
-.m-cur-opt b{font-size:13px}
-.m-cur-opt small{color:var(--text-2);font-size:11px;font-weight:600}
-.m-cur-menu button.on .m-cur-opt,.m-cur-menu button.on .m-cur-opt small{color:#fff}
-.m-cur-note{display:block;padding:7px 10px 3px;color:var(--text-2);font-size:10.5px;border-top:1px solid var(--border);margin-top:3px}
 .m-hero-meta{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);display:flex;flex-direction:column;gap:4px}
 .m-hero-asof{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
 .m-hero-change{font-size:11px;opacity:.85}
@@ -619,6 +606,16 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-pcb-paid{background:rgba(116,191,75,.13);border:1px solid rgba(116,191,75,.32);color:#4e8a31}
 .m-pcb-open{background:rgba(0,81,175,.09);border:1px solid rgba(0,81,175,.24);color:#0051af}
 .m-pcb-upcoming{background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);color:#7c3aed}
+/* Upcoming-statement placeholder on Payments (no breakdown yet) */
+.m-upc-body{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:18px 12px 12px;border:1.5px dashed var(--border);border-radius:14px}
+.m-upc-badge{width:38px;height:38px}
+.m-upc-amt{font-size:26px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+.m-upc-amt small{font-size:12px;font-weight:700;color:var(--text-2)}
+.m-upc-note{font-size:12.5px;color:var(--text-2);line-height:1.5;max-width:360px;margin:0}
+.m-upc-note b{color:var(--text)}
+.m-upc-dates{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--text-2);border-top:1px dashed var(--border);padding-top:12px;width:100%;justify-content:center;flex-wrap:wrap}
+.m-upc-dates b{color:var(--text);font-weight:800}
+.m-upc-dates i{font-style:normal;color:var(--muted)}
 .m-pcb-asof{width:28px;height:28px;background:#fff;border:1px solid rgba(0,81,175,.2)}
 /* Card deep-links to its period on the Payments page */
 .m-context-click{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}

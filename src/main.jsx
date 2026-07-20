@@ -76,7 +76,7 @@ const PE_COLOR = { PE1:"#fbab2c", PE2:"#74bf4b", PE3:"#0077c2", KSO:"#52719c", O
 const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"8,688.08", change:"▲ 40.4%", payDate:"Paid May 2, 2026"},
   {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▼ 2.9%", payDate:"Pay: Jun 2, 2026"},
-  {month:"JUN 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // no statement period yet — card stays inert
+  {month:"JUN 2026", period:"June 2026", status:"Upcoming", amount:"0.00", payDate:"Pay: Jul 2, 2026"}   // clicks into the upcoming statement (lock/pay schedule)
 ];
 
 const planElements = [
@@ -453,8 +453,20 @@ const olderPaymentPeriods = [
   ["February 2026", "4,206.00", "1,425.00", [16,54,28], "Mar 2, 2026", "Feb 28, 2026", "Feb 1 – Feb 28, 2026", H1_FY26]
 ].map(pastStatement);
 
-/* Chronological (oldest → newest): June 2025 … May 2026 */
-const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slice().reverse()];
+/* Upcoming statement — no revenue captured yet, but the schedule (lock /
+   pay / revenue dates) is already known, so the seller can click in and
+   see when the June statement starts moving. */
+const upcomingPaymentPeriod = {
+  month:"June 2026", amount:"0.00", status:"Upcoming",
+  payDate:"Jul 2, 2026", lockDate:"Jun 28, 2026", revDates:"Jun 1 – Jun 18, 2026",
+  goalSheet:{period:H1_FY26, total:"0.00", items:[]},
+  spiff:{total:"0.00", items:[]}, draws:{total:"0.00", items:[]},
+  adj:{total:"0.00", items:[]}, otb:{total:"0.00", items:[]},
+  past:{total:"0.00", groups:[]}
+};
+
+/* Chronological (oldest → newest): June 2025 … May 2026, then upcoming June */
+const fullPaymentPeriods = [...olderPaymentPeriods, ...recentPaymentPeriods.slice().reverse(), upcomingPaymentPeriod];
 
 /* Goals — one entry per plan element tab (PE1, PE2, PE3, KSO, OTB, NDR) */
 /* blColor = the lighter backlog segment tint, matching planElements so the
@@ -884,30 +896,6 @@ function HeroAmt({value}) {
   return <span className={`m-hero-amt ${cls}`}>{a}</span>;
 }
 
-/* Currency chip on the payment hero — tap "USD" to flip the display currency.
-   Conversion is display-only (fixed demo rates); payments are made in USD. */
-function CurSwitch({s}) {
-  const [open, setOpen] = useState(false);
-  return <span className="m-gsel-wrap m-cur-wrap" onClick={e=>e.stopPropagation()} onKeyDown={e=>e.stopPropagation()}>
-    <button className="m-cur-btn" onClick={()=>setOpen(o=>!o)}
-      aria-haspopup="listbox" aria-expanded={open} aria-label="Display currency">
-      {s.cur} <ChevronDown size={10}/>
-    </button>
-    {open && <>
-      <div className="m-gsel-backdrop" onClick={()=>setOpen(false)}/>
-      <div className="m-gsel-menu m-cur-menu" role="listbox" aria-label="Display currency">
-        {CURRENCIES.map(c=><button key={c.code} role="option" aria-selected={s.cur===c.code}
-          className={s.cur===c.code?"on":""} onClick={()=>{ s.setCur(c.code); setOpen(false); }}>
-          <span className="m-gsel-check">{s.cur===c.code ? "✓" : ""}</span>
-          <span className="m-cur-sym">{c.sym}</span>
-          <span className="m-cur-opt"><b>{c.code}</b><small>{c.name} · {c.note}</small></span>
-        </button>)}
-        <small className="m-cur-note">Demo rates · payments are made in USD</small>
-      </div>
-    </>}
-  </span>;
-}
-
 /* One collapsible insight card — details stay hidden behind a chevron
    dropdown so the feed shows a clean list of titles. */
 function InsightCard({badge, badgeColor, tag, title, children}) {
@@ -1142,7 +1130,7 @@ function AtAGlancePage({s}) {
         </div>
         <div className="m-hero-amt-row">
           <HeroAmt value={hero.amount}/>
-          <CurSwitch s={s}/>
+          <span className="m-hero-usd">USD</span>
         </div>
         <div className="m-hero-meta">
           <span className="m-hero-asof"><Calendar size={11}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
@@ -1237,7 +1225,7 @@ function PeriodChips({s}) {
      chevron toggle expands to the last 12 months. */
   const wrapRef = useRef(null);
   const all = fullPaymentPeriods.map((pr,i)=>({pr,i}));
-  const visible = s.showAllPeriods ? all : all.slice(-2);
+  const visible = s.showAllPeriods ? all : all.slice(-3);
   useEffect(()=>{
     if (!wrapRef.current) return;
     if (s.showAllPeriods) wrapRef.current.querySelector(".m-period-active")?.scrollIntoView({inline:"nearest", block:"nearest"});
@@ -1249,16 +1237,27 @@ function PeriodChips({s}) {
       title={s.showAllPeriods ? "Last 3 months" : "Last 12 months"}>
       <ChevronRight size={15} className={s.showAllPeriods?"back":""}/>
     </button>
-    {visible.map(({pr,i})=><div key={pr.month} className={`m-period-item ${i===s.periodIdx?"m-period-active":""}`} onClick={()=>s.setPeriodIdx(i)}>
+    {visible.map(({pr,i})=><div key={pr.month} className={`m-period-item ${i===s.periodIdx?"m-period-active":""} ${pr.status==="Upcoming"?"m-period-ghost":""}`} onClick={()=>s.setPeriodIdx(i)}>
       <span className="m-period-month">{pr.month}</span>
       <b className="m-period-amt">{amt("$"+pr.amount)}</b>
       <span className={`m-pay-status m-status-${pr.status.toLowerCase()}`}>{pr.status}</span>
     </div>)}
-    {/* upcoming month (no statement yet) — keeps the open month centered */}
-    <div className="m-period-item m-period-ghost" aria-disabled="true">
-      <span className="m-period-month">June 2026</span>
-      <b className="m-period-amt">{amt("$0.00")}</b>
-      <span className="m-pay-status m-status-upcoming">Upcoming</span>
+  </div>;
+}
+
+/* Upcoming statement placeholder — there's no breakdown to chart until the
+   revenue window opens, so the click-in leads with the schedule: the lock
+   date and payday the seller came looking for. */
+function UpcomingPaymentCard({p}) {
+  return <div className="m-section">
+    <div className="m-section-hdr"><h2>Payment Breakdown · {p.month}</h2><span className="m-pay-status m-status-upcoming">Upcoming</span></div>
+    <div className="m-upc-body">
+      <span className="m-pcal-badge m-pcb-upcoming m-upc-badge"><Calendar size={16}/></span>
+      <b className="m-upc-amt">{amt("$"+p.amount)} <small>USD (Est.)</small></b>
+      <p className="m-upc-note">This statement hasn't opened yet — bookings and revenue from <b>{p.revDates}</b> will start appearing after the first data refresh.</p>
+      <div className="m-upc-dates">
+        <span>Lock: <b>{p.lockDate}</b></span><i>·</i><span>Pay: <b>{p.payDate}</b></span>
+      </div>
     </div>
   </div>;
 }
@@ -1640,9 +1639,13 @@ function PaymentsPage({s}) {
     <div className="m-asof-banner"><span className="m-pcal-badge m-pcb-asof"><Calendar size={14}/></span><div className="m-asof-text"><span>{DATA_AS_OF}</span><small>{REFRESH_NOTE}</small></div><HideBtn s={s}/></div>
     <PaymentDatesStrip p={p} s={s}/>
     <PeriodChips s={s}/>
-    <PaymentBreakdownCard p={p} s={s} compact/>
-    <div className="m-expandall-row"><ExpandAllBtn s={s} p={p}/></div>
-    <PaymentAccordion p={p} s={s}/>
+    {p.status === "Upcoming"
+      ? <UpcomingPaymentCard p={p}/>
+      : <>
+        <PaymentBreakdownCard p={p} s={s} compact/>
+        <div className="m-expandall-row"><ExpandAllBtn s={s} p={p}/></div>
+        <PaymentAccordion p={p} s={s}/>
+      </>}
   </div>;
 }
 
@@ -3730,7 +3733,8 @@ function useCompXState() {
   const [showAskIQ, setShowAskIQ] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [reminders, setReminders] = useState(REMINDERS_SEED);
-  const [periodIdx, setPeriodIdx] = useState(fullPaymentPeriods.length-1);   // newest (current) month
+  const [periodIdx, setPeriodIdx] = useState(
+    Math.max(0, fullPaymentPeriods.findIndex(p => p.status === "Open")));    // open (current) month, not the upcoming ghost
   const [showAllPeriods, setShowAllPeriods] = useState(false);               // last 3 ↔ last 12 months
   const [expanded, setExpanded] = useState({});   // payment sections start collapsed — Expand All / per-section taps open them
   const [goalIdx, setGoalIdx] = useState(0);
@@ -3837,7 +3841,7 @@ function useCompXState() {
     sideCollapsed, setSideCollapsed, hideAmts, setHideAmts, cur, setCur,
     insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
     showRecovBal, setShowRecovBal, showPayCal, setShowPayCal, notifs, setNotifs,
-    currentMonth: fullPaymentPeriods[fullPaymentPeriods.length-1].month
+    currentMonth: (fullPaymentPeriods.find(p => p.status === "Open") || fullPaymentPeriods[fullPaymentPeriods.length-1]).month
   };
 }
 
@@ -4040,7 +4044,7 @@ function IPadGlance({s}) {
                 <span className="m-hero-label">Current Payment · {c.month}</span>
                 <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
               </div>
-              <div className="m-hero-amt-row"><HeroAmt value={c.amount}/><CurSwitch s={s}/></div>
+              <div className="m-hero-amt-row"><HeroAmt value={c.amount}/><span className="m-hero-usd">USD</span></div>
               <div className="m-hero-meta">
                 <span className="m-hero-asof"><Calendar size={12}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
                 <span className="m-hero-change">{c.change} vs Apr · {c.payDate}</span>
@@ -4100,14 +4104,16 @@ function IPadPayments({s}) {
       right={<><button className="m-goalsheet-btn" onClick={()=>s.setShowRecovBal(true)}>Recoverable Balance History</button><ExpandAllBtn s={s} p={fullPaymentPeriods[s.periodIdx]}/><HideBtn s={s}/></>}/>
     <PaymentDatesStrip p={p} s={s}/>
     <PeriodChips s={s}/>
-    <div className="i-split">
-      <div className="i-col-a">
-        <PaymentBreakdownCard p={p} s={s} donutSize={188}/>
-      </div>
-      <div className="i-col-b">
-        <PaymentAccordion p={p} s={s}/>
-      </div>
-    </div>
+    {p.status === "Upcoming"
+      ? <UpcomingPaymentCard p={p}/>
+      : <div className="i-split">
+        <div className="i-col-a">
+          <PaymentBreakdownCard p={p} s={s} donutSize={188}/>
+        </div>
+        <div className="i-col-b">
+          <PaymentAccordion p={p} s={s}/>
+        </div>
+      </div>}
   </div>;
 }
 
