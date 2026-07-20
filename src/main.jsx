@@ -2167,32 +2167,58 @@ function EstimatorCard({s}) {
   const extra = estEarned(p, addRev) - base;
   const max = Math.round(p.goal*1.5 - p.revenue);
   const setAdd = v => s.setEstAdd(prev=>({...prev, [p.pe]: Math.max(0, Math.min(max, v))}));
+  /* % mode edits the same additional revenue, expressed in attainment points */
+  const pct = s.estMode === "pct";
+  const maxPct = Math.max(1, Math.round(150 - attBase));
+  const addPct = Math.round(addRev / p.goal * 100);
+  const setAddPct = v => setAdd(Math.round(Math.max(0, Math.min(maxPct, v)) / 100 * p.goal));
   return <div className="m-section m-est-card" style={{borderLeftColor:p.color}}>
     <div className="m-section-hdr">
       <div className="m-pe-left"><span className="m-pe-badge" style={{background:p.color}}>{p.pe}</span><b>{p.name}</b></div>
       <span className="m-pe-goal">{fmtGoalK(p.goal)} Goal</span>
     </div>
     <div className="m-goal-stats m-est-stats">
-      <div><small>Revenue Att.</small><span style={{color:p.color}}>{Math.round(attBase)}%</span></div>
       <div><small>Revenue</small><span>{amt(fmtGoalK(p.revenue))}</span></div>
       <div><small>Est. Incentive (H1)</small><span className="m-goal-earn">{amt(estUsd(base))}</span></div>
     </div>
     <div className="m-est-inputs">
       <label className="m-est-input"><small>Additional Attainment</small>
-        <div className="m-est-field"><span>$</span>
-          <input type="number" inputMode="numeric" min="0" max={max} step="1000" value={addRev||""} placeholder="0"
-            onChange={e=>setAdd(Number(e.target.value)||0)}/>
-        </div>
+        {pct
+          ? <div className="m-est-field"><span>%</span>
+              <input type="number" inputMode="numeric" min="0" max={maxPct} step="1" value={addPct||""} placeholder="0"
+                onChange={e=>setAddPct(Number(e.target.value)||0)}/>
+            </div>
+          : <div className="m-est-field"><span>$</span>
+              <input type="number" inputMode="numeric" min="0" max={max} step="1000" value={addRev||""} placeholder="0"
+                onChange={e=>setAdd(Number(e.target.value)||0)}/>
+            </div>}
       </label>
       <div className="m-est-input"><small>Additional Earnings</small>
         <b className="m-est-extra">{maskText(`+${estUsd(extra)}`)}</b>
       </div>
     </div>
-    <input type="range" className="m-est-slider" min="0" max={max} step="1000" value={addRev}
-      onChange={e=>setAdd(Number(e.target.value))} aria-label="Additional attainment"/>
-    <div className="m-est-slider-lbls"><span>$0</span><b>{addRev>0 ? `+${fmtGoalK(addRev)}` : ""}</b><span>{fmtGoalK(max)}</span></div>
+    {pct
+      ? <>
+          <input type="range" className="m-est-slider" min="0" max={maxPct} step="1" value={addPct}
+            onChange={e=>setAddPct(Number(e.target.value))} aria-label="Additional attainment %"/>
+          <div className="m-est-slider-lbls"><span>0%</span><b>{addPct>0 ? `+${addPct}%` : ""}</b><span>{maxPct}%</span></div>
+        </>
+      : <>
+          <input type="range" className="m-est-slider" min="0" max={max} step="1000" value={addRev}
+            onChange={e=>setAdd(Number(e.target.value))} aria-label="Additional attainment"/>
+          <div className="m-est-slider-lbls"><span>$0</span><b>{addRev>0 ? `+${fmtGoalK(addRev)}` : ""}</b><span>{fmtGoalK(max)}</span></div>
+        </>}
     <EstChart p={p} addRev={addRev}/>
     <EstRateTable p={p} addRev={addRev}/>
+  </div>;
+}
+
+/* Page-level $ / % toggle — switches the estimator's additional-attainment
+   input between dollars and attainment percentage (desktop reference pill) */
+function EstModeToggle({s}) {
+  return <div className="m-est-mode" role="group" aria-label="Estimator input mode">
+    <button className={s.estMode==="usd" ? "on" : ""} onClick={()=>s.setEstMode("usd")} aria-pressed={s.estMode==="usd"}>$</button>
+    <button className={s.estMode==="pct" ? "on" : ""} onClick={()=>s.setEstMode("pct")} aria-pressed={s.estMode==="pct"}>%</button>
   </div>;
 }
 
@@ -2226,9 +2252,12 @@ function PayEstimatorPage({s}) {
     <MobileHeader s={s}/>
     <h1 className="m-page-title" style={{marginBottom:4}}>Pay Estimator</h1>
     <p className="m-team-sub">Use this estimator to estimate your potential incentive compensation. This is not a commitment of the compensation you will receive.</p>
-    <div className="m-goaltab-scroll">
-      {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
-        style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+    <div className="m-est-toprow">
+      <div className="m-goaltab-scroll">
+        {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
+          style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+      </div>
+      <EstModeToggle s={s}/>
     </div>
     <EstimatorCard s={s}/>
     <EstSummary s={s}/>
@@ -2241,6 +2270,7 @@ function IPadEstimator({s}) {
     <div className="i-goaltab-row">
       {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
         style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+      <EstModeToggle s={s}/>
     </div>
     <div className="i-split i-est-split">
       <div className="i-col-a"><EstimatorCard s={s}/></div>
@@ -3640,6 +3670,7 @@ function useCompXState() {
   const [backlogFilter, setBacklogFilter] = useState("All");        // Backlog Insights month bucket
   const [estPe, setEstPe] = useState(0);                            // Pay Estimator selected plan element
   const [estAdd, setEstAdd] = useState({PE1:0, PE2:0, PE3:0});      // Pay Estimator additional attainment $ per PE
+  const [estMode, setEstMode] = useState("usd");                    // Pay Estimator input mode: "usd" | "pct"
   const [moreOpen, setMoreOpen] = useState(false);                  // mobile bottom-nav More sheet
   const [histItem, setHistItem] = useState(null);                   // Payment History popup (payment line item)
   const [otbCalcItem, setOtbCalcItem] = useState(null);             // OTB Compensation Calculation popup
@@ -3719,7 +3750,7 @@ function useCompXState() {
     orderQuery, setOrderQuery, orderType, setOrderType, orderStatus, setOrderStatus, orderPe, setOrderPe,
     orderSubmitted, setOrderSubmitted, spiffFilters, setSpiffFilters, spiffExpanded, setSpiffExpanded,
     aagSpiffExpanded, setAagSpiffExpanded, backlogFilter, setBacklogFilter,
-    estPe, setEstPe, estAdd, setEstAdd, moreOpen, setMoreOpen,
+    estPe, setEstPe, estAdd, setEstAdd, estMode, setEstMode, moreOpen, setMoreOpen,
     histItem, setHistItem, otbCalcItem, setOtbCalcItem, showKsoCalc, setShowKsoCalc,
     teamPe, setTeamPe, teamExpanded, setTeamExpanded, teamView, setTeamView, savedViews, setSavedViews,
     dismissedInsights, setDismissedInsights,
