@@ -1024,7 +1024,7 @@ function NotifDropdown({s, onClose, ipad=false}) {
 const UTIL_ITEMS = [
   {id:"support", Icon:HelpCircle, label:"Support", items:["Help","Open Case"]},
   {id:"dash", Icon:LayoutGrid, label:"Dashboards",
-    items:["Next Gen Claiming","Sales Incentive Calendar","MBR","Sales Comp Portal"]},
+    items:["Sales Incentive Calendar","Sales Comp Portal"]},
 ];
 function UtilityIcons({ipad=false}) {
   const [open, setOpen] = useState(null);
