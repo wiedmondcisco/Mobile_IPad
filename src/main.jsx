@@ -82,7 +82,7 @@ const PE_COLOR = { PE1:"#fbab2c", PE2:"#74bf4b", PE3:"#0077c2", KSO:"#52719c", O
 const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"8,688.08", change:"▲ 40.4%", payDate:"Paid May 2, 2026"},
   {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▼ 2.9%", payDate:"Pay: Jun 2, 2026"},
-  {month:"JUN 2026", period:"June 2026", status:"Upcoming", amount:"0.00", lock:"Jun 28, 2026", payDate:"Pay: Jul 2, 2026"}   // clicks into the upcoming statement (lock/pay schedule)
+  {month:"JUN 2026", period:"June 2026", status:"Upcoming", amount:"4,825.50", lock:"Jun 28, 2026", payDate:"Pay: Jul 2, 2026"}   // projected estimate — clicks into the upcoming statement (lock/pay schedule)
 ];
 
 const planElements = [
@@ -463,7 +463,7 @@ const olderPaymentPeriods = [
    pay / revenue dates) is already known, so the seller can click in and
    see when the June statement starts moving. */
 const upcomingPaymentPeriod = {
-  month:"June 2026", amount:"0.00", status:"Upcoming",
+  month:"June 2026", amount:"4,825.50", status:"Upcoming",
   payDate:"Jul 2, 2026", lockDate:"Jun 28, 2026", revDates:"Jun 1 – Jun 18, 2026",
   goalSheet:{period:H1_FY26, total:"0.00", items:[]},
   spiff:{total:"0.00", items:[]}, draws:{total:"0.00", items:[]},
@@ -1231,8 +1231,10 @@ function PeriodChips({s}) {
      June-upcoming so the open statement sits front and center; the compact
      chevron toggle expands to the last 12 months. */
   const wrapRef = useRef(null);
-  const all = fullPaymentPeriods.map((pr,i)=>({pr,i}));
-  const visible = s.showAllPeriods ? all : all.slice(-3);
+  /* Current + past statements only — the upcoming month (no statement yet)
+     is reachable from At A Glance but doesn't take a chip here. */
+  const all = fullPaymentPeriods.map((pr,i)=>({pr,i})).filter(({pr})=>pr.status!=="Upcoming");
+  const visible = s.showAllPeriods ? all : all.slice(-2);
   useEffect(()=>{
     if (!wrapRef.current) return;
     if (s.showAllPeriods) wrapRef.current.querySelector(".m-period-active")?.scrollIntoView({inline:"nearest", block:"nearest"});
@@ -1244,7 +1246,7 @@ function PeriodChips({s}) {
       title={s.showAllPeriods ? "Last 3 months" : "Last 12 months"}>
       <ChevronRight size={15} className={s.showAllPeriods?"back":""}/>
     </button>
-    {visible.map(({pr,i})=><div key={pr.month} className={`m-period-item ${i===s.periodIdx?"m-period-active":""} ${pr.status==="Upcoming"?"m-period-ghost":""}`} onClick={()=>s.setPeriodIdx(i)}>
+    {visible.map(({pr,i})=><div key={pr.month} className={`m-period-item ${i===s.periodIdx?"m-period-active":""}`} onClick={()=>s.setPeriodIdx(i)}>
       <span className="m-period-month">{pr.month}</span>
       <b className="m-period-amt">{amt("$"+pr.amount)}</b>
       <span className={`m-pay-status m-status-${pr.status.toLowerCase()}`}>{pr.status}</span>
@@ -1261,7 +1263,7 @@ function UpcomingPaymentCard({p}) {
     <div className="m-upc-body">
       <span className="m-pcal-badge m-pcb-upcoming m-upc-badge"><Calendar size={16}/></span>
       <b className="m-upc-amt">{amt(p.amount)} <small>USD (Est.)</small></b>
-      <p className="m-upc-note">This statement hasn't opened yet — bookings and revenue from <b>{p.revDates}</b> will start appearing after the first data refresh.</p>
+      <p className="m-upc-note">Projected from your current attainment run rate. The statement hasn't opened yet — bookings and revenue from <b>{p.revDates}</b> will start appearing after the first data refresh.</p>
       <div className="m-upc-dates">
         <span>Lock: <b>{p.lockDate}</b></span><i>·</i><span>Pay: <b>{p.payDate}</b></span>
       </div>
