@@ -905,51 +905,6 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .i-page .m-kso-calc-row{flex-direction:row;align-items:baseline;justify-content:space-between;gap:18px}
 .i-page .m-kso-calc-row .m-kso-calc-inst,.i-page .m-kso-calc-note{text-align:right;max-width:62%}
 
-/* ─── USAGE ANALYTICS (SIO/Admin) ─── */
-.m-ua-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.m-ua-asof{font-size:10px;color:var(--muted);font-weight:600}
-.m-ua-pills{display:flex;gap:6px;flex-wrap:wrap}
-.m-ua-pills button{border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:11px;font-weight:700;padding:6px 12px;border-radius:14px;cursor:pointer}
-.m-ua-pills button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.m-ua-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.m-ua-kpi{background:var(--card);border:1px solid var(--border);border-top:3px solid;border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.m-ua-kpi b{font-size:20px;font-weight:900;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
-.m-ua-kpi span{font-size:11px;font-weight:800;color:var(--text)}
-.m-ua-kpi small{font-size:9.5px;color:var(--muted);font-weight:600}
-.m-ua-insight{display:flex;align-items:flex-start;gap:9px;border-left:3px solid;border-radius:6px;background:var(--card-2);padding:9px 11px;margin-bottom:8px}
-.m-ua-insight:last-child{margin-bottom:0}
-.m-ua-instag{flex-shrink:0;font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border:1px solid;border-radius:10px;padding:3px 8px;margin-top:1px;white-space:nowrap}
-.m-ua-insight p{font-size:11.5px;line-height:1.55;color:var(--text-2);font-weight:600}
-.m-ua-tr{display:grid;grid-template-columns:1.5fr .65fr .75fr .6fr .55fr;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--divider);font-size:11px}
-.m-ua-ftr{display:grid;grid-template-columns:1.6fr .95fr .55fr .55fr;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--divider);font-size:11px}
-.m-ua-tr:last-child,.m-ua-ftr:last-child{border-bottom:none}
-.m-ua-th{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
-.m-ua-tr .r,.m-ua-ftr .r{text-align:right}
-.m-ua-page{font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.m-ua-num{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
-.m-ua-dim{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.m-ua-trend{font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
-.m-ua-trend.neg{color:var(--red)}
-.m-ua-sub{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin:-4px 0 10px}
-.m-ua-sub2{font-size:10px;color:var(--muted);font-weight:700}
-.m-ua-heat{display:grid;grid-template-columns:34px repeat(7,1fr);gap:3px;align-items:center}
-.m-ua-heat-day{font-size:8.5px;font-weight:800;color:var(--muted);text-align:center;text-transform:uppercase}
-.m-ua-heat-hour{font-size:8.5px;font-weight:700;color:var(--muted);text-align:right;padding-right:4px;font-variant-numeric:tabular-nums}
-.m-ua-heat-cell{height:20px;border-radius:5px;background:var(--track);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
-.m-ua-heat-leg{display:flex;align-items:center;gap:4px;margin-top:10px;font-size:9px;font-weight:700;color:var(--muted)}
-.m-ua-heat-leg i{width:16px;height:10px;border-radius:3px}
-.m-ua-pain{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--divider)}
-.m-ua-pain:last-child{border-bottom:none}
-.m-ua-rank{flex-shrink:0;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
-.m-ua-pain-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.m-ua-pain-txt b{font-size:12.5px;font-weight:800;color:var(--text)}
-.m-ua-pain-txt span{font-size:10.5px;color:var(--muted);font-weight:600}
-.m-ua-ptrend{flex-shrink:0;font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:12px;text-transform:capitalize}
-.m-ua-ptrend-improving{color:var(--green);background:rgba(116,191,75,.14)}
-.m-ua-ptrend-stable{color:var(--muted);background:var(--track)}
-.m-ua-ptrend-worsening{color:var(--red);background:rgba(227,36,27,.14)}
-/* iPad: KPI strip runs five-up */
-.i-page .m-ua-kpis{grid-template-columns:repeat(5,1fr)}
 
 /* ─── BACKLOG INSIGHTS ─── */
 /* Mobile backlog hero — selected bucket at a glance, dropdown filter */
