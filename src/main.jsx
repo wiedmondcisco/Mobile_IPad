@@ -2426,7 +2426,7 @@ const UPLIFT_GOAL = "$109,000.00";
 function CompUpliftSection({s}) {
   return <div className="m-uplift">
     <button className="m-uplift-toggle" onClick={()=>s.setUpliftOpen(!s.upliftOpen)} aria-expanded={s.upliftOpen}>
-      View Comp Uplift
+      Comp Uplift
       <ChevronDown size={15} className={s.upliftOpen?"up":""}/>
     </button>
     {s.upliftOpen && compUpliftPlans.map((p,i)=><div key={i} className="m-uplift-card">
