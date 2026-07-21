@@ -1664,6 +1664,15 @@ function PePill({pe, label, color}) {
   </span>;
 }
 
+/* Target Incentive derivation shown on the TI Calculation tab (desktop
+   reference): annual base → semi-annual base → OTE → TI. One calculation
+   for the seller, shared by every PE's popup. */
+const TI_CALC = {
+  annualBase:"148,208.92", varPct:"30%", interval:"H2",
+  semiBase:"74,104.46", ote:"105,863.51", ti:"31,759.05",
+  days:"182 / 182"
+};
+
 /* Compensation Calculation popup — the MONEY-value trigger. Full-screen, two tabs. */
 function CompCalcPopup({item, month, onClose}) {
   const [tab, setTab] = useState("Payment Calculation");
@@ -1738,15 +1747,51 @@ function CompCalcPopup({item, month, onClose}) {
     </>}
 
     {tab==="TI Calculation" && <>
-      <p className="m-calc-summary">Your Target Incentive is your annual variable comp target, weighted to {item.pe} and prorated for the goal period.</p>
-      <div className="m-calc-formula-card">
-        <div className="m-calc-rows" style={{width:"100%"}}>
-          <div className="m-calc-row"><span>Annual Target Incentive</span><b>{amt(c.targetIncentive)}</b></div>
-          <div className="m-calc-row"><span>Plan Weight</span><b>{c.weight}</b></div>
-          <div className="m-calc-row"><span>Proration</span><b>{c.proration}</b></div>
-          <div className="m-calc-row m-calc-total"><span>Weighted TI (this period)</span><b>{amt(c.result)}</b></div>
-        </div>
+      <div className="m-calc-badge-row"><PePill pe="TI" label="Target Incentive Calculation" color="#0077c2"/></div>
+      <p className="m-calc-summary">Your Semi-Annual Target Incentive is derived from your base salary and variable pay percentage. This is the maximum incentive payout at 100% goal attainment before multipliers.</p>
+
+      <div className="m-ti-step"><b>Step 1: Calculate Semi-Annual OTE</b></div>
+      <p className="m-ti-eq">Semi-Annual OTE = Semi-Annual Base Salary × (1 - Variable Pay %)</p>
+      <div className="m-ti-card">
+        <div className="m-ti-part"><b>{amt("$"+TI_CALC.semiBase)}</b><small>Semi-Annual Base</small></div>
+        <span className="m-ti-op">×</span>
+        <div className="m-ti-part"><b>(1 - {TI_CALC.varPct})</b><small>1 - Variable Pay %</small></div>
+        <span className="m-ti-op">=</span>
+        <div className="m-ti-part m-ti-res"><b>{amt("$"+TI_CALC.ote)}</b><small>Semi-Annual OTE</small></div>
       </div>
+
+      <div className="m-ti-step"><b>Step 2: Calculate Target Incentive</b></div>
+      <p className="m-ti-eq">Target Incentive = Semi-Annual OTE - Semi-Annual Base Salary</p>
+      <div className="m-ti-card">
+        <div className="m-ti-part"><b>{amt("$"+TI_CALC.ote)}</b><small>Semi-Annual OTE</small></div>
+        <span className="m-ti-op">−</span>
+        <div className="m-ti-part"><b>{amt("$"+TI_CALC.semiBase)}</b><small>Semi-Annual Base</small></div>
+        <span className="m-ti-op">=</span>
+        <div className="m-ti-part m-ti-res"><b>{amt("$"+TI_CALC.ti)}</b><small>Target Incentive</small></div>
+      </div>
+
+      <div className="m-ti-step"><b>Compensation Summary</b></div>
+      <div className="m-ti-tablewrap">
+        <table className="m-ti-table">
+          <thead><tr><th>Component</th><th>Value</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr><td>Annual Base Salary</td><td>{amt("$"+TI_CALC.annualBase)}</td><td>Gross annual base compensation</td></tr>
+            <tr><td>Variable Pay %</td><td>{TI_CALC.varPct}</td><td>Target variable as % of OTE</td></tr>
+            <tr><td>Goaling Interval</td><td>{TI_CALC.interval}</td><td>Semi-Annual proration</td></tr>
+            <tr><td>Semi-Annual Base Salary</td><td>{amt("$"+TI_CALC.semiBase)}</td><td>Base for the goal period</td></tr>
+            <tr><td>Semi-Annual OTE</td><td>{amt("$"+TI_CALC.ote)}</td><td>On-Target Earnings for period</td></tr>
+            <tr className="m-ti-hot"><td>Semi-Annual Target Incentive</td><td>{amt("$"+TI_CALC.ti)}</td><td>Maximum incentive at 100% attainment</td></tr>
+            <tr><td>Active Days / Total Days</td><td>{TI_CALC.days}</td><td>Proration factor = 100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <Expandable title="How is my Variable Pay % determined?">
+        <p className="m-exp-text">Your variable pay percentage is set by your compensation plan and role level. It represents the portion of your On-Target Earnings (OTE) that is performance-based. A {TI_CALC.varPct} variable pay means {TI_CALC.varPct} of your OTE is at risk and tied to goal attainment.</p>
+      </Expandable>
+      <Expandable title="Why are calculations semi-annual?">
+        <p className="m-exp-text">Your goaling interval is <b>{TI_CALC.interval}</b> with <b>Semi-Annual</b> proration. Target Incentive is calculated for the 6-month goal period (182 active days out of 182 total days).</p>
+      </Expandable>
     </>}
   </FullScreenPopup>;
 }

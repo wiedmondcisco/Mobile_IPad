@@ -906,6 +906,27 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .i-page .m-kso-calc-row .m-kso-calc-inst,.i-page .m-kso-calc-note{text-align:right;max-width:62%}
 
 
+/* ─── TI CALCULATION TAB (Comp Calc popup) ─── */
+.m-ti-step{display:flex;align-items:center;gap:7px;margin:16px 0 3px;font-size:14px;color:var(--text)}
+.m-ti-step::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--accent);flex-shrink:0}
+.m-ti-eq{font-size:12px;color:var(--text-2);margin:2px 0 8px}
+.m-ti-card{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:var(--track);border:1px solid var(--divider);border-radius:14px;padding:16px 12px;margin-bottom:4px}
+.m-ti-part{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.m-ti-part b{font-size:15px;font-variant-numeric:tabular-nums;color:var(--text)}
+.m-ti-part small{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.m-ti-res b{font-size:19px}
+.m-ti-op{color:var(--muted);font-weight:700;font-size:14px}
+.m-ti-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px}
+.m-ti-table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:360px}
+.m-ti-table th{text-align:left;font-size:9.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);font-weight:800;padding:8px;background:var(--track)}
+.m-ti-table td{padding:9.5px 8px;border-bottom:1px solid var(--divider);color:var(--text);font-variant-numeric:tabular-nums}
+.m-ti-table td:nth-child(2){font-weight:800;white-space:nowrap}
+.m-ti-table td:nth-child(3){color:var(--text-2)}
+.m-ti-table tr:last-child td{border-bottom:none}
+.m-ti-hot td{background:rgba(0,119,194,.08);color:var(--accent)}
+.m-ti-hot td:first-child{font-weight:800}
+:root[data-theme="dark"] .m-ti-hot td{background:rgba(0,188,235,.10)}
+
 /* ─── BACKLOG INSIGHTS ─── */
 /* Mobile backlog hero — selected bucket at a glance, dropdown filter */
 .m-blg-hero-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
