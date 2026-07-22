@@ -5,25 +5,16 @@ import { DeviceToggle } from "./device.jsx";
 import { IPadFrame } from "./ipad.jsx";
 import { useCompXState } from "./state.js";
 
-/* Bare mode: on a real phone-sized viewport the app renders full-bleed —
-   no mock bezel or Safari chrome. Overrides: ?bare forces it (testing on
-   desktop), ?frame forces the framed demo (e.g. screenshots on a phone). */
-const QUERY = new URLSearchParams(window.location.search);
-const FORCE_BARE = QUERY.has("bare"), FORCE_FRAME = QUERY.has("frame");
-const isBareViewport = () => window.innerWidth > 0 && window.innerWidth <= 520;
+/* The app always renders bare (no mock device shell) — full-bleed on phones,
+   a centered column on wide screens. The framed iPhone/iPad demo stage is
+   still reachable with ?frame for presentations. */
+const FORCE_FRAME = new URLSearchParams(window.location.search).has("frame");
 
 export function App() {
   const s = useCompXState();
   const [device, setDevice] = useState("mobile");
   const [orientation, setOrientation] = useState("portrait");   // iPad only
-  const [bare, setBare] = useState(FORCE_BARE || (!FORCE_FRAME && isBareViewport()));
-  useEffect(() => {
-    if (FORCE_BARE || FORCE_FRAME) return;
-    const sync = () => setBare(isBareViewport());
-    sync();                                   // re-check once layout has settled
-    window.addEventListener("resize", sync);
-    return () => window.removeEventListener("resize", sync);
-  }, []);
+  const bare = !FORCE_FRAME;
   useEffect(() => { document.body.classList.toggle("bare-body", bare); }, [bare]);
 
   if (bare) return <div className="app-root app-bare"><BareFrame s={s}/></div>;
