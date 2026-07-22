@@ -1,3 +1,4 @@
+import { USERS } from "../data/users.js";
 import { useState, useEffect } from "react";
 import { Calendar, Search } from "lucide-react";
 import { MAX_PINS, REMINDERS_SEED, notifications } from "../data/insights.js";
@@ -54,6 +55,7 @@ export function useCompXState() {
   const [histPeriods, setHistPeriods] = useState([...HIST_PERIODS]);
   const [histPe, setHistPe] = useState("PE1");
   const [sideCollapsed, setSideCollapsed] = useState(false);        // iPad sidebar rail mode
+  const [user, setUser] = useState(USERS[0]);                       // signed-in (or switched-to) user
   const [hideAmts, setHideAmts] = useState(true);                   // privacy default: figures dotted out until the seller taps Show
   setAmountsHidden(hideAmts);
   const [cur, setCur] = useState("USD");                            // display currency (demo conversion, USD base)
@@ -126,7 +128,7 @@ export function useCompXState() {
     upliftOpen, setUpliftOpen,
     histView, setHistView, histMode, setHistMode, histMember, setHistMember,
     histCmpMember, setHistCmpMember, histPeriods, setHistPeriods, histPe, setHistPe,
-    sideCollapsed, setSideCollapsed, hideAmts, setHideAmts, cur, setCur,
+    sideCollapsed, setSideCollapsed, hideAmts, setHideAmts, cur, setCur, user, setUser,
     insightCanvasOpen, setInsightCanvasOpen, pinnedInsights, setPinnedInsights,
     showRecovBal, setShowRecovBal, showPayCal, setShowPayCal, notifs, setNotifs,
     orderPopOpen, setOrderPopOpen,

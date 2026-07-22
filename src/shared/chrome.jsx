@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { AlertTriangle, Bell, Calendar, Check, CheckCircle2, HelpCircle, Info, LayoutGrid, Search, X } from "lucide-react";
+import { AlertTriangle, Bell, Calendar, Check, CheckCircle2, HelpCircle, Info, LayoutGrid, LogOut, Search, X } from "lucide-react";
 import { fmtRemDate, notifications } from "../data/insights.js";
+import { USERS } from "../data/users.js";
 import { orders } from "../data/orders.js";
 import { OrderQuickSearch } from "../pages/order-search/quick-search.jsx";
 
@@ -101,15 +102,30 @@ export function SellerViewBanner({s}) {
   </div>;
 }
 
-/* Universal mobile header — avatar, name/role, bell with unread count.
-   Shown on every mobile page so the top of the app reads consistently. */
+/* Universal mobile header — tappable identity (Switch User / Logout menu),
+   search, utilities, bell. Shown on every mobile page. */
 
 export function MobileHeader({s}) {
+  const [userMenu, setUserMenu] = useState(false);
+  const [switchOpen, setSwitchOpen] = useState(false);
+  const u = s.user;
   return <>
     <div className="m-header">
-      <div className="m-header-left">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" className="m-avatar" alt=""/>
-        <h1>Alex Johnson</h1>
+      <div className="m-header-left m-user-wrap">
+        <button className="m-user-btn" onClick={()=>setUserMenu(o=>!o)}
+          aria-haspopup="menu" aria-expanded={userMenu} aria-label="Account menu">
+          <img src={u.avatar} className="m-avatar" alt=""/>
+          <span className="m-user-txt"><h1>{u.name}</h1><small>{u.id}</small></span>
+        </button>
+        {userMenu && <>
+          <div className="m-gsel-backdrop" onClick={()=>setUserMenu(false)}/>
+          <div className="m-umenu" role="menu">
+            <button role="menuitem" onClick={()=>{ setUserMenu(false); setSwitchOpen(true); }}>Switch User</button>
+            <button role="menuitem" className="m-umenu-logout" onClick={()=>{ setUserMenu(false); s.setUser(USERS[0]); }}>
+              <LogOut size={14}/> Logout
+            </button>
+          </div>
+        </>}
       </div>
       <div className="m-header-actions">
         <button className="m-util-btn" aria-label="Search orders" onClick={()=>s.setOrderPopOpen(true)}><Search size={16}/></button>
@@ -123,6 +139,46 @@ export function MobileHeader({s}) {
     {s.notifOpen && <><div className="m-notif-overlay" onClick={()=>s.setNotifOpen(false)}/>
       <NotifDropdown s={s} onClose={()=>s.setNotifOpen(false)}/></>}
     {s.orderPopOpen && <OrderQuickSearch s={s} onClose={()=>s.setOrderPopOpen(false)}/>}
+    {switchOpen && <SwitchUserPopup s={s} onClose={()=>setSwitchOpen(false)}/>}
+  </>;
+}
+
+/* Switch User dialog (desktop reference): Viewing-as box, search by name /
+   CEC ID / employee ID, Apply to impersonate. Logout resets to the default. */
+function SwitchUserPopup({s, onClose}) {
+  const [pending, setPending] = useState(s.user);
+  const [q, setQ] = useState("");
+  const t = q.trim().toLowerCase();
+  const matches = t ? USERS.filter(u =>
+    u.name.toLowerCase().includes(t) || u.id.includes(t) || u.cec.toLowerCase().includes(t)) : [];
+  return <>
+    <div className="m-oq-overlay" onClick={onClose}/>
+    <div className="m-su" role="dialog" aria-label="Switch user">
+      <b className="m-su-title">Switch User</b>
+      <div className="m-su-viewing">
+        <small>Viewing as</small>
+        <span><b>{pending.name}</b> <i>({pending.id})</i></span>
+      </div>
+      <div className="m-su-field">
+        <Search size={15}/>
+        <input placeholder="Search by name, CEC ID, or employee ID" value={q} autoFocus
+          onChange={e=>setQ(e.target.value)}
+          onKeyDown={e=>{ if (e.key==="Enter" && matches.length===1) { setPending(matches[0]); setQ(""); } }}/>
+      </div>
+      {matches.length>0 && <div className="m-su-results">
+        {matches.map(m=><button key={m.id} className={m.id===pending.id?"on":""}
+          onClick={()=>{ setPending(m); setQ(""); }}>
+          <img src={m.avatar} alt=""/>
+          <span><b>{m.name}</b><small>{m.id} · {m.cec}</small></span>
+          {m.id===pending.id && <Check size={14}/>}
+        </button>)}
+      </div>}
+      {t && matches.length===0 && <div className="m-su-empty">No users match “{q}”</div>}
+      <div className="m-su-actions">
+        <button className="m-su-apply" onClick={()=>{ s.setUser(pending); onClose(); }}>Apply</button>
+        <button className="m-su-cancel" onClick={onClose}>Cancel</button>
+      </div>
+    </div>
   </>;
 }
 

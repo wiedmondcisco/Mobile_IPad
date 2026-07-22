@@ -1,3 +1,4 @@
+import { firstName } from "../data/users.js";
 import { Bell, ChevronLeft, ChevronRight, Moon, Sparkles, Sun, User, Users, X } from "lucide-react";
 import { FramePopups } from "./FramePopups.jsx";
 import { CiscoLogo, IPadSafariBar, IPadStatusBar, useUrlBarCollapse } from "./device.jsx";
@@ -49,8 +50,8 @@ export function IPadFrame({s, landscape=false}) {
           </div>
           <p className="i-brand-tag">Your source for compensation information</p>
           <div className="i-profile" title="Alex Johnson · Enterprise AE">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" className="i-avatar" alt=""/>
-            <div className="i-profile-txt"><b>Hi Alex!</b><small>Enterprise AE</small></div>
+            <img src={s.user.avatar} className="i-avatar" alt=""/>
+            <div className="i-profile-txt"><b>Hi {firstName(s.user)}!</b><small>{s.user.role}</small></div>
           </div>
           <div className="i-viewtoggle">
             <button className={!team?"on":""} onClick={()=>{ s.setSellerView(null); s.setViewMode("me"); }} title="My Compensation"><User size={15}/><span>My Compensation</span></button>

@@ -105,6 +105,38 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-header-left{display:flex;align-items:center;gap:12px}
 .m-avatar{width:48px;height:48px;border-radius:50%;border:2px solid var(--accent)}
 .m-header h1{font-size:17px;font-weight:700;color:var(--text);white-space:nowrap}
+/* tappable identity + account menu */
+.m-user-wrap{position:relative}
+.m-user-btn{display:flex;align-items:center;gap:12px;border:none;background:none;padding:0;cursor:pointer;text-align:left;font-family:inherit}
+.m-user-txt{display:flex;flex-direction:column;gap:1px}
+.m-user-txt small{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.3px}
+.m-umenu{position:absolute;left:0;top:calc(100% + 8px);z-index:60;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.25);padding:6px;min-width:176px;display:flex;flex-direction:column;gap:2px}
+.m-umenu button{display:flex;align-items:center;gap:8px;border:none;background:none;color:var(--text);font-size:13.5px;font-weight:800;padding:11px 12px;border-radius:9px;cursor:pointer;text-align:left;font-family:inherit}
+.m-umenu button:hover{background:var(--track)}
+.m-umenu button.m-umenu-logout{color:#e3241b}
+/* Switch User dialog */
+.m-su{position:fixed;top:64px;left:12px;right:12px;z-index:321;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 18px 44px rgba(0,0,0,.30);max-width:496px;margin:0 auto}
+.m-su-title{display:block;font-size:16.5px;color:var(--text);margin-bottom:12px}
+.m-su-viewing{background:var(--track);border:1px solid var(--divider);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.m-su-viewing small{font-size:10.5px;font-weight:700;color:var(--muted)}
+.m-su-viewing b{color:var(--accent);font-size:14px}
+.m-su-viewing i{font-style:normal;color:var(--muted);font-weight:700;font-size:12.5px}
+.m-su-field{display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);background:var(--bg);border-radius:11px;padding:0 12px;margin-bottom:10px;color:var(--muted)}
+.m-su-field:focus-within{border-color:var(--accent)}
+.m-su-field input{flex:1;min-width:0;border:none;background:none;color:var(--text);padding:11px 0;font-size:13px;outline:none;font-family:inherit}
+.m-su-field input::placeholder{color:var(--muted)}
+.m-su-results{display:flex;flex-direction:column;gap:2px;margin-bottom:10px;max-height:190px;overflow-y:auto}
+.m-su-results button{display:flex;align-items:center;gap:10px;border:none;background:none;padding:8px 10px;border-radius:10px;cursor:pointer;text-align:left;font-family:inherit}
+.m-su-results button:hover,.m-su-results button.on{background:var(--track)}
+.m-su-results img{width:28px;height:28px;border-radius:50%;flex-shrink:0}
+.m-su-results span{display:flex;flex-direction:column;flex:1;min-width:0}
+.m-su-results b{font-size:13px;color:var(--text)}
+.m-su-results small{font-size:10.5px;color:var(--muted);font-weight:600}
+.m-su-results svg{color:var(--accent);flex-shrink:0}
+.m-su-empty{font-size:12px;color:var(--muted);padding:2px 2px 10px}
+.m-su-actions{display:flex;gap:10px}
+.m-su-apply{flex:1;border:none;background:var(--accent);color:#fff;font-weight:800;font-size:13.5px;padding:12px;border-radius:11px;cursor:pointer}
+.m-su-cancel{flex:1;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-weight:800;font-size:13.5px;padding:12px;border-radius:11px;cursor:pointer}
 .m-bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer}
 .m-bell-count{position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
 
