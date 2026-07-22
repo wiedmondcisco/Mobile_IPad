@@ -6,7 +6,7 @@ import { PE_COLOR } from "../lib/brand.js";
 export const planElements = [
   {id:"PE1", name:"Prod+Services", goal:"$109k Goal", bookingsAmt:"$68k", bookingsPct:63, revenueAmt:"$26k", revenuePct:24, backlogAmt:"$42k", backlogPct:39, attPct:24, color:PE_COLOR.PE1, blColor:"#fcc661"},
   {id:"PE2", name:"Recurring Software", goal:"$87k Goal", bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71, backlogAmt:"$28k", backlogPct:32, attPct:71, color:PE_COLOR.PE2, blColor:"#a8d98d"},
-  {id:"PE3", name:"Services", goal:"$90k Goal", bookingsAmt:"$85k", bookingsPct:94, revenueAmt:"$40k", revenuePct:44, backlogAmt:"$45k", backlogPct:50, attPct:44, color:PE_COLOR.PE3, blColor:"#7fc5ea"}
+  {id:"PE3", name:"Services", goal:"$90k Goal", bookingsAmt:"$85k", bookingsPct:94, revenueAmt:"$40k", revenuePct:44, backlogAmt:"$45k", backlogPct:50, attPct:44, color:PE_COLOR.PE3, blColor:"#c7d2fe"}
 ];
 
 /* Glance section shows the two active programs + the latest completed one;
@@ -15,7 +15,7 @@ export const planElements = [
 export const goalTabs = [
   {id:"PE1", name:"Prod+Services",       color:PE_COLOR.PE1, blColor:"#fcc661", goal:"$109k", attPct:24,   bookingsAmt:"$68k", bookingsPct:63,  revenueAmt:"$26k", revenuePct:24,  backlogAmt:"$42k", backlogPct:39, incentive:"$1,386.18"},
   {id:"PE2", name:"Recurring Software",  color:PE_COLOR.PE2, blColor:"#a8d98d", goal:"$87k",  attPct:71, bookingsAmt:"$90k", bookingsPct:103, revenueAmt:"$62k", revenuePct:71,  backlogAmt:"$28k", backlogPct:32, incentive:"$1,019.47"},
-  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#7fc5ea", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.08"},
+  {id:"PE3", name:"Services",            color:PE_COLOR.PE3, blColor:"#c7d2fe", goal:"$90k",  attPct:44,   bookingsAmt:"$85k", bookingsPct:94,  revenueAmt:"$40k", revenuePct:44,  backlogAmt:"$45k", backlogPct:50, incentive:"$980.08"},
   {id:"KSO", name:"Key Sales Objectives",color:PE_COLOR.KSO, goal:"$2.5k", attPct:100,  bookingsAmt:"—",    bookingsPct:100, revenueAmt:"—",    revenuePct:100, backlogAmt:"—",    backlogPct:0,  incentive:"$2,500.00"},
   {id:"OTB", name:"On-Top Bonus",        color:PE_COLOR.OTB, blColor:"#9db9e8", goal:"$5k",   attPct:65,   bookingsAmt:"$3.3k",bookingsPct:65,  revenueAmt:"$2.1k",revenuePct:42,  backlogAmt:"$1.2k",backlogPct:24, incentive:"$100.00"},
   {id:"NDR", name:"Net Dollar Retention",color:PE_COLOR.NDR, blColor:"#7ee1f7", goal:"110%",  attPct:88,   bookingsAmt:"104%", bookingsPct:88,  revenueAmt:"102%", revenuePct:82,  backlogAmt:"6%",   backlogPct:12, incentive:"$0.00"}

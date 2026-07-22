@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { IPadHeader } from "../../app/ipad.jsx";
 import { orders } from "../../data/orders.js";
-import { PE_COLOR } from "../../lib/brand.js";
+import { PE_COLOR, peBadgeStyle } from "../../lib/brand.js";
 import { amt, maskText } from "../../lib/core.js";
 import { MobileHeader } from "../../shared/chrome.jsx";
 
@@ -81,7 +81,7 @@ export function BacklogOrderCard({o}) {
     onClick={()=>setOpen(v=>!v)}
     onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(v=>!v); } }}>
     <div className="m-blg-top">
-      <span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>
+      <span className="m-pb-pe-badge" style={peBadgeStyle(o.pe)}>{o.pe}</span>
       <div className="m-blg-who"><b>{o.customer}</b><small>{o.id}</small></div>
       <div className="m-blg-amt"><b>{amt(o.backlog)}</b><small>Backlog</small></div>
       <ChevronDown size={14} className={`m-insight-chev ${open?"open":""}`}/>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { peBadgeStyle } from "../../lib/brand.js";
 import { Calendar, ChevronDown, Menu } from "lucide-react";
 import { IPadHeader } from "../../app/ipad.jsx";
 import { monthlyPayCards } from "../../data/payments.js";
@@ -124,7 +125,7 @@ export function planBlock(s, sheet, sheetIdx, setSheetIdx, sheetOpen, setSheetOp
         aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
         onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
         <div className="m-pe-top">
-          <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
+          <div className="m-pe-left"><span className="m-pe-badge" style={peBadgeStyle(pe.id, pe.color)}>{pe.id}</span><b>{pe.name}</b></div>
           <span className="m-pe-goal">{cvt(pe.goal)}</span>
         </div>
         <div className="m-pe-att-row">
@@ -188,7 +189,7 @@ export function IPadGlance({s}) {
           aria-label={`Open ${pe.id} on Goals`} onClick={()=>s.openGoal(pe.id)}
           onKeyDown={e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); s.openGoal(pe.id); } }}>
           <div className="m-pe-top">
-            <div className="m-pe-left"><span className="m-pe-badge" style={{background:pe.color}}>{pe.id}</span><b>{pe.name}</b></div>
+            <div className="m-pe-left"><span className="m-pe-badge" style={peBadgeStyle(pe.id, pe.color)}>{pe.id}</span><b>{pe.name}</b></div>
             <span className="m-pe-goal">{cvt(pe.goal)}</span>
           </div>
           <div className="m-pe-att-row">

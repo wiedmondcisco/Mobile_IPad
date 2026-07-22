@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar, ChevronDown, Layers, Menu, Target, X } from "lucide-react";
 import { IPadHeader } from "../../app/ipad.jsx";
-import { PE_COLOR } from "../../lib/brand.js";
+import { PE_COLOR, peBadgeStyle } from "../../lib/brand.js";
 import { REFRESH_NOTE, cvt } from "../../lib/core.js";
 import { HistPage } from "./history.jsx";
 import { MobileHeader } from "../../shared/chrome.jsx";
@@ -199,7 +199,7 @@ export function SellerBreakdownPopup({s, onClose}) {
       <div className="m-gs-row-top">
         <AttainDonut pct={s.pe[i]} color={PE_COLOR[meta.id]} size={64} stroke={9} sub=""/>
         <div className="m-gs-row-info">
-          <div className="m-gs-row-hdr"><span className="m-pe-badge" style={{background:PE_COLOR[meta.id]}}>{meta.id}</span><b>{meta.label}</b></div>
+          <div className="m-gs-row-hdr"><span className="m-pe-badge" style={peBadgeStyle(meta.id)}>{meta.id}</span><b>{meta.label}</b></div>
           <span className="m-gs-goal">{s.pe[i]}% attainment</span>
         </div>
       </div>

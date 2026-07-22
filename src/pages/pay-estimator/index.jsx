@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { IPadHeader } from "../../app/ipad.jsx";
-import { PE_COLOR } from "../../lib/brand.js";
+import { PE_COLOR, peBadgeStyle, peChipStyle } from "../../lib/brand.js";
 import { ACTIVE_CUR, amt, cvt, maskText } from "../../lib/core.js";
 import { MobileHeader } from "../../shared/chrome.jsx";
 import { Expandable } from "../../shared/primitives.jsx";
@@ -94,7 +94,7 @@ export function EstimatorCard({s}) {
   const setAddPct = v => setAdd(Math.round(Math.max(0, Math.min(maxPct, v)) / 100 * p.goal));
   return <div className="m-section m-est-card" style={{borderLeftColor:p.color}}>
     <div className="m-section-hdr">
-      <div className="m-pe-left"><span className="m-pe-badge" style={{background:p.color}}>{p.pe}</span><b>{p.name}</b></div>
+      <div className="m-pe-left"><span className="m-pe-badge" style={peBadgeStyle(p.pe, p.color)}>{p.pe}</span><b>{p.name}</b></div>
       <span className="m-pe-goal">{cvt(fmtGoalK(p.goal))} Goal</span>
     </div>
     <div className="m-goal-stats m-est-stats">
@@ -155,7 +155,7 @@ export function EstSummary({s}) {
   return <div className="m-section m-est-sum">
     <div className="m-section-hdr"><h2>Estimated Earnings</h2><span className="m-badge">H1 2026</span></div>
     {rows.map(({p,extra,total})=><div key={p.pe} className="m-est-sum-row">
-      <span className="m-pe-badge" style={{background:p.color}}>{p.pe}</span>
+      <span className="m-pe-badge" style={peBadgeStyle(p.pe, p.color)}>{p.pe}</span>
       <span className="m-est-sum-name">{p.name}</span>
       <span className={`m-est-sum-add ${extra>0?"pos":""}`}>{maskText(`+${estUsd(extra)}`)}</span>
       <b>{amt(estUsd(total))}</b>
@@ -176,7 +176,7 @@ export function PayEstimatorPage({s}) {
     <div className="m-est-toprow">
       <div className="m-goaltab-scroll">
         {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
-          style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+          style={i===s.estPe?peChipStyle(p.pe, p.color):{}}>{p.pe}</button>)}
       </div>
       <EstModeToggle s={s}/>
     </div>
@@ -190,7 +190,7 @@ export function IPadEstimator({s}) {
     <IPadHeader title="Pay Estimator" sub="Use this estimator to estimate your potential incentive compensation. This is not a commitment of the compensation you will receive." s={s}/>
     <div className="i-goaltab-row">
       {estPlans.map((p,i)=><button key={p.pe} className={`m-goaltab ${i===s.estPe?"on":""}`} onClick={()=>s.setEstPe(i)}
-        style={i===s.estPe?{background:p.color, color:"#fff", borderColor:p.color}:{}}>{p.pe}</button>)}
+        style={i===s.estPe?peChipStyle(p.pe, p.color):{}}>{p.pe}</button>)}
       <EstModeToggle s={s}/>
     </div>
     <div className="i-split i-est-split">

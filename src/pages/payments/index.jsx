@@ -3,7 +3,7 @@ import { ArrowUp, Calculator, Calendar, ChevronDown, ChevronLeft, ChevronRight, 
 import { IPadHeader } from "../../app/ipad.jsx";
 import { revenueTxns } from "../../data/orders.js";
 import { ACCENT_AMT_SECTIONS, OTB_CALC, PAYCAL_MONTHS, PAYCAL_SHORT, PAYMENT_HISTORY, SECTION_CHIP, fullPaymentPeriods, paycalInfo, paymentDonutItems, paymentSections } from "../../data/payments.js";
-import { PE_COLOR } from "../../lib/brand.js";
+import { PE_COLOR, peBadgeStyle } from "../../lib/brand.js";
 import { DATA_AS_OF, REFRESH_NOTE, amt } from "../../lib/core.js";
 import { MobileHeader } from "../../shared/chrome.jsx";
 import { FullScreenPopup, HideBtn, SegmentDonut } from "../../shared/primitives.jsx";
@@ -214,7 +214,7 @@ export function GoalSheetItemRow({item, onOpenCalc, onOpenPdf, onOpenKso}) {
       onClick={kids ? ()=>setOpen(o=>!o) : undefined}
       role={kids?"button":undefined} tabIndex={kids?0:undefined} aria-expanded={kids?open:undefined}
       onKeyDown={kids ? (e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }) : undefined}>
-      <span className="m-pb-pe-badge" style={{background:item.color+"22", color:item.color}}>{item.pe}</span>
+      <span className="m-pb-pe-badge" style={peBadgeStyle(item.pe, item.color)}>{item.pe}</span>
       <span className="m-pb-pe-name">{item.label || item.pe}</span>
       {kids && <ChevronDown size={13} className={`m-insight-chev ${open?"open":""}`}/>}
       <span className="m-pb-pe-weight">{item.weight}</span>
@@ -248,7 +248,7 @@ export function GoalSheetItemRow({item, onOpenCalc, onOpenPdf, onOpenKso}) {
     {kids && open && <div className="m-pb-kids">
       {kids.map((kid,k)=><div key={k} className="m-pb-kid">
         <div className="m-pb-kid-top">
-          <span className="m-pb-pe-badge" style={{background:kid.color+"22", color:kid.color}}>{kid.pe}</span>
+          <span className="m-pb-pe-badge" style={peBadgeStyle(kid.pe, kid.color)}>{kid.pe}</span>
           <span className="m-pb-pe-name">{kid.label}</span>
           {revenueTxns[kid.txnKey || kid.pe] && <button className="m-pb-pe-pdf m-pb-pe-pdf-sm" aria-label={`${kid.label} revenue transactions`}
             onClick={()=>onOpenPdf(kid)}><FileText size={13}/></button>}
@@ -279,7 +279,7 @@ export function ReplacedRow({it, child=false}) {
       onClick={kids ? ()=>setOpen(o=>!o) : undefined}
       role={kids?"button":undefined} tabIndex={kids?0:undefined} aria-expanded={kids?open:undefined}
       onKeyDown={kids ? (e=>{ if (e.key==="Enter"||e.key===" ") { e.preventDefault(); setOpen(o=>!o); } }) : undefined}>
-      <span className="m-pb-pe-badge" style={{background:color+"22", color}}>{it.pe}</span>
+      <span className="m-pb-pe-badge" style={peBadgeStyle(it.pe, color)}>{it.pe}</span>
       <span className="m-replaced-name">{it.label}</span>
       {kids && <ChevronDown size={13} className={`m-insight-chev ${open?"open":""}`}/>}
       <b className="m-replaced-amt">{amt(it.amount)}</b>
@@ -353,7 +353,7 @@ export function PaymentAccordion({p, s}) {
             </div>
             {g.items.map((it,k)=><div key={k} className="m-pb-detail-row">
               <span className="m-pb-detail-name">
-                <span className="m-pb-pe-badge" style={{background:PE_COLOR[it.pe]+"22", color:PE_COLOR[it.pe]}}>{it.pe}</span>
+                <span className="m-pb-pe-badge" style={peBadgeStyle(it.pe)}>{it.pe}</span>
                 {it.name}
               </span>
               <b className="m-pb-sub-amt">{amt(it.amount)}</b>

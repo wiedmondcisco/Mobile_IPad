@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { PE_BADGE } from "../lib/brand.js";
 import { Calendar, ChevronDown, Eye, EyeOff, Target, X } from "lucide-react";
 import { amt, cvt } from "../lib/core.js";
 
@@ -187,7 +188,7 @@ export function PayCalBadge({status, hero}) {
 /* Outlined PE pill used inside popups */
 export function PePill({pe, label, color}) {
   return <span className="m-calc-pe-pill">
-    <span className="m-calc-pe-id" style={{color}}>{pe}</span>
+    <span className="m-calc-pe-id" style={{color: PE_BADGE[pe]?.fg || color}}>{pe}</span>
     <b>{label}</b>
   </span>;
 }

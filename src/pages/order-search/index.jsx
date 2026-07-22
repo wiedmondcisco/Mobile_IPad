@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import { IPadHeader } from "../../app/ipad.jsx";
 import { ORDER_PES, ORDER_PE_LABEL, ORDER_SEARCH_TYPES, ORDER_STATUSES, deriveOrders, orderDetailMeta, orders } from "../../data/orders.js";
-import { PE_COLOR } from "../../lib/brand.js";
+import { PE_COLOR, peBadgeStyle } from "../../lib/brand.js";
 import { amt } from "../../lib/core.js";
 import { MobileHeader } from "../../shared/chrome.jsx";
 import { FullScreenPopup } from "../../shared/primitives.jsx";
@@ -12,7 +12,7 @@ export const ORDER_STATUS_CHIP = {"Backlog":"m-status-upcoming", "Partial":"m-st
 export function OrderCard({o, onOpen}) {
   return <div className="m-order-card">
     <div className="m-order-top">
-      <span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>
+      <span className="m-pb-pe-badge" style={peBadgeStyle(o.pe)}>{o.pe}</span>
       <button className="m-order-id m-order-id-link" onClick={onOpen} title={`View ${o.id} order details`}>{o.id}</button>
       <span className={`m-pay-status ${ORDER_STATUS_CHIP[o.status]||"m-status-paid"}`}>{o.status}</span>
     </div>
@@ -48,7 +48,7 @@ export function OrderDetailPopup({o, onClose}) {
       <div className="m-section-hdr"><h2>Plan Element Summary</h2><span className="m-od-gs">Goal Sheet: H1 FY2026</span></div>
       <div className="m-od-tr m-od-th"><span/><span className="r">Bookings</span><span className="r">Backlog</span><span className="r">Revenue</span></div>
       <div className="m-od-tr">
-        <span className="m-od-pe"><span className="m-pb-pe-badge" style={{background:PE_COLOR[o.pe]+"22", color:PE_COLOR[o.pe]}}>{o.pe}</span>{ORDER_PE_LABEL[o.pe] || o.pe}</span>
+        <span className="m-od-pe"><span className="m-pb-pe-badge" style={peBadgeStyle(o.pe)}>{o.pe}</span>{ORDER_PE_LABEL[o.pe] || o.pe}</span>
         <span className="r m-od-num">{amt(o.bookings)}</span>
         <span className={`r m-od-num ${o.backlog !== "$0" ? "m-od-backlog" : ""}`}>{amt(o.backlog)}</span>
         <span className="r m-od-num">{amt(o.revenue)}</span>

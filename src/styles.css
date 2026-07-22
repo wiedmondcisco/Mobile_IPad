@@ -206,7 +206,7 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-pe-card:last-child{margin-bottom:0}
 .m-pe-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:nowrap}
 .m-pe-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.m-pe-badge{font-size:8px;font-weight:800;color:white;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
+.m-pe-badge{font-size:8px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
 .m-pe-left b{font-size:12px;font-weight:800;color:var(--text-strong);white-space:nowrap}
 .m-pe-goal{font-size:10px;color:var(--text-3);font-weight:600;white-space:nowrap;margin-left:auto;flex-shrink:0}
 /* Half-circle gauge */

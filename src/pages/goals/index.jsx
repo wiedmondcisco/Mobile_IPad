@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { IPadHeader } from "../../app/ipad.jsx";
 import { goalSheetOptions, goalTabs } from "../../data/plans.js";
-import { PE_COLOR } from "../../lib/brand.js";
+import { PE_COLOR, peBadgeStyle, peChipStyle } from "../../lib/brand.js";
 import { amt, cvt } from "../../lib/core.js";
 import { KsoSection } from "./kso.jsx";
 import { NdrSection } from "./ndr.jsx";
@@ -90,7 +90,7 @@ export function GoalsPage({s}) {
     {/* PE tab row */}
     <div className="m-goaltab-scroll">
       {goalTabs.map((t,i)=><button key={t.id} className={`m-goaltab ${i===tabIdx?"on":""}`} onClick={()=>setTabIdx(i)}
-        style={i===tabIdx?{background:t.color, color:"#fff", borderColor:t.color}:{}}>{t.id}</button>)}
+        style={i===tabIdx?peChipStyle(t.id, t.color):{}}>{t.id}</button>)}
     </div>
 
     {g.id==="KSO" ? <KsoSection/> : g.id==="NDR" ? <NdrSection/> : <>
@@ -98,7 +98,7 @@ export function GoalsPage({s}) {
         Section rail, stat, and bar all bind to the active PE color. */}
     <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
       <div className="m-section-hdr">
-        <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
+        <div className="m-pe-left"><span className="m-pe-badge" style={peBadgeStyle(g.id, g.color)}>{g.id}</span><b>{g.name}</b></div>
         <span className="m-pe-goal">{cvt(g.goal)} Goal</span>
       </div>
       <div className="m-pe-att-row">
@@ -142,7 +142,7 @@ export function IPadGoals({s}) {
       <div className="i-grid-2">
         {goalTabs.slice(0,3).map(t=><div key={t.id} className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:t.color}}>
           <div className="m-section-hdr">
-            <div className="m-pe-left"><span className="m-pe-badge" style={{background:t.color}}>{t.id}</span><b>{t.name}</b></div>
+            <div className="m-pe-left"><span className="m-pe-badge" style={peBadgeStyle(t.id, t.color)}>{t.id}</span><b>{t.name}</b></div>
             <span className="m-pe-goal">{cvt(t.goal)} Goal</span>
           </div>
           <div className="m-pe-att-row">
@@ -162,7 +162,7 @@ export function IPadGoals({s}) {
       <div className="i-col-a">
         <div className="m-section m-pe-flat m-pe-solo" style={{borderLeftColor:g.color}}>
           <div className="m-section-hdr">
-            <div className="m-pe-left"><span className="m-pe-badge" style={{background:g.color}}>{g.id}</span><b>{g.name}</b></div>
+            <div className="m-pe-left"><span className="m-pe-badge" style={peBadgeStyle(g.id, g.color)}>{g.id}</span><b>{g.name}</b></div>
             <span className="m-pe-goal">{cvt(g.goal)} Goal</span>
           </div>
           <div className="m-pe-att-row">
