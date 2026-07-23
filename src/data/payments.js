@@ -4,7 +4,7 @@ import { fmtAmt } from "../lib/core.js";
 
 export const monthlyPayCards = [
   {month:"APR 2026", period:"April 2026", status:"Paid", amount:"8,688.08", change:"▲ 40.4%", payDate:"Paid May 2, 2026"},
-  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, amount:"8,434.23", change:"▼ 2.9%", payDate:"Pay: Jun 2, 2026"},
+  {month:"MAY 2026", period:"May 2026", status:"Open", current:true, payState:"Unpaid", amount:"8,434.23", change:"▼ 2.9%", payDate:"Pay: Jun 2, 2026"},
   {month:"JUN 2026", period:"June 2026", status:"Upcoming", amount:"4,825.50", lock:"Jun 28, 2026", payDate:"Pay: Jul 2, 2026"}   // projected estimate — clicks into the upcoming statement (lock/pay schedule)
 ];
 

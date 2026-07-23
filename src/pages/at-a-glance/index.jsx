@@ -58,11 +58,14 @@ export function AtAGlancePage({s}) {
       <div className="m-hero-body">
         <div className="m-hero-top">
           <span className="m-hero-label">Current Payment · {hero.month}</span>
-          <span className={`m-pay-status m-status-${hero.status.toLowerCase()}`}>{hero.status}</span>
+          <span className="m-hero-pills">
+            <span className="m-pay-status m-status-current">CURRENT</span>
+            <span className={`m-pay-status m-status-${(hero.payState||"Unpaid").toLowerCase()}`}>{hero.payState||"Unpaid"}</span>
+          </span>
         </div>
         <div className="m-hero-amt-row">
           <HeroAmt value={hero.amount}/>
-          <span className="m-hero-usd">USD</span>
+          <span className="m-hero-usd">USD <i className="m-hero-est">(Est.)</i></span>
         </div>
         <div className="m-hero-meta">
           <span className="m-hero-asof"><Calendar size={11}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
@@ -156,9 +159,12 @@ export function IPadGlance({s}) {
             <div className="m-hero-body">
               <div className="m-hero-top">
                 <span className="m-hero-label">Current Payment · {c.month}</span>
-                <span className={`m-pay-status m-status-${c.status.toLowerCase()}`}>{c.status}</span>
+                <span className="m-hero-pills">
+                  <span className="m-pay-status m-status-current">CURRENT</span>
+                  <span className={`m-pay-status m-status-${(c.payState||"Unpaid").toLowerCase()}`}>{c.payState||"Unpaid"}</span>
+                </span>
               </div>
-              <div className="m-hero-amt-row"><HeroAmt value={c.amount}/><span className="m-hero-usd">USD</span></div>
+              <div className="m-hero-amt-row"><HeroAmt value={c.amount}/><span className="m-hero-usd">USD <i className="m-hero-est">(Est.)</i></span></div>
               <div className="m-hero-meta">
                 <span className="m-hero-asof"><Calendar size={12}/> {DATA_AS_OF}<HideBtn s={s} light/></span>
                 <span className="m-hero-change">{c.change} vs Apr · {c.payDate}</span>

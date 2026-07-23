@@ -605,10 +605,16 @@ body{font-family:'CiscoSansTT','Cisco Sans','CiscoSans',-apple-system,BlinkMacSy
 .m-hero-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9}
 .m-hero .m-pay-status{background:rgba(255,255,255,.22);color:#fff}
 .m-hero-amt-row{display:flex;align-items:baseline;gap:6px}
-.m-hero-amt{font-size:48px;font-weight:900;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
+.m-hero-amt{font-size:45px;font-weight:900;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
 .m-hero-amt.m-hero-amt-sm{font-size:39px;letter-spacing:-1.5px}
 .m-hero-amt.m-hero-amt-xs{font-size:30px;letter-spacing:-1px}
-.m-hero-usd{font-size:15px;font-weight:700;opacity:.75}
+.m-hero-usd{font-size:15px;font-weight:700;opacity:.75;white-space:nowrap}
+.m-hero-est{font-style:normal;font-size:11px;font-weight:700;opacity:.9}
+/* hero status pills (desktop reference): CURRENT + payment state */
+.m-hero-pills{display:inline-flex;gap:6px;flex-shrink:0}
+.m-pay-status.m-status-current{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.38);color:#fff;letter-spacing:.5px}
+.m-pay-status.m-status-unpaid{background:rgba(255,255,255,.30);border:1px solid rgba(255,255,255,.55);color:#fff}
+.m-pay-status.m-status-locked{background:rgba(13,39,77,.30);border:1px solid rgba(255,255,255,.35);color:#fff}
 .m-hero-meta{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);display:flex;flex-direction:column;gap:4px}
 .m-hero-asof{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
 .m-hero-change{font-size:11px;opacity:.85}
