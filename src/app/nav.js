@@ -13,9 +13,9 @@ export const NAV_TABS = [
 /* Mobile bottom bar: core tabs only — Order Search moved behind the header
    magnifier (quick-search popup) and the More sheet */
 
-export const MOBILE_TAB_IDS = ["glance","payments","goals"];
+export const MOBILE_TAB_IDS = ["glance","payments","goals","backlog"];
 
-export const MOBILE_MORE_IDS = ["spiff","backlog","estimator"];   // Order Search: header magnifier only
+export const MOBILE_MORE_IDS = ["spiff","estimator"];   // Order Search: header magnifier only
 
 export const MOBILE_TABS = NAV_TABS.filter(t=>MOBILE_TAB_IDS.includes(t.id));
 
