@@ -9,6 +9,11 @@ export function NotifDropdown({s, onClose, ipad=false}) {
   const [tab, setTab] = useState("notifications");
   const [note, setNote] = useState("");
   const [date, setDate] = useState("");
+  const [accepted, setAccepted] = useState([]);      // titles mid-acknowledge (brief ✓ state before removal)
+  const accept = n => {
+    setAccepted(a=>[...a, n.title]);
+    setTimeout(()=>s.setNotifs(list=>list.filter(x=>x!==n)), 700);
+  };
   const add = () => {
     if (!note.trim()) return;
     s.setReminders(prev=>[...prev, {id:Date.now(), text:note.trim(), date, done:false}]);
@@ -26,14 +31,20 @@ export function NotifDropdown({s, onClose, ipad=false}) {
       ? <div className="m-rem-empty">You're all caught up — no new notifications.</div>
       : s.notifs.map(n=>{
         const Ic = {amber:AlertTriangle, green:Check, blue:Info}[n.type] || Info;
-        return <div key={n.title} className={`m-notif m-notif-${n.type}`}>
+        const done = accepted.includes(n.title);
+        return <div key={n.title} className={`m-notif m-notif-${n.type} ${done?"m-notif-done":""}`}>
           <Ic size={16} className="m-notif-ic"/>
           <div className="m-notif-body">
             <b>{n.title}</b>
             <span>{n.desc}</span>
-            <button className="m-notif-action" onClick={()=>{ s.setTab(n.nav); onClose(); }}>{n.action}</button>
+            {done
+              ? <span className="m-notif-acked"><Check size={13}/> Accepted</span>
+              : <div className="m-notif-btns">
+                  <button className="m-notif-accept" onClick={()=>accept(n)}><Check size={13}/> Accept</button>
+                  <button className="m-notif-action" onClick={()=>{ s.setTab(n.nav); onClose(); }}>{n.action}</button>
+                </div>}
           </div>
-          <button className="m-notif-x" onClick={()=>s.setNotifs(list=>list.filter(x=>x!==n))} aria-label={`Dismiss ${n.title}`}><X size={13}/></button>
+          {!done && <button className="m-notif-x" onClick={()=>s.setNotifs(list=>list.filter(x=>x!==n))} aria-label={`Dismiss ${n.title}`}><X size={13}/></button>}
         </div>;
       }))}
     {tab==="reminders" && <>
