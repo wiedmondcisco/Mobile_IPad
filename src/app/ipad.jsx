@@ -30,14 +30,11 @@ export function IPadHeader({title, sub, s, right}) {
   </div>;
 }
 
-export function IPadFrame({s, landscape=false}) {
+/* The tablet screen's contents — sidebar, active page, popup host. Shared by
+   the framed demo (IPadFrame) and the bare tablet/desktop build (BareIPad). */
+export function IPadShell({s, onScroll}) {
   const team = s.viewMode === "team";
-  const [urlMini, setUrlMini, onScroll] = useUrlBarCollapse();
-  return <div className={`i-device ${landscape?"land":""}`}>
-    <span className="i-cam"/>
-    <div className="i-screen" style={{"--isafari-h": urlMini ? "26px" : "53px"}}>
-      <IPadStatusBar/>
-      <IPadSafariBar mini={urlMini} onExpand={()=>setUrlMini(false)}/>
+  return <>
       <div className="i-shell">
         <aside className={`i-sidebar ${s.sideCollapsed?"closed":""}`}>
           <div className="i-brand">
@@ -86,6 +83,30 @@ export function IPadFrame({s, landscape=false}) {
         </main>
       </div>
       <FramePopups s={s} variant="ipad"/>
+  </>;
+}
+
+/* Framed demo — the tablet app inside an iPad mockup (bezel, status bar,
+   Safari chrome). Reached via ?frame. */
+export function IPadFrame({s, landscape=false}) {
+  const [urlMini, setUrlMini, onScroll] = useUrlBarCollapse();
+  return <div className={`i-device ${landscape?"land":""}`}>
+    <span className="i-cam"/>
+    <div className="i-screen" style={{"--isafari-h": urlMini ? "26px" : "53px"}}>
+      <IPadStatusBar/>
+      <IPadSafariBar mini={urlMini} onExpand={()=>setUrlMini(false)}/>
+      <IPadShell s={s} onScroll={onScroll}/>
+    </div>
+  </div>;
+}
+
+/* Bare tablet/desktop build — sidebar layout full-bleed in the real viewport.
+   Keeps the .i-device/.land class hooks so orientation-scoped layout rules
+   apply; the bezel itself is stripped by the .bare-ipad overrides. */
+export function BareIPad({s, landscape=false}) {
+  return <div className={`i-device bare-ipad ${landscape?"land":""}`}>
+    <div className="i-screen bare-iscreen">
+      <IPadShell s={s}/>
     </div>
   </div>;
 }
